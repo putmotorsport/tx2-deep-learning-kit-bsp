@@ -1,28 +1,39 @@
 /*
- * Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 
-#include "gk20a/gk20a.h"
+#include <nvgpu/pmu.h>
+#include <nvgpu/pmuif/nvgpu_gpmu_cmdif.h>
+#include <nvgpu/gk20a.h>
+
 #include "boardobj/boardobjgrp.h"
 #include "boardobj/boardobjgrp_e32.h"
-#include "gm206/bios_gm206.h"
+#include "gp106/bios_gp106.h"
 #include "ctrl/ctrlvolt.h"
 #include "ctrl/ctrlperf.h"
-#include "gk20a/pmu_gk20a.h"
 
 #include "volt.h"
-#include <nvgpu/pmuif/nvgpu_gpmu_cmdif.h>
 
-#define RAIL_COUNT 2
+#define RAIL_COUNT_GP 2
+#define RAIL_COUNT_GV 1
 
 struct volt_rpc_pmucmdhandler_params {
 	struct nv_pmu_volt_rpc *prpc_call;
@@ -35,28 +46,34 @@ static void volt_rpc_pmucmdhandler(struct gk20a *g, struct pmu_msg *msg,
 	struct volt_rpc_pmucmdhandler_params *phandlerparams =
 		(struct volt_rpc_pmucmdhandler_params *)param;
 
-	gk20a_dbg_info("");
+	nvgpu_log_info(g, " ");
 
 	if (msg->msg.volt.msg_type != NV_PMU_VOLT_MSG_ID_RPC) {
-		gk20a_err(dev_from_gk20a(g), "unsupported msg for VOLT RPC %x",
+		nvgpu_err(g, "unsupported msg for VOLT RPC %x",
 			msg->msg.volt.msg_type);
 		return;
 	}
 
-	if (phandlerparams->prpc_call->b_supported)
+	if (phandlerparams->prpc_call->b_supported) {
 		phandlerparams->success = 1;
+	}
 }
 
 
 static u32 volt_pmu_rpc_execute(struct gk20a *g,
 	struct nv_pmu_volt_rpc *prpc_call)
 {
-	struct pmu_cmd cmd = { { 0 } };
-	struct pmu_msg msg = { { 0 } };
-	struct pmu_payload payload = { { 0 } };
+	struct pmu_cmd cmd;
+	struct pmu_msg msg;
+	struct pmu_payload payload;
 	u32 status = 0;
 	u32 seqdesc;
-	struct volt_rpc_pmucmdhandler_params handler = {0};
+	struct volt_rpc_pmucmdhandler_params handler;
+
+	memset(&payload, 0, sizeof(struct pmu_payload));
+	memset(&cmd, 0, sizeof(struct pmu_cmd));
+	memset(&msg, 0, sizeof(struct pmu_msg));
+	memset(&handler, 0, sizeof(struct volt_rpc_pmucmdhandler_params));
 
 	cmd.hdr.unit_id = PMU_UNIT_VOLT;
 	cmd.hdr.size = (u32)sizeof(struct nv_pmu_volt_cmd) +
@@ -77,12 +94,12 @@ static u32 volt_pmu_rpc_execute(struct gk20a *g,
 	handler.prpc_call = prpc_call;
 	handler.success = 0;
 
-	status = gk20a_pmu_cmd_post(g, &cmd, NULL, &payload,
+	status = nvgpu_pmu_cmd_post(g, &cmd, NULL, &payload,
 			PMU_COMMAND_QUEUE_LPQ,
 			volt_rpc_pmucmdhandler, (void *)&handler,
 			&seqdesc, ~0);
 	if (status) {
-		gk20a_err(dev_from_gk20a(g), "unable to post volt RPC cmd %x",
+		nvgpu_err(g, "unable to post volt RPC cmd %x",
 			cmd.cmd.volt.cmd_type);
 		goto volt_pmu_rpc_execute;
 	}
@@ -91,16 +108,16 @@ static u32 volt_pmu_rpc_execute(struct gk20a *g,
 			gk20a_get_gr_idle_timeout(g),
 			&handler.success, 1);
 
-	if (handler.success == 0) {
+	if (handler.success == 0U) {
 		status = -EINVAL;
-		gk20a_err(dev_from_gk20a(g), "rpc call to volt failed");
+		nvgpu_err(g, "rpc call to volt failed");
 	}
 
 volt_pmu_rpc_execute:
 	return status;
 }
 
-u32 volt_pmu_send_load_cmd_to_pmu(struct gk20a *g)
+u32 nvgpu_volt_send_load_cmd_to_pmu_gp10x(struct gk20a *g)
 {
 	struct nv_pmu_volt_rpc rpc_call = { 0 };
 	u32 status = 0;
@@ -108,15 +125,32 @@ u32 volt_pmu_send_load_cmd_to_pmu(struct gk20a *g)
 	rpc_call.function = NV_PMU_VOLT_RPC_ID_LOAD;
 
 	status =  volt_pmu_rpc_execute(g, &rpc_call);
-	if (status)
-		gk20a_err(dev_from_gk20a(g),
+	if (status) {
+		nvgpu_err(g,
 			"Error while executing LOAD RPC: status = 0x%08x.",
 			status);
+	}
 
 	return status;
 }
 
-static u32 volt_rail_get_voltage(struct gk20a *g,
+u32 nvgpu_volt_send_load_cmd_to_pmu_gv10x(struct gk20a *g)
+{
+	struct nvgpu_pmu *pmu = &g->pmu;
+	struct nv_pmu_rpc_struct_volt_load rpc;
+	u32 status = 0;
+
+	memset(&rpc, 0, sizeof(struct nv_pmu_rpc_struct_volt_load));
+	PMU_RPC_EXECUTE(status, pmu, VOLT, LOAD, &rpc, 0);
+	if (status) {
+		nvgpu_err(g, "Failed to execute RPC status=0x%x",
+			status);
+	}
+
+	return status;
+}
+
+u32 nvgpu_volt_rail_get_voltage_gp10x(struct gk20a *g,
 	u8 volt_domain, u32 *pvoltage_uv)
 {
 	struct nv_pmu_volt_rpc rpc_call = { 0 };
@@ -126,7 +160,7 @@ static u32 volt_rail_get_voltage(struct gk20a *g,
 	rail_idx = volt_rail_volt_domain_convert_to_idx(g, volt_domain);
 	if ((rail_idx == CTRL_VOLT_RAIL_INDEX_INVALID) ||
 		(!VOLT_RAIL_INDEX_IS_VALID(&g->perf_pmu.volt, rail_idx))) {
-		gk20a_err(dev_from_gk20a(g),
+		nvgpu_err(g,
 			"failed: volt_domain = %d, voltage rail table = %d.",
 			volt_domain, rail_idx);
 		return -EINVAL;
@@ -139,7 +173,7 @@ static u32 volt_rail_get_voltage(struct gk20a *g,
 	/* Execute the voltage get request via PMU RPC. */
 	status = volt_pmu_rpc_execute(g, &rpc_call);
 	if (status) {
-		gk20a_err(dev_from_gk20a(g),
+		nvgpu_err(g,
 			"Error while executing volt_rail_get_voltage rpc");
 		return status;
 	}
@@ -150,6 +184,37 @@ static u32 volt_rail_get_voltage(struct gk20a *g,
 	return status;
 }
 
+u32 nvgpu_volt_rail_get_voltage_gv10x(struct gk20a *g,
+	u8 volt_domain, u32 *pvoltage_uv)
+{
+	struct nvgpu_pmu *pmu = &g->pmu;
+	struct nv_pmu_rpc_struct_volt_volt_rail_get_voltage rpc;
+	u32 status  = 0;
+	u8 rail_idx;
+
+	rail_idx = volt_rail_volt_domain_convert_to_idx(g, volt_domain);
+	if ((rail_idx == CTRL_VOLT_RAIL_INDEX_INVALID) ||
+		(!VOLT_RAIL_INDEX_IS_VALID(&g->perf_pmu.volt, rail_idx))) {
+		nvgpu_err(g,
+			"failed: volt_domain = %d, voltage rail table = %d.",
+			volt_domain, rail_idx);
+		return -EINVAL;
+	}
+
+	memset(&rpc, 0,
+		sizeof(struct nv_pmu_rpc_struct_volt_volt_rail_get_voltage));
+	rpc.rail_idx = rail_idx;
+
+	PMU_RPC_EXECUTE_CPB(status, pmu, VOLT, VOLT_RAIL_GET_VOLTAGE, &rpc, 0);
+	if (status) {
+		nvgpu_err(g, "Failed to execute RPC status=0x%x",
+			status);
+	}
+
+	*pvoltage_uv = rpc.voltage_uv;
+
+	return status;
+}
 
 static u32 volt_policy_set_voltage(struct gk20a *g, u8 client_id,
 		struct ctrl_perf_volt_rail_list *prail_list)
@@ -166,11 +231,10 @@ static u32 volt_policy_set_voltage(struct gk20a *g, u8 client_id,
 				CTRL_VOLT_DOMAIN_INVALID) ||
 			(prail_list->rails[i].voltage_uv ==
 				NV_PMU_VOLT_VALUE_0V_IN_UV)) {
-			gk20a_err(dev_from_gk20a(g), "Invalid voltage domain or target ");
-			gk20a_err(dev_from_gk20a(g), " client_id = %d, listEntry = %d ",
+			nvgpu_err(g, "Invalid voltage domain or target");
+			nvgpu_err(g, " client_id = %d, listEntry = %d",
 					client_id, i);
-			gk20a_err(dev_from_gk20a(g),
-				"volt_domain = %d, voltage_uv = %d uV.",
+			nvgpu_err(g, " volt_domain = %d, voltage_uv = %d uV.",
 				prail_list->rails[i].volt_domain,
 				prail_list->rails[i].voltage_uv);
 			status = -EINVAL;
@@ -179,9 +243,10 @@ static u32 volt_policy_set_voltage(struct gk20a *g, u8 client_id,
 	}
 
 	/* Convert the client ID to index. */
-	if (client_id == CTRL_VOLT_POLICY_CLIENT_PERF_CORE_VF_SEQ)
+	if (client_id == CTRL_VOLT_POLICY_CLIENT_PERF_CORE_VF_SEQ) {
 		policy_idx =
 			pvolt->volt_policy_metadata.perf_core_vf_seq_policy_idx;
+	}
 	else {
 		status = -EINVAL;
 		goto exit;
@@ -195,20 +260,61 @@ static u32 volt_policy_set_voltage(struct gk20a *g, u8 client_id,
 
 	/* Execute the voltage change request via PMU RPC. */
 	status = volt_pmu_rpc_execute(g, &rpc_call);
-	if (status)
-		gk20a_err(dev_from_gk20a(g),
+	if (status) {
+		nvgpu_err(g,
 			"Error while executing VOLT_POLICY_SET_VOLTAGE RPC");
+	}
 
 exit:
 	return status;
 }
 
-u32 volt_set_voltage(struct gk20a *g, u32 logic_voltage_uv, u32 sram_voltage_uv)
+static u32 volt_set_voltage_gv10x_rpc(struct gk20a *g, u8 client_id,
+		struct ctrl_volt_volt_rail_list_v1 *prail_list)
 {
-	u32 status = 0;
+	struct nvgpu_pmu *pmu = &g->pmu;
+	struct nv_pmu_rpc_struct_volt_volt_set_voltage rpc;
+	int status = 0;
+
+	memset(&rpc, 0, sizeof(struct nv_pmu_rpc_struct_volt_volt_set_voltage));
+	rpc.client_id = 0x1;
+	rpc.rail_list = *prail_list;
+
+	PMU_RPC_EXECUTE_CPB(status, pmu, VOLT, VOLT_SET_VOLTAGE, &rpc, 0);
+	if (status) {
+		nvgpu_err(g, "Failed to execute RPC status=0x%x",
+			status);
+	}
+
+	return status;
+}
+
+u32 nvgpu_volt_set_voltage_gv10x(struct gk20a *g, u32 logic_voltage_uv,
+		u32 sram_voltage_uv)
+{
+	int status = 0;
+	struct ctrl_volt_volt_rail_list_v1 rail_list = { 0 };
+
+	rail_list.num_rails = RAIL_COUNT_GV;
+	rail_list.rails[0].rail_idx =
+		volt_rail_volt_domain_convert_to_idx(g,
+			CTRL_VOLT_DOMAIN_LOGIC);
+	rail_list.rails[0].voltage_uv = logic_voltage_uv;
+	rail_list.rails[0].voltage_min_noise_unaware_uv = logic_voltage_uv;
+
+	status = volt_set_voltage_gv10x_rpc(g,
+		CTRL_VOLT_POLICY_CLIENT_PERF_CORE_VF_SEQ, &rail_list);
+
+	return status;
+}
+
+u32 nvgpu_volt_set_voltage_gp10x(struct gk20a *g, u32 logic_voltage_uv,
+		u32 sram_voltage_uv)
+{
+	int status = 0;
 	struct ctrl_perf_volt_rail_list rail_list = { 0 };
 
-	rail_list.num_rails = RAIL_COUNT;
+	rail_list.num_rails = RAIL_COUNT_GP;
 	rail_list.rails[0].volt_domain = CTRL_VOLT_DOMAIN_LOGIC;
 	rail_list.rails[0].voltage_uv = logic_voltage_uv;
 	rail_list.rails[0].voltage_min_noise_unaware_uv = logic_voltage_uv;
@@ -220,12 +326,18 @@ u32 volt_set_voltage(struct gk20a *g, u32 logic_voltage_uv, u32 sram_voltage_uv)
 		CTRL_VOLT_POLICY_CLIENT_PERF_CORE_VF_SEQ, &rail_list);
 
 	return status;
+}
 
+u32 volt_set_voltage(struct gk20a *g, u32 logic_voltage_uv, u32 sram_voltage_uv)
+{
+	return g->ops.pmu_ver.volt.volt_set_voltage(g,
+		logic_voltage_uv, sram_voltage_uv);
 }
 
 u32 volt_get_voltage(struct gk20a *g, u32 volt_domain, u32 *voltage_uv)
 {
-	return volt_rail_get_voltage(g, volt_domain, voltage_uv);
+	return g->ops.pmu_ver.volt.volt_get_voltage(g,
+		volt_domain, voltage_uv);
 }
 
 static int volt_policy_set_noiseaware_vmin(struct gk20a *g,
@@ -244,7 +356,7 @@ static int volt_policy_set_noiseaware_vmin(struct gk20a *g,
 	/* Execute the voltage change request via PMU RPC. */
 	status = volt_pmu_rpc_execute(g, &rpc_call);
 	if (status) {
-		gk20a_err(dev_from_gk20a(g),
+		nvgpu_err(g,
 			"Error while executing VOLT_POLICY_SET_VOLTAGE RPC");
 		return -EINVAL;
 	}
@@ -258,7 +370,7 @@ int volt_set_noiseaware_vmin(struct gk20a *g, u32 logic_voltage_uv,
 	int status = 0;
 	struct ctrl_volt_volt_rail_list rail_list = { 0 };
 
-	rail_list.num_rails = RAIL_COUNT;
+	rail_list.num_rails = RAIL_COUNT_GP;
 	rail_list.rails[0].rail_idx = 0;
 	rail_list.rails[0].voltage_uv = logic_voltage_uv;
 	rail_list.rails[1].rail_idx = 1;

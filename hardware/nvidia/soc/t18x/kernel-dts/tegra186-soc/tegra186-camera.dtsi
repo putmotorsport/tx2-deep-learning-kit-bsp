@@ -35,13 +35,18 @@
 		reg-names = "sce-evp", "sce-pm", "sce-cfg",
 				"ast-cpu", "ast-dma";
 
-		#stream-id-cells = <1>;
+		iommus = <&smmu TEGRA_SID_RCE>;
+		iommu-resv-regions = <0x0 0x0 0x0 0xA0000000 0x0 0xc0000000 0xffffffff 0xffffffff>;
 
 		clocks =
 			<&tegra_car TEGRA186_CLK_SCE_APB>,
-			<&tegra_car TEGRA186_CLK_SCE_CPU_NIC>,
-			<&tegra_car TEGRA186_CLK_SCE_NIC>;
-		clock-names = "sce-apb", "sce-cpu-nic", "sce-nic";
+			<&tegra_car TEGRA186_CLK_SCE_CPU_NIC>;
+		clock-names = "sce-apb", "sce-cpu-nic";
+
+		nvidia,clock-rates =
+			<102000000 102000000>,
+			<115200000 473600000>;
+
 		resets =
 			<&tegra_car TEGRA186_RESET_TSCTNSCE>,
 			<&tegra_car TEGRA186_RESET_SCE_PM>,
@@ -68,11 +73,31 @@
 			"sce-nreset",
 			"sce-nsysporeset";
 
+		nvidia,reset-group-1 =
+			"tsctnsce",
+			"sce-pm",
+			"sce-dbgresetn",
+			"sce-presetdbgn",
+			"sce-actmon",
+			"sce-dma",
+			"sce-tke",
+			"sce-gte",
+			"sce-cfg";
+
+		nvidia,reset-group-2 =
+			"sce-nreset",
+			"sce-nsysporeset";
+
+		/* Max EMC bandwidth used during initializing SCE */
+		nvidia,memory-bw = <0xffffffff>;
+
 		interrupts = <0 16 0x4>;
 		interrupt-names = "wdt-remote";
 
-		nvidia,trace = <&tegra_rtcpu_trace 4 0x70100000 0x100000>;
+		nvidia,trace = <&tegra_rtcpu_sce_trace 4 0x70100000 0x100000>;
 		nvidia,ivc-channels = <&tegra_sce_ivc 2 0x90000000 0x10000>;
+
+		nvidia,autosuspend-delay-ms = <5000>;
 
 		hsp {
 			compatible = "nvidia,tegra186-hsp-mailbox";
@@ -81,35 +106,43 @@
 		};
 	};
 
-	tegra_sce_ivc: sce-ivc-channels {
-		#address-cells = <1>;
-		#size-cells = <0>;
+	tegra_rtcpu_sce_trace: tegra-rtcpu-sce-trace {
+		nvidia,enable-printk;
+		nvidia,interval-ms = <50>;
+		nvidia,log-prefix = "[SCE]";
+	};
 
+	tegra_sce_ivc: sce-ivc-channels {
 		echo@0 {
-			compatible = "nvidia,tegra186-camera-ivc-protocol-echo";
-			reg = <0x0000>, <0x8000>;
-			reg-names = "rx", "tx";
+			compatible = "nvidia,tegra-ivc-cdev";
+			nvidia,devname = "camchar-echo";
 			nvidia,service = "echo";
 			nvidia,version = <0>;
 			nvidia,group = <1>;
 			nvidia,frame-count = <16>;
 			nvidia,frame-size = <64>;
 		};
+		i2c@480 {
+			compatible = "nvidia,tegra186-camera-ivc-rpc-i2c-single";
+			nvidia,service = "i2c-single";
+			nvidia,version = <0>;
+			nvidia,group = <1>;
+			nvidia,frame-count = <8>;
+			nvidia,frame-size = <128>;
+			device = <&cam_i2c>;
+		    status = "disabled";
+		};
 		vinotify@12c0 {
 			compatible = "nvidia,tegra186-camera-ivc-protocol-vinotify";
-			reg = <0x012C0>, <0x92C0>;
-			reg-names = "rx", "tx";
 			nvidia,service = "vinotify";
 			nvidia,version = <0>;
 			nvidia,group = <1>;
-			nvidia,frame-count = <63>;
+			nvidia,frame-count = <64>;
 			nvidia,frame-size = <128>;
 			device = <&tegra_vi>;
 		};
 		mods@32c0 {
 			compatible = "nvidia,tegra186-camera-ivc-protocol-mods";
-			reg = <0x032C0>, <0xB2C0>;
-			reg-names = "rx", "tx";
 			nvidia,service = "mods";
 			nvidia,version = <0>;
 			nvidia,group = <1>;
@@ -133,9 +166,8 @@
 			nvidia,frame-size = <64>;
 		};
 		dbg@7c00 {
-			compatible = "nvidia,tegra186-camera-ivc-protocol-dbg";
-			reg = <0x7C00>, <0xFC00>;
-			reg-names = "rx", "tx";
+			compatible = "nvidia,tegra-ivc-cdev";
+			nvidia,devname = "camchar-dbg";
 			nvidia,service = "debug";
 			nvidia,version = <0>;
 			nvidia,group = <1>;
@@ -144,27 +176,33 @@
 		};
 		dbg@7e00 {
 			compatible = "nvidia,tegra186-camera-ivc-protocol-debug";
-			reg = <0x7E00>, <0xFE00>;
-			reg-names = "rx", "tx";
 			nvidia,service = "debug";
 			nvidia,version = <0>;
 			nvidia,group = <1>;
 			nvidia,frame-count = <1>;
-			nvidia,frame-size = <384>;
+			nvidia,frame-size = <8192>;
+			nvidia,ivc-timeout = <50>;
+			nvidia,test-timeout = <5000>;
 		};
 	};
 
+#if TEGRA_AUDIO_BUS_DT_VERSION >= DT_VERSION_2
+	aconnect@2a41000 {
+#endif
 	tegra_ape: rtcpu@2993000 {
 		compatible = "nvidia,tegra186-ape-ivc";
 		status = "disabled";
 
+#if TEGRA_POWER_DOMAIN_DT_VERSION <= DT_VERSION_1
 		power-domains = <&ape_pd>;
+#endif
 		reg =	<0 0x02993000 0 0x1000>, /* APE EVP */
 			<0 0x02990000 0 0x0800>, /* AMISC */
 			<0 0x02994000 0 0x2000>; /* ACAST */
 		reg-names = "ape-evp", "ape-amisc", "ast-cpu";
 
-		#stream-id-cells = <1>;
+		iommus = <&smmu TEGRA_SID_APE_CAM>;
+		iommu-group-id = <TEGRA_IOMMU_GROUP_RTCPU>;
 
 		clocks =
 			<&tegra_car TEGRA186_CLK_APE>,
@@ -206,24 +244,35 @@
 
 		interrupt-names = "adsp-wfi", "adsp-wfe", "wdt-remote";
 
-		nvidia,trace = <&tegra_rtcpu_trace 4 0x40200000 0x80000>;
+		nvidia,trace = <&tegra_rtcpu_ape_trace 4 0x40200000 0x80000>;
 		nvidia,ivc-channels = <&tegra_ape_ivc 2 0x40000000 0x10000>;
+
+		nvidia,autosuspend-delay-ms = <5000>;
 
 		hsp {
 			compatible = "nvidia,tegra186-hsp-mailbox";
+#if TEGRA_HSP_DT_VERSION >= DT_VERSION_2
+			device = <&ape_hsp>;
+#endif
 			nvidia,hsp-shared-mailbox = <&ape_hsp 1 &ape_hsp 6>;
 			nvidia,hsp-shared-mailbox-names = "ivc-pair", "cmd-pair";
 		};
 	};
 
-	tegra_ape_ivc: ape-ivc-channels {
-		#address-cells = <1>;
-		#size-cells = <0>;
+#if TEGRA_AUDIO_BUS_DT_VERSION >= DT_VERSION_2
+	};
+#endif
 
+	tegra_rtcpu_ape_trace: tegra-rtcpu-ape-trace {
+		nvidia,enable-printk;
+		nvidia,interval-ms = <50>;
+		nvidia,log-prefix = "[APE]";
+	};
+
+	tegra_ape_ivc: ape-ivc-channels {
 		echo@0 {
-			compatible = "nvidia,tegra186-camera-ivc-protocol-echo";
-			reg = <0x0000>, <0x8000>;
-			reg-names = "rx", "tx";
+			compatible = "nvidia,tegra-ivc-cdev";
+			nvidia,devname = "camchar-echo";
 			nvidia,service = "echo";
 			nvidia,version = <0>;
 			nvidia,group = <1>;
@@ -232,12 +281,10 @@
 		};
 		vinotify@12c0 {
 			compatible = "nvidia,tegra186-camera-ivc-protocol-vinotify";
-			reg = <0x012C0>, <0x92C0>;
-			reg-names = "rx", "tx";
 			nvidia,service = "vinotify";
 			nvidia,version = <0>;
 			nvidia,group = <1>;
-			nvidia,frame-count = <63>;
+			nvidia,frame-count = <64>;
 			nvidia,frame-size = <128>;
 			device = <&tegra_vi>;
 		};
@@ -258,9 +305,8 @@
 			nvidia,frame-size = <64>;
 		};
 		dbg@7c00 {
-			compatible = "nvidia,tegra186-camera-ivc-protocol-dbg";
-			reg = <0x7C00>, <0xFC00>;
-			reg-names = "rx", "tx";
+			compatible = "nvidia,tegra-ivc-cdev";
+			nvidia,devname = "camchar-dbg";
 			nvidia,service = "debug";
 			nvidia,version = <0>;
 			nvidia,group = <1>;
@@ -269,17 +315,13 @@
 		};
 		dbg@7e00 {
 			compatible = "nvidia,tegra186-camera-ivc-protocol-debug";
-			reg = <0x7E00>, <0xFE00>;
-			reg-names = "rx", "tx";
 			nvidia,service = "debug";
 			nvidia,version = <0>;
 			nvidia,group = <1>;
 			nvidia,frame-count = <1>;
-			nvidia,frame-size = <384>;
+			nvidia,frame-size = <8192>;
+			nvidia,ivc-timeout = <50>;
+			nvidia,test-timeout = <5000>;
 		};
-	};
-
-	tegra_rtcpu_trace:tegra-rtcpu-trace {
-		nvidia,interval-ms = <50>;
 	};
 };

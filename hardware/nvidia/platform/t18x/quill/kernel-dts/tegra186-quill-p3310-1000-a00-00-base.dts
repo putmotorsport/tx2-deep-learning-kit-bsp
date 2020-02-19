@@ -1,7 +1,7 @@
 /*
  * tegra186-quill-p3310-a00-00-base.dts Quill A00 Board
  *
- * Copyright (c) 2015-2017, NVIDIA CORPORATION. All rights reserved.
+ * Copyright (c) 2015-2019, NVIDIA CORPORATION. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,6 +15,7 @@
 
 #include <t18x-common-platforms/tegra186-quill-common-p3310-1000-a00.dtsi>
 #include <t18x-common-platforms/tegra186-quill-power-tree-p3310-1000-a00-00.dtsi>
+#include <t18x-common-platforms/tegra186-quill-camera-modules.dtsi>
 #include <t18x-common-modules/tegra186-display-e3320-1000-a00.dtsi>
 
 /* comms dtsi file should be included after gpio dtsi file */
@@ -23,27 +24,54 @@
 #include <t18x-common-modules/tegra186-super-module-e2614-p2597-1000-a00.dtsi>
 #include <t18x-common-plugin-manager/tegra186-quill-display-plugin-manager.dtsi>
 #include <t18x-common-prod/tegra186-priv-quill-p3310-1000-a00-prod.dtsi>
-#include <t18x-common-platforms/tegra186-quill-camera-ov5640.dtsi>
-#include <dt-bindings/linux/driver-info.h>
+#include <t18x-common-plugin-manager/tegra186-quill-camera-plugin-manager.dtsi>
 
 / {
 	model = "quill";
-	compatible = "nvidia,quill", "nvidia,tegra186";
+	compatible = "nvidia,quill", "nvidia,p2597-0000+p3310-1000", "nvidia,tegra186";
 
 	nvidia,dtsfilename = __FILE__;
 	nvidia,boardids = "3310:0000:A0";
 	nvidia,proc-boardid = "3310:0000:A0";
+	nvidia,fastboot-usb-vid = <0x0955>;
+	nvidia,fastboot-usb-pid = <0xee16>;
 
 	chosen {
 		board-has-eeprom;
+#if TEGRA_BOOTARGUMENT_VERSION >= DT_VERSION_2
+		bootargs ="console=ttyS0,115200 androidboot.presilicon=true firmware_class.path=/etc/firmware";
+#else
 		bootargs ="console=ttyS0,115200";
+#endif
 		stdout-path = &uarta;
+		nvidia,tegra-joint_xpu_rail;
 	};
 
 	firmware {
 		android {
 			compatible = "android,firmware";
 			hardware = "quill";
+			vbmeta {
+				compatible = "android,vbmeta";
+				parts = "vbmeta,kernel,kernel-dtb,kernel-dtbo,APP,vendor,SOS";
+			};
+			fstab {
+				compatible = "android,fstab";
+				vendor {
+					compatible = "android,vendor";
+					dev = "/dev/block/platform/3460000.sdhci/by-name/vendor";
+					type = "ext4";
+					mnt_flags = "ro";
+					fsmgr_flags = "wait,avb";
+				};
+				odm {
+					compatible = "android,odm";
+					dev = "/dev/block/platform/3460000.sdhci/by-name/odm";
+					type = "ext4";
+					mnt_flags = "ro";
+					fsmgr_flags = "wait,avb";
+				};
+			};
 		};
 	};
 
@@ -64,13 +92,40 @@
 		phy-names = "otg-usb2";
 	};
 
+#if TEGRA_XUSB_PADCONTROL_VERSION >= DT_VERSION_2
+	xudc@3550000 {
+		status = "okay";
+		phys = <&{/xusb_padctl@3520000/pads/usb2/lanes/usb2-0}>;
+		phy-names = "usb2";
+		nvidia,boost-cpu-freq = <1200>;
+	};
+
+	usb_cd {
+		status = "okay";
+		phys = <&{/xusb_padctl@3520000/pads/usb2/lanes/usb2-0}>;
+		phy-names = "otg-phy";
+		nvidia,xusb-padctl = <&xusb_padctl>;
+	};
+#else
 	xudc@3550000 {
 		status = "okay";
 		phys = <&tegra_xusb_padctl TEGRA_PADCTL_PHY_UTMI_P(0)>;
 		phy-names = "usb2";
 		emc-frequency = <150000000>;
+		nvidia,boost-cpu-freq = <1200>;
 	};
+#endif
 
+#if TEGRA_XUSB_PADCONTROL_VERSION >= DT_VERSION_2
+	xhci@3530000 {
+		status = "okay";
+		phys = <&{/xusb_padctl@3520000/pads/usb2/lanes/usb2-0}>,
+			<&{/xusb_padctl@3520000/pads/usb2/lanes/usb2-1}>,
+			<&{/xusb_padctl@3520000/pads/usb2/lanes/usb2-2}>,
+			<&{/xusb_padctl@3520000/pads/usb3/lanes/usb3-1}>;
+		phy-names = "usb2-0", "usb2-1", "usb2-2", "usb3-1";
+	};
+#else
 	xhci@3530000 {
 		status = "okay";
 		phys = <&tegra_xusb_padctl TEGRA_PADCTL_PHY_UTMI_P(0)>,
@@ -79,7 +134,84 @@
 		phy-names = "utmi-0", "utmi-1", "usb3-1";
 		nvidia,boost_cpu_freq = <800>;
 	};
+#endif
 
+#if TEGRA_XUSB_PADCONTROL_VERSION >= DT_VERSION_2
+	xusb_padctl@3520000 {
+		status = "okay";
+		pinctrl-0 = <&vbus_en0_default_state>;
+		pinctrl-1 = <&vbus_en1_default_state>;
+		pinctrl-2 = <&vbus_en0_sfio_tristate_state>;
+		pinctrl-3 = <&vbus_en1_sfio_tristate_state>;
+		pinctrl-4 = <&vbus_en0_sfio_passthrough_state>;
+		pinctrl-5 = <&vbus_en1_sfio_passthrough_state>;
+		pinctrl-names = "vbus_en0_default", "vbus_en1_default",
+			"vbus_en0_sfio_tristate", "vbus_en1_sfio_tristate",
+			"vbus_en0_sfio_passthrough", "vbus_en1_sfio_passthrough";
+
+		pads {
+			usb2 {
+				lanes {
+					usb2-0 {
+						nvidia,function = "xusb";
+						status = "okay";
+					};
+					usb2-1 {
+						nvidia,function = "xusb";
+						status = "okay";
+					};
+					usb2-2 {
+						nvidia,function = "xusb";
+						status = "okay";
+					};
+				};
+			};
+			usb3 {
+				lanes {
+					usb3-0 {
+						nvidia,function = "xusb";
+						status = "okay";
+					};
+					usb3-1 {
+						nvidia,function = "xusb";
+						status = "okay";
+					};
+					usb3-2 {
+						nvidia,function = "xusb";
+						status = "okay";
+					};
+				};
+			};
+		};
+
+		ports {
+			usb2-0 {
+				status = "okay";
+				mode = "otg";
+				vbus-supply = <&vdd_usb0_5v>;
+				nvidia,oc-pin = <0>;
+			};
+			usb2-1 {
+				status = "okay";
+				mode = "host";
+				vbus-supply = <&vdd_usb1_5v>;
+				nvidia,oc-pin = <1>;
+			};
+			usb2-2 {
+				status = "okay";
+				mode = "host";
+				vbus-supply = <&vdd_usb2_5v>;
+			};
+			usb3-0 {
+				nvidia,usb2-companion = <2>;
+			};
+			usb3-1 {
+				nvidia,usb2-companion = <1>;
+				status = "okay";
+			};
+		};
+	};
+#endif
 	pinctrl@3520000 {
 		status = "okay";
 		pinctrl-0 = <&tegra_xusb_padctl_pinmux_default>;
@@ -180,6 +312,7 @@
 
 		sor1 {
 			status = "okay";
+			nvidia,active-panel = <&sor1_hdmi_display>;
 			hdmi-display {
 				status = "okay";
 			};
@@ -197,25 +330,11 @@
 		};
 	};
 
-        mttcan@c310000 {
-                status = "okay";
-                gpio_can_stb = <&tegra_aon_gpio TEGRA_AON_GPIO(AA, 0) GPIO_ACTIVE_HIGH>;
-                gpio_can_en = <&tegra_aon_gpio TEGRA_AON_GPIO(AA, 1) GPIO_ACTIVE_HIGH>;
-                mram-params = <0 16 16 8 8 8 16 16 16>;
-                tx-config = <8 8 0 64>;
-                rx-config = <64 64 64>;
-        };
-
-        mttcan@c320000 {
-                status = "okay";
-                gpio_can_stb = <&tegra_aon_gpio TEGRA_AON_GPIO(AA, 6) GPIO_ACTIVE_HIGH>;
-                gpio_can_en = <&tegra_aon_gpio TEGRA_AON_GPIO(AA, 7) GPIO_ACTIVE_HIGH>;
-                mram-params = <0 16 16 8 8 8 16 16 16>;
-                tx-config = <8 8 0 64>;
-                rx-config = <64 64 64>;
-        };
+	tegra_udrm: tegra_udrm {
+		compatible = "nvidia,tegra-udrm";
+	};
 };
 
-#ifdef KERNEL_VERSION_4_9
-#include "quill-platforms/tegra186-quill-kernel-4.9.dtsi"
+#if LINUX_VERSION >= 414
+#include <tegra186-linux-4.14.dtsi>
 #endif

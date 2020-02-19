@@ -1,28 +1,43 @@
 /*
- * Copyright (c) 2011-2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2011-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 
 #ifndef NVGPU_ALLOCATOR_H
 #define NVGPU_ALLOCATOR_H
 
-#include <linux/debugfs.h>
+#ifdef __KERNEL__
+/*
+ * The Linux kernel has this notion of seq_files for printing info to userspace.
+ * One of the allocator function pointers takes advantage of this and allows the
+ * debug output to be directed either to nvgpu_log() or a seq_file.
+ */
 #include <linux/seq_file.h>
-#include <linux/platform_device.h>
-#include <nvgpu/lock.h>
+#endif
 
-/* #define ALLOCATOR_DEBUG */
+#include <nvgpu/log.h>
+#include <nvgpu/lock.h>
+#include <nvgpu/list.h>
+#include <nvgpu/types.h>
+
+/* #define ALLOCATOR_DEBUG_FINE */
 
 struct nvgpu_allocator;
 struct nvgpu_alloc_carveout;
@@ -34,6 +49,8 @@ struct gk20a;
  */
 struct nvgpu_allocator_ops {
 	u64  (*alloc)(struct nvgpu_allocator *allocator, u64 len);
+	u64  (*alloc_pte)(struct nvgpu_allocator *allocator, u64 len,
+			  u32 page_size);
 	void (*free)(struct nvgpu_allocator *allocator, u64 addr);
 
 	/*
@@ -66,18 +83,22 @@ struct nvgpu_allocator_ops {
 	u64  (*base)(struct nvgpu_allocator *allocator);
 	u64  (*length)(struct nvgpu_allocator *allocator);
 	u64  (*end)(struct nvgpu_allocator *allocator);
-	int  (*inited)(struct nvgpu_allocator *allocator);
+	bool (*inited)(struct nvgpu_allocator *allocator);
 	u64  (*space)(struct nvgpu_allocator *allocator);
 
 	/* Destructor. */
 	void (*fini)(struct nvgpu_allocator *allocator);
 
+#ifdef __KERNEL__
 	/* Debugging. */
 	void (*print_stats)(struct nvgpu_allocator *allocator,
 			    struct seq_file *s, int lock);
+#endif
 };
 
 struct nvgpu_allocator {
+	struct gk20a *g;
+
 	char name[32];
 	struct nvgpu_mutex lock;
 
@@ -98,14 +119,21 @@ struct nvgpu_alloc_carveout {
 	/*
 	 * For usage by the allocator implementation.
 	 */
-	struct list_head co_entry;
+	struct nvgpu_list_node co_entry;
 };
 
-#define NVGPU_CARVEOUT(__name, __base, __length)	\
-	{						\
-		.name = (__name),			\
-		.base = (__base),			\
-		.length = (__length)			\
+static inline struct nvgpu_alloc_carveout *
+nvgpu_alloc_carveout_from_co_entry(struct nvgpu_list_node *node)
+{
+	return (struct nvgpu_alloc_carveout *)
+	((uintptr_t)node - offsetof(struct nvgpu_alloc_carveout, co_entry));
+};
+
+#define NVGPU_CARVEOUT(local_name, local_base, local_length)	\
+	{							\
+		.name = (local_name),				\
+		.base = (local_base),				\
+		.length = (local_length)			\
 	}
 
 /*
@@ -160,11 +188,11 @@ struct nvgpu_alloc_carveout {
  *     pointing to the allocation base (requires GPU_ALLOC_FORCE_CONTIG to be
  *     set as well).
  */
-#define GPU_ALLOC_GVA_SPACE		0x1
-#define GPU_ALLOC_NO_ALLOC_PAGE		0x2
-#define GPU_ALLOC_4K_VIDMEM_PAGES	0x4
-#define GPU_ALLOC_FORCE_CONTIG		0x8
-#define GPU_ALLOC_NO_SCATTER_GATHER	0x10
+#define GPU_ALLOC_GVA_SPACE		BIT64(0)
+#define GPU_ALLOC_NO_ALLOC_PAGE		BIT64(1)
+#define GPU_ALLOC_4K_VIDMEM_PAGES	BIT64(2)
+#define GPU_ALLOC_FORCE_CONTIG		BIT64(3)
+#define GPU_ALLOC_NO_SCATTER_GATHER	BIT64(4)
 
 static inline void alloc_lock(struct nvgpu_allocator *a)
 {
@@ -179,25 +207,22 @@ static inline void alloc_unlock(struct nvgpu_allocator *a)
 /*
  * Buddy allocator specific initializers.
  */
-int  __nvgpu_buddy_allocator_init(struct gk20a *g, struct nvgpu_allocator *a,
-				  struct vm_gk20a *vm, const char *name,
-				  u64 base, u64 size, u64 blk_size,
-				  u64 max_order, u64 flags);
-int  nvgpu_buddy_allocator_init(struct gk20a *g, struct nvgpu_allocator *a,
-				const char *name, u64 base, u64 size,
-				u64 blk_size, u64 flags);
+int nvgpu_buddy_allocator_init(struct gk20a *g, struct nvgpu_allocator *na,
+			       struct vm_gk20a *vm, const char *name,
+			       u64 base, u64 size, u64 blk_size,
+			       u64 max_order, u64 flags);
 
 /*
  * Bitmap initializers.
  */
-int nvgpu_bitmap_allocator_init(struct gk20a *g, struct nvgpu_allocator *a,
+int nvgpu_bitmap_allocator_init(struct gk20a *g, struct nvgpu_allocator *na,
 				const char *name, u64 base, u64 length,
 				u64 blk_size, u64 flags);
 
 /*
  * Page allocator initializers.
  */
-int nvgpu_page_allocator_init(struct gk20a *g, struct nvgpu_allocator *a,
+int nvgpu_page_allocator_init(struct gk20a *g, struct nvgpu_allocator *na,
 			      const char *name, u64 base, u64 length,
 			      u64 blk_size, u64 flags);
 
@@ -206,16 +231,17 @@ int nvgpu_page_allocator_init(struct gk20a *g, struct nvgpu_allocator *a,
  * Note: This allocator can only allocate fixed-size structures of a
  * pre-defined size.
  */
-int nvgpu_lockless_allocator_init(struct gk20a *g, struct nvgpu_allocator *a,
+int nvgpu_lockless_allocator_init(struct gk20a *g, struct nvgpu_allocator *na,
 				  const char *name, u64 base, u64 length,
 				  u64 struct_size, u64 flags);
 
-#define GPU_BALLOC_MAX_ORDER		31
+#define GPU_BALLOC_MAX_ORDER		31U
 
 /*
  * Allocator APIs.
  */
 u64  nvgpu_alloc(struct nvgpu_allocator *allocator, u64 len);
+u64  nvgpu_alloc_pte(struct nvgpu_allocator *a, u64 len, u32 page_size);
 void nvgpu_free(struct nvgpu_allocator *allocator, u64 addr);
 
 u64  nvgpu_alloc_fixed(struct nvgpu_allocator *allocator, u64 base, u64 len,
@@ -230,23 +256,32 @@ void nvgpu_alloc_release_carveout(struct nvgpu_allocator *a,
 u64  nvgpu_alloc_base(struct nvgpu_allocator *a);
 u64  nvgpu_alloc_length(struct nvgpu_allocator *a);
 u64  nvgpu_alloc_end(struct nvgpu_allocator *a);
-u64  nvgpu_alloc_initialized(struct nvgpu_allocator *a);
+bool nvgpu_alloc_initialized(struct nvgpu_allocator *a);
 u64  nvgpu_alloc_space(struct nvgpu_allocator *a);
 
 void nvgpu_alloc_destroy(struct nvgpu_allocator *allocator);
 
+#ifdef __KERNEL__
 void nvgpu_alloc_print_stats(struct nvgpu_allocator *a,
 			     struct seq_file *s, int lock);
+#endif
 
+static inline struct gk20a *nvgpu_alloc_to_gpu(struct nvgpu_allocator *a)
+{
+	return a->g;
+}
+
+#ifdef CONFIG_DEBUG_FS
 /*
  * Common functionality for the internals of the allocators.
  */
 void nvgpu_init_alloc_debug(struct gk20a *g, struct nvgpu_allocator *a);
 void nvgpu_fini_alloc_debug(struct nvgpu_allocator *a);
+#endif
 
-int  __nvgpu_alloc_common_init(struct nvgpu_allocator *a,
-			       const char *name, void *priv, bool dbg,
-			       const struct nvgpu_allocator_ops *ops);
+int  nvgpu_alloc_common_init(struct nvgpu_allocator *a, struct gk20a *g,
+			     const char *name, void *priv, bool dbg,
+			     const struct nvgpu_allocator_ops *ops);
 
 static inline void nvgpu_alloc_enable_dbg(struct nvgpu_allocator *a)
 {
@@ -261,51 +296,36 @@ static inline void nvgpu_alloc_disable_dbg(struct nvgpu_allocator *a)
 /*
  * Debug stuff.
  */
-extern u32 nvgpu_alloc_tracing_on;
-
-void nvgpu_alloc_debugfs_init(struct device *dev);
-
-#define nvgpu_alloc_trace_func()			\
-	do {						\
-		if (nvgpu_alloc_tracing_on)		\
-			trace_printk("%s\n", __func__);	\
-	} while (0)
-
-#define nvgpu_alloc_trace_func_done()				\
-	do {							\
-		if (nvgpu_alloc_tracing_on)			\
-			trace_printk("%s_done\n", __func__);	\
-	} while (0)
-
+#ifdef __KERNEL__
 #define __alloc_pstat(seq, allocator, fmt, arg...)		\
 	do {							\
-		if (s)						\
-			seq_printf(seq, fmt, ##arg);		\
+		if (seq)					\
+			seq_printf(seq, fmt "\n", ##arg);	\
 		else						\
 			alloc_dbg(allocator, fmt, ##arg);	\
 	} while (0)
-
-#define __alloc_dbg(a, fmt, arg...)					\
-	pr_info("%-25s %25s() " fmt, (a)->name, __func__, ##arg)
-
-#if defined(ALLOCATOR_DEBUG)
-/*
- * Always print the debug messages...
- */
-#define alloc_dbg(a, fmt, arg...) __alloc_dbg(a, fmt, ##arg)
-#else
-/*
- * Only print debug messages if debug is enabled for a given allocator.
- */
-#define alloc_dbg(a, fmt, arg...)			\
-	do {						\
-		if ((a)->debug)				\
-			__alloc_dbg((a), fmt, ##arg);	\
-	} while (0)
-
 #endif
-#define balloc_pr(alloctor, format, arg...)		\
-	pr_info("%-25s %25s() " format,			\
-		alloctor->name, __func__, ##arg)
+
+#define do_alloc_dbg(a, fmt, arg...)				\
+	nvgpu_log((a)->g, gpu_dbg_alloc, "%25s " fmt, (a)->name, ##arg)
+
+/*
+ * This gives finer control over debugging messages. By defining the
+ * ALLOCATOR_DEBUG_FINE macro prints for an allocator will only get made if
+ * that allocator's debug flag is set.
+ *
+ * Otherwise debugging is as normal: debug statements for all allocators
+ * if the GPU debugging mask bit is set. Note: even when ALLOCATOR_DEBUG_FINE
+ * is set gpu_dbg_alloc must still also be set to true.
+ */
+#if defined(ALLOCATOR_DEBUG_FINE)
+#define alloc_dbg(a, fmt, arg...)				\
+	do {							\
+		if ((a)->debug)					\
+			do_alloc_dbg((a), fmt, ##arg);		\
+	} while (0)
+#else
+#define alloc_dbg(a, fmt, arg...) do_alloc_dbg(a, fmt, ##arg)
+#endif
 
 #endif /* NVGPU_ALLOCATOR_H */

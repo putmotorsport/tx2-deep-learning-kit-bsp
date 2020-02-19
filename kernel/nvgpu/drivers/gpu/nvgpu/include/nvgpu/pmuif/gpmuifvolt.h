@@ -1,29 +1,38 @@
 /*
-* Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
+* Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
 *
-* This program is free software; you can redistribute it and/or modify it
-* under the terms and conditions of the GNU General Public License,
-* version 2, as published by the Free Software Foundation.
-*
-* This program is distributed in the hope it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-* more details.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
 */
-#ifndef _GPMUIFVOLT_H_
-#define _GPMUIFVOLT_H_
+#ifndef NVGPU_PMUIF_GPMUIFVOLT_H
+#define NVGPU_PMUIF_GPMUIFVOLT_H
 
 #include "gpmuifboardobj.h"
 #include <nvgpu/flcnif_cmn.h>
 #include "ctrl/ctrlvolt.h"
 
-#define NV_PMU_VOLT_VALUE_0V_IN_UV	(0)
+#define NV_PMU_VOLT_VALUE_0V_IN_UV	(0U)
 
 /* ------------- VOLT_RAIL's GRP_SET defines and structures ------------- */
 
-#define NV_PMU_VOLT_BOARDOBJGRP_CLASS_ID_VOLT_RAIL		0x00
-#define NV_PMU_VOLT_BOARDOBJGRP_CLASS_ID_VOLT_DEVICE	0x01
-#define NV_PMU_VOLT_BOARDOBJGRP_CLASS_ID_VOLT_POLICY	0x02
+#define NV_PMU_VOLT_BOARDOBJGRP_CLASS_ID_VOLT_RAIL		0x00U
+#define NV_PMU_VOLT_BOARDOBJGRP_CLASS_ID_VOLT_DEVICE		0x01U
+#define NV_PMU_VOLT_BOARDOBJGRP_CLASS_ID_VOLT_POLICY		0x02U
 
 
 struct nv_pmu_volt_volt_rail_boardobjgrp_set_header {
@@ -40,6 +49,8 @@ struct nv_pmu_volt_volt_rail_boardobj_set {
 	u8 volt_margin_limit_vfe_equ_idx;
 	u8 pwr_equ_idx;
 	u8 volt_dev_idx_default;
+	u8 volt_dev_idx_ipc_vmin;
+	u8 volt_scale_exp_pwr_equ_idx;
 	struct ctrl_boardobjgrp_mask_e32 volt_dev_mask;
 	s32 volt_delta_uv[CTRL_VOLT_RAIL_VOLT_DELTA_MAX_ENTRIES];
 };
@@ -92,8 +103,8 @@ NV_PMU_BOARDOBJ_GRP_SET_MAKE_E32(volt, volt_device);
 
 /* ------------ VOLT_POLICY's GRP_SET defines and structures ------------ */
 struct nv_pmu_volt_volt_policy_boardobjgrp_set_header {
-
 	struct nv_pmu_boardobjgrp_e32 super;
+	u8 perf_core_vf_seq_policy_idx;
 };
 
 struct nv_pmu_volt_volt_policy_boardobj_set {
@@ -102,6 +113,13 @@ struct nv_pmu_volt_volt_policy_boardobj_set {
 struct nv_pmu_volt_volt_policy_sr_boardobj_set {
 	struct nv_pmu_volt_volt_policy_boardobj_set super;
 	u8 rail_idx;
+};
+
+struct nv_pmu_volt_volt_policy_sr_multi_step_boardobj_set {
+	struct nv_pmu_volt_volt_policy_sr_boardobj_set super;
+	u16 inter_switch_delay_us;
+	u32 ramp_up_step_size_uv;
+	u32 ramp_down_step_size_uv;
 };
 
 struct nv_pmu_volt_volt_policy_splt_r_boardobj_set {
@@ -128,6 +146,8 @@ union nv_pmu_volt_volt_policy_boardobj_set_union {
 	struct nv_pmu_boardobj board_obj;
 	struct nv_pmu_volt_volt_policy_boardobj_set super;
 	struct nv_pmu_volt_volt_policy_sr_boardobj_set single_rail;
+	struct nv_pmu_volt_volt_policy_sr_multi_step_boardobj_set
+		single_rail_ms;
 	struct nv_pmu_volt_volt_policy_splt_r_boardobj_set split_rail;
 	struct nv_pmu_volt_volt_policy_srms_boardobj_set
 			split_rail_m_s;
@@ -244,17 +264,17 @@ struct nv_pmu_volt_volt_rail_set_noise_unaware_vmin {
 	rail_list;
 };
 
-#define NV_PMU_VOLT_CMD_ID_BOARDOBJ_GRP_SET	(0x00000000)
-#define NV_PMU_VOLT_CMD_ID_RPC				(0x00000001)
-#define NV_PMU_VOLT_CMD_ID_BOARDOBJ_GRP_GET_STATUS	(0x00000002)
-#define NV_PMU_VOLT_RPC_ID_VOLT_RAIL_SET_NOISE_UNAWARE_VMIN (0x00000004)
+#define NV_PMU_VOLT_CMD_ID_BOARDOBJ_GRP_SET			(0x00000000U)
+#define NV_PMU_VOLT_CMD_ID_RPC					(0x00000001U)
+#define NV_PMU_VOLT_CMD_ID_BOARDOBJ_GRP_GET_STATUS		(0x00000002U)
+#define NV_PMU_VOLT_RPC_ID_VOLT_RAIL_SET_NOISE_UNAWARE_VMIN	(0x00000004U)
 
 /*!
 * PMU VOLT RPC calls.
 */
-#define NV_PMU_VOLT_RPC_ID_LOAD	(0x00000000)
-#define NV_PMU_VOLT_RPC_ID_VOLT_POLICY_SET_VOLTAGE	(0x00000002)
-#define NV_PMU_VOLT_RPC_ID_VOLT_RAIL_GET_VOLTAGE	(0x00000003)
+#define NV_PMU_VOLT_RPC_ID_LOAD					(0x00000000U)
+#define NV_PMU_VOLT_RPC_ID_VOLT_POLICY_SET_VOLTAGE		(0x00000002U)
+#define NV_PMU_VOLT_RPC_ID_VOLT_RAIL_GET_VOLTAGE		(0x00000003U)
 
 struct nv_pmu_volt_cmd_rpc {
 	u8 cmd_type;
@@ -290,9 +310,9 @@ struct nv_pmu_volt_rpc {
 /*!
 * VOLT MSG ID definitions
 */
-#define NV_PMU_VOLT_MSG_ID_BOARDOBJ_GRP_SET	(0x00000000)
-#define NV_PMU_VOLT_MSG_ID_RPC				(0x00000001)
-#define NV_PMU_VOLT_MSG_ID_BOARDOBJ_GRP_GET_STATUS	(0x00000002)
+#define NV_PMU_VOLT_MSG_ID_BOARDOBJ_GRP_SET			(0x00000000U)
+#define NV_PMU_VOLT_MSG_ID_RPC					(0x00000001U)
+#define NV_PMU_VOLT_MSG_ID_BOARDOBJ_GRP_GET_STATUS		(0x00000002U)
 
 /*!
 * Message carrying the result of the VOLT RPC execution.
@@ -315,7 +335,7 @@ struct nv_pmu_volt_msg {
 	};
 };
 
-#define NV_PMU_VF_INJECT_MAX_VOLT_RAILS		(2)
+#define NV_PMU_VF_INJECT_MAX_VOLT_RAILS		(2U)
 
 struct nv_pmu_volt_volt_rail_list {
 	u8 num_rails;
@@ -323,4 +343,60 @@ struct nv_pmu_volt_volt_rail_list {
 	rails[NV_PMU_VF_INJECT_MAX_VOLT_RAILS];
 };
 
-#endif  /* _GPMUIFVOLT_H_*/
+struct nv_pmu_volt_volt_rail_list_v1 {
+	u8 num_rails;
+	struct ctrl_volt_volt_rail_list_item_v1
+	rails[NV_PMU_VF_INJECT_MAX_VOLT_RAILS];
+};
+
+/* VOLT RPC */
+#define NV_PMU_RPC_ID_VOLT_BOARD_OBJ_GRP_CMD			0x00U
+#define NV_PMU_RPC_ID_VOLT_VOLT_SET_VOLTAGE			0x01U
+#define NV_PMU_RPC_ID_VOLT_LOAD					0x02U
+#define NV_PMU_RPC_ID_VOLT_VOLT_RAIL_GET_VOLTAGE		0x03U
+#define NV_PMU_RPC_ID_VOLT_VOLT_POLICY_SANITY_CHECK		0x04U
+#define NV_PMU_RPC_ID_VOLT_TEST_EXECUTE				0x05U
+#define NV_PMU_RPC_ID_VOLT__COUNT				0x06U
+
+/*
+ * Defines the structure that holds data
+ * used to execute LOAD RPC.
+ */
+struct nv_pmu_rpc_struct_volt_load {
+	/*[IN/OUT] Must be first field in RPC structure */
+	struct nv_pmu_rpc_header hdr;
+	u32  scratch[1];
+};
+
+/*
+ * Defines the structure that holds data
+ * used to execute VOLT_SET_VOLTAGE RPC.
+ */
+struct nv_pmu_rpc_struct_volt_volt_set_voltage {
+	/*[IN/OUT] Must be first field in RPC structure */
+	struct nv_pmu_rpc_header hdr;
+	/*[IN] ID of the client that wants to set the voltage */
+	u8 client_id;
+	/*
+	 * [IN] The list containing target voltage and
+	 *  noise-unaware Vmin value for the VOLT_RAILs.
+	 */
+	struct ctrl_volt_volt_rail_list_v1 rail_list;
+	u32  scratch[1];
+};
+
+/*
+ * Defines the structure that holds data
+ * used to execute VOLT_RAIL_GET_VOLTAGE RPC.
+ */
+struct nv_pmu_rpc_struct_volt_volt_rail_get_voltage {
+	/*[IN/OUT] Must be first field in RPC structure */
+	struct nv_pmu_rpc_header hdr;
+	/* [OUT] Current voltage in uv */
+	u32 voltage_uv;
+	/* [IN] Voltage Rail Table Index */
+	u8 rail_idx;
+	u32  scratch[1];
+};
+
+#endif  /* NVGPU_PMUIF_GPMUIFVOLT_H*/

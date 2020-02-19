@@ -1,29 +1,32 @@
 /*
- * Copyright (c) 2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __SEC2_H_
-#define __SEC2_H_
+#ifndef NVGPU_SEC2_GP106_H
+#define NVGPU_SEC2_GP106_H
 
-int sec2_clear_halt_interrupt_status(struct gk20a *g, unsigned int timeout);
-int sec2_wait_for_halt(struct gk20a *g, unsigned int timeout);
-void sec2_copy_to_dmem(struct pmu_gk20a *pmu,
-		u32 dst, u8 *src, u32 size, u8 port);
-void sec2_dump_falcon_stats(struct pmu_gk20a *pmu);
-int bl_bootstrap_sec2(struct pmu_gk20a *pmu,
-	void *desc, u32 bl_sz);
-void sec_enable_irq(struct pmu_gk20a *pmu, bool enable);
-void init_pmu_setup_hw1(struct gk20a *g);
-int init_sec2_setup_hw1(struct gk20a *g,
-		void *desc, u32 bl_sz);
+int gp106_sec2_reset(struct gk20a *g);
 
-#endif /*__SEC2_H_*/
+int gp106_sec2_setup_hw_and_bl_bootstrap(struct gk20a *g,
+	struct hs_acr *acr_desc,
+	struct nvgpu_falcon_bl_info *bl_info);
+
+#endif /* NVGPU_SEC2_GP106_H */

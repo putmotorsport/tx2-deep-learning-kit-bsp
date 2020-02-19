@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, NVIDIA Corporation, All rights reserved.
+ * Copyright (c) 2017, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,12 +19,18 @@
 / {
 	aon: aon@c160000 {
 		compatible = "nvidia,tegra186-aon";
-		reg = <0x0 0x0c1a0000 0x0 0x20000>; /* AON shared semaphore */
-		#mbox-cells = <1>;
-		#stream-id-cells = <1>;
 		status = "disabled";
+		reg = <0x0 0x0c1a0000 0x0 0x40000>; /* AON shared semaphore */
+		#mbox-cells = <1>;
+		iommus = <&smmu TEGRA_SID_AON>;
 		nvidia,hsp-shared-mailbox = <&aon_hsp 2>;
 		nvidia,hsp-shared-mailbox-names = "ivc-pair";
+		nvidia,ivc-carveout-base-ss = <0>;
+		nvidia,ivc-carveout-size-ss = <1>;
+		nvidia,ivc-rx-ss = <2>;
+		nvidia,ivc-tx-ss = <3>;
+		nvidia,ivc-dbg-enable-ss = <0>;
+
 
 		ivc-channels@80000000 {
 			#address-cells = <1>;
@@ -60,28 +66,18 @@
 				nvidia,frame-count = <16>;
 				nvidia,frame-size = <128>;
 			};
+			ivc_aon_shub@d880 {
+				reg = <0xd880>, <0x1d880>;
+				reg-names = "rx", "tx";
+				nvidia,frame-count = <4>;
+				nvidia,frame-size = <256>;
+			};
 		};
-	};
-
-	tegra-aon-ivc-echo {
-		compatible = "nvidia,tegra186-aon-ivc-echo";
-		mboxes = <&aon 0>;
-		status = "disabled";
 	};
 
 	aondbg {
 		compatible = "nvidia,tegra186-aondbg";
 		mboxes = <&aon 1>;
-	};
-
-	aon_spi: aon_spi@c260000 {
-		status = "disabled";
-		compatible = "nvidia,tegra186-aon-spi";
-		bus-number = <1>;
-		#address-cells = <1>;
-		#size-cells = <0>;
-		spi-max-frequency = <12000000>;
-		mboxes = <&aon 2>;
 	};
 
 	mttcan0-ivc {
@@ -95,5 +91,11 @@
 		mboxes = <&aon 4>;
 		status = "disabled";
 	};
-};
 
+	aon_shub {
+		status = "disabled";
+		compatible = "nvidia,tegra186_aon_shub";
+		mboxes = <&aon 5>;
+	};
+
+};

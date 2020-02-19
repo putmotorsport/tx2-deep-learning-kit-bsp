@@ -15,6 +15,20 @@
 
 / {
 	i2c@c240000 {
+		bmi160@69 {
+			compatible = "bmi,bmi160";
+			reg = <0x69>;
+			interrupt-parent = <&tegra_aon_gpio>;
+			interrupts = <TEGRA_AON_GPIO(AA, 2) 0x01>;
+			accelerometer_matrix    = [01 00 00 00 01 00 00 00 01];
+			gyroscope_matrix        = [01 00 00 00 01 00 00 00 01];
+			accelerometer_delay_us_min = <2500>;
+			gyroscope_delay_us_min = <2500>;
+			vdd-supply = <&spmic_sd3>;
+			vdd_IO-supply = <&spmic_sd3>;
+			status = "disabled";
+		};
+
 		e2614_i2c_mux: i2cmux@70 {
 			compatible = "nxp,pca9546";
 			reg = <0x70>;
@@ -167,6 +181,9 @@
                         gyroscope_matrix	= [01 00 00 00 01 00 00 00 01];
 			vdd-supply = <&spmic_sd3>;
 			vlogic-supply = <&spmic_sd3>;
+			geomagnetic_rotation_vector_disable = <1>;
+			gyroscope_uncalibrated_disable = <1>;
+			quaternion_disable = <1>;
 			status = "disabled";
                 };
 
@@ -287,6 +304,7 @@
 			overrides@10 {
 				target = <&tegra_sound>;
 				_overlay_ {
+					nvidia,num-codec-link = <13>;
 					nvidia,audio-routing =
 						"x Headphone Jack",	"x HPO L Playback",
 						"x Headphone Jack",	"x HPO R Playback",
@@ -298,7 +316,8 @@
 						"x DMIC R2",		"x Int Mic",
 						"y Headphone",		"y OUT",
 						"y IN",			"y Mic",
-						"z IN",			"z OUT",
+						"z Headphone",		"z OUT",
+						"z IN",			"z Mic",
 						"m Headphone",		"m OUT",
 						"m IN",			"m Mic",
 						"n Headphone",		"n OUT",
@@ -309,16 +328,16 @@
 						"b IN",			"b Mic",
 						"c IN",			"c Mic",
 						"d IN",			"d Mic",
-						"e Headphone",		"e OUT",
-						"e IN",			"e Mic",
 						"d1 Headphone",		"d1 OUT",
-						"d2 Headphone",		"d2 OUT";
+						"d2 Headphone",		"d2 OUT",
+						"d3 Headphone",		"d3 OUT";
 				};
 			};
 
 			overrides@11 {
 				target = <&rt565x_dai_link>;
 				_overlay_ {
+					link-name = "rt565x-playback";
 					codec-dai-name = "rt5659-aif1";
 				};
 			};

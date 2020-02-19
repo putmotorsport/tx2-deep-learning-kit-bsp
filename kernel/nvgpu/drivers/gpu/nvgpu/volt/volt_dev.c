@@ -1,43 +1,54 @@
 /*
- * Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 
-#include <linux/sort.h>
+#include <nvgpu/types.h>
+#include <nvgpu/sort.h>
+#include <nvgpu/pmuif/nvgpu_gpmu_cmdif.h>
+#include <nvgpu/bios.h>
+#include <nvgpu/kmem.h>
+#include <nvgpu/gk20a.h>
 
-#include "gk20a/gk20a.h"
+#include "gp106/bios_gp106.h"
+
 #include "boardobj/boardobjgrp.h"
 #include "boardobj/boardobjgrp_e32.h"
-#include "gm206/bios_gm206.h"
 #include "ctrl/ctrlvolt.h"
-#include "gk20a/pmu_gk20a.h"
 
 #include "volt.h"
-#include <nvgpu/pmuif/nvgpu_gpmu_cmdif.h>
 
-#include <nvgpu/bios.h>
+#define VOLT_DEV_PWM_VOLTAGE_STEPS_INVALID	0U
+#define VOLT_DEV_PWM_VOLTAGE_STEPS_DEFAULT	1U
 
-#define VOLT_DEV_PWM_VOLTAGE_STEPS_INVALID	0
-#define VOLT_DEV_PWM_VOLTAGE_STEPS_DEFAULT	1
-
-u32 volt_device_pmu_data_init_super(struct gk20a *g,
+static int volt_device_pmu_data_init_super(struct gk20a *g,
 	struct boardobj *pboard_obj, struct nv_pmu_boardobj *ppmudata)
 {
-	u32 status;
+	int status;
 	struct voltage_device *pdev;
 	struct nv_pmu_volt_volt_device_boardobj_set *pset;
 
 	status = boardobj_pmudatainit_super(g, pboard_obj, ppmudata);
-	if (status)
+	if (status) {
 		return status;
+	}
 
 	pdev = (struct voltage_device *)pboard_obj;
 	pset = (struct nv_pmu_volt_volt_device_boardobj_set *)ppmudata;
@@ -50,16 +61,17 @@ u32 volt_device_pmu_data_init_super(struct gk20a *g,
 	return status;
 }
 
-static u32 volt_device_pmu_data_init_pwm(struct gk20a *g,
+static int volt_device_pmu_data_init_pwm(struct gk20a *g,
 		struct boardobj *pboard_obj, struct nv_pmu_boardobj *ppmudata)
 {
-	u32 status = 0;
+	int status = 0;
 	struct voltage_device_pwm *pdev;
 	struct nv_pmu_volt_volt_device_pwm_boardobj_set *pset;
 
 	status = volt_device_pmu_data_init_super(g, pboard_obj, ppmudata);
-	if (status)
+	if (status) {
 		return  status;
+	}
 
 	pdev = (struct voltage_device_pwm *)pboard_obj;
 	pset = (struct nv_pmu_volt_volt_device_pwm_boardobj_set *)ppmudata;
@@ -72,16 +84,17 @@ static u32 volt_device_pmu_data_init_pwm(struct gk20a *g,
 	return status;
 }
 
-u32 construct_volt_device(struct gk20a *g,
+static int construct_volt_device(struct gk20a *g,
 	struct boardobj **ppboardobj, u16 size, void *pargs)
 {
 	struct voltage_device *ptmp_dev = (struct voltage_device *)pargs;
 	struct voltage_device *pvolt_dev = NULL;
-	u32 status = 0;
+	int status = 0;
 
 	status = boardobj_construct_super(g, ppboardobj, size, pargs);
-	if (status)
+	if (status) {
 		return status;
+	}
 
 	pvolt_dev = (struct voltage_device *)*ppboardobj;
 
@@ -100,18 +113,20 @@ u32 construct_volt_device(struct gk20a *g,
 	return status;
 }
 
-u32 construct_pwm_volt_device(struct gk20a *g, struct boardobj **ppboardobj,
+static int construct_pwm_volt_device(struct gk20a *g,
+		struct boardobj **ppboardobj,
 		u16 size, void *pargs)
 {
 	struct boardobj *pboard_obj = NULL;
 	struct voltage_device_pwm *ptmp_dev =
 			(struct voltage_device_pwm *)pargs;
 	struct voltage_device_pwm *pdev = NULL;
-	u32 status = 0;
+	int status = 0;
 
 	status = construct_volt_device(g, ppboardobj, size, pargs);
-	if (status)
+	if (status) {
 		return status;
+	}
 
 	pboard_obj = (*ppboardobj);
 	pdev  = (struct voltage_device_pwm *)*ppboardobj;
@@ -128,16 +143,18 @@ u32 construct_pwm_volt_device(struct gk20a *g, struct boardobj **ppboardobj,
 }
 
 
-struct voltage_device_entry *volt_dev_construct_dev_entry_pwm(struct gk20a *g,
+static struct voltage_device_entry *volt_dev_construct_dev_entry_pwm(
+		struct gk20a *g,
 		u32 voltage_uv, void *pargs)
 {
 	struct voltage_device_pwm_entry *pentry = NULL;
 	struct voltage_device_pwm_entry *ptmp_entry =
 			(struct voltage_device_pwm_entry *)pargs;
 
-	pentry = kzalloc(sizeof(struct voltage_device_pwm_entry), GFP_KERNEL);
-	if (pentry == NULL)
+	pentry = nvgpu_kzalloc(g, sizeof(struct voltage_device_pwm_entry));
+	if (pentry == NULL) {
 		return NULL;
+	}
 
 	memset(pentry, 0, sizeof(struct voltage_device_pwm_entry));
 
@@ -163,16 +180,16 @@ static u8 volt_dev_operation_type_convert(u8 vbios_type)
 	return CTRL_VOLT_DEVICE_OPERATION_TYPE_INVALID;
 }
 
-struct voltage_device *volt_volt_device_construct(struct gk20a *g,
+static struct voltage_device *volt_volt_device_construct(struct gk20a *g,
 		void *pargs)
 {
 	struct boardobj *pboard_obj = NULL;
 
 	if (BOARDOBJ_GET_TYPE(pargs) == CTRL_VOLT_DEVICE_TYPE_PWM) {
-		u32 status = construct_pwm_volt_device(g, &pboard_obj,
+		int status = construct_pwm_volt_device(g, &pboard_obj,
 				sizeof(struct voltage_device_pwm), pargs);
 		if (status) {
-			gk20a_err(dev_from_gk20a(g),
+			nvgpu_err(g,
 				" Could not allocate memory for VOLTAGE_DEVICE type (%x).",
 				BOARDOBJ_GET_TYPE(pargs));
 			pboard_obj = NULL;
@@ -182,12 +199,12 @@ struct voltage_device *volt_volt_device_construct(struct gk20a *g,
 	return (struct voltage_device *)pboard_obj;
 }
 
-static u32 volt_get_voltage_device_table_1x_psv(struct gk20a *g,
+static int volt_get_voltage_device_table_1x_psv(struct gk20a *g,
 		struct vbios_voltage_device_table_1x_entry *p_bios_entry,
 		struct voltage_device_metadata *p_Volt_Device_Meta_Data,
 		u8 entry_Idx)
 {
-	u32 status = 0;
+	int status = 0;
 	u32 entry_cnt = 0;
 	struct voltage_device *pvolt_dev = NULL;
 	struct voltage_device_pwm *pvolt_dev_pwm = NULL;
@@ -200,9 +217,10 @@ static u32 volt_get_voltage_device_table_1x_psv(struct gk20a *g,
 	u8 volt_domain = 0;
 	struct voltage_device_pwm_entry pwm_entry = { { 0 } };
 
-	ptmp_dev = kzalloc(sizeof(struct voltage_device_pwm), GFP_KERNEL);
-	if (ptmp_dev == NULL)
+	ptmp_dev = nvgpu_kzalloc(g, sizeof(struct voltage_device_pwm));
+	if (ptmp_dev == NULL) {
 		return -ENOMEM;
+	}
 
 	frequency_hz = (u32)BIOS_GET_FIELD(p_bios_entry->param0,
 		NV_VBIOS_VDT_1X_ENTRY_PARAM0_PSV_INPUT_FREQUENCY);
@@ -216,8 +234,7 @@ static u32 volt_get_voltage_device_table_1x_psv(struct gk20a *g,
 
 	if (ptmp_dev->super.operation_type ==
 			CTRL_VOLT_DEVICE_OPERATION_TYPE_INVALID) {
-		gk20a_err(dev_from_gk20a(g),
-			" Invalid Voltage Device Operation Type.");
+		nvgpu_err(g, " Invalid Voltage Device Operation Type.");
 
 		status = -EINVAL;
 		goto done;
@@ -236,8 +253,9 @@ static u32 volt_get_voltage_device_table_1x_psv(struct gk20a *g,
 
 	steps = (u8)BIOS_GET_FIELD(p_bios_entry->param3,
 		NV_VBIOS_VDT_1X_ENTRY_PARAM3_PSV_VOLTAGE_STEPS);
-	if (steps == VOLT_DEV_PWM_VOLTAGE_STEPS_INVALID)
+	if (steps == VOLT_DEV_PWM_VOLTAGE_STEPS_INVALID) {
 		steps = VOLT_DEV_PWM_VOLTAGE_STEPS_DEFAULT;
+	}
 
 	ptmp_dev->voltage_offset_scale_uv =
 			BIOS_GET_FIELD(p_bios_entry->param4,
@@ -246,8 +264,7 @@ static u32 volt_get_voltage_device_table_1x_psv(struct gk20a *g,
 	volt_domain = volt_rail_vbios_volt_domain_convert_to_internal(g,
 		(u8)p_bios_entry->volt_domain);
 	if (volt_domain == CTRL_VOLT_DOMAIN_INVALID) {
-		gk20a_err(dev_from_gk20a(g),
-			"invalid voltage domain = %d",
+		nvgpu_err(g, "invalid voltage domain = %d",
 			(u8)p_bios_entry->volt_domain);
 		status = -EINVAL;
 		goto done;
@@ -255,12 +272,14 @@ static u32 volt_get_voltage_device_table_1x_psv(struct gk20a *g,
 
 	if (ptmp_dev->super.operation_type ==
 			CTRL_VOLT_DEVICE_OPERATION_TYPE_DEFAULT) {
-		if (volt_domain == CTRL_VOLT_DOMAIN_LOGIC)
+		if (volt_domain == CTRL_VOLT_DOMAIN_LOGIC) {
 			ptmp_dev->source =
 				NV_PMU_PMGR_PWM_SOURCE_THERM_VID_PWM_0;
-		if (volt_domain == CTRL_VOLT_DOMAIN_SRAM)
+		}
+		if (volt_domain == CTRL_VOLT_DOMAIN_SRAM) {
 			ptmp_dev->source =
 				NV_PMU_PMGR_PWM_SOURCE_THERM_VID_PWM_1;
+		}
 		ptmp_dev->raw_period =
 			g->ops.clk.get_crystal_clk_hz(g) / frequency_hz;
 	} else if (ptmp_dev->super.operation_type ==
@@ -281,8 +300,7 @@ static u32 volt_get_voltage_device_table_1x_psv(struct gk20a *g,
 
 	pvolt_dev = volt_volt_device_construct(g, ptmp_dev);
 	if (pvolt_dev == NULL) {
-		gk20a_err(dev_from_gk20a(g),
-			" Failure to construct VOLTAGE_DEVICE object.");
+		nvgpu_err(g, " Failure to construct VOLTAGE_DEVICE object.");
 
 		status = -EINVAL;
 		goto done;
@@ -292,7 +310,7 @@ static u32 volt_get_voltage_device_table_1x_psv(struct gk20a *g,
 				&p_Volt_Device_Meta_Data->volt_devices.super,
 				(struct boardobj *)pvolt_dev, entry_Idx);
 	if (status) {
-		gk20a_err(dev_from_gk20a(g),
+		nvgpu_err(g,
 			"could not add VOLTAGE_DEVICE for entry %d into boardobjgrp ",
 			entry_Idx);
 		goto done;
@@ -310,15 +328,16 @@ static u32 volt_get_voltage_device_table_1x_psv(struct gk20a *g,
 		/* Skip creating entry for invalid voltage. */
 		if ((voltage_uv >= pvolt_dev_pwm->super.voltage_min_uv) &&
 			(voltage_uv <= pvolt_dev_pwm->super.voltage_max_uv)) {
-			if (pvolt_dev_pwm->voltage_offset_scale_uv < 0)
+			if (pvolt_dev_pwm->voltage_offset_scale_uv < 0) {
 				pwm_entry.duty_cycle =
 					pvolt_dev_pwm->raw_period - duty_cycle;
-			else
+			} else {
 				pwm_entry.duty_cycle = duty_cycle;
+			}
 
 			/* Check if there is room left in the voltage table. */
 			if (entry_cnt == VOLTAGE_TABLE_MAX_ENTRIES) {
-				gk20a_err(dev_from_gk20a(g), "Voltage table is full");
+				nvgpu_err(g, "Voltage table is full");
 				status = -EINVAL;
 				goto done;
 			}
@@ -327,7 +346,7 @@ static u32 volt_get_voltage_device_table_1x_psv(struct gk20a *g,
 				volt_dev_construct_dev_entry_pwm(g,
 					voltage_uv, &pwm_entry);
 			if (pvolt_dev->pentry[entry_cnt] == NULL) {
-				gk20a_err(dev_from_gk20a(g),
+				nvgpu_err(g,
 					" Error creating voltage_device_pwm_entry!");
 				status = -EINVAL;
 				goto done;
@@ -340,16 +359,18 @@ static u32 volt_get_voltage_device_table_1x_psv(struct gk20a *g,
 		duty_cycle = duty_cycle + (u32)steps;
 
 		/* Cap duty cycle to PWM period. */
-		if (duty_cycle > pvolt_dev_pwm->raw_period)
+		if (duty_cycle > pvolt_dev_pwm->raw_period) {
 			duty_cycle = pvolt_dev_pwm->raw_period;
+		}
 
 	} while (duty_cycle < pvolt_dev_pwm->raw_period);
 
 done:
-	if (pvolt_dev != NULL)
+	if (pvolt_dev != NULL) {
 		pvolt_dev->num_entries = entry_cnt;
+	}
 
-	kfree(ptmp_dev);
+	nvgpu_kfree(g, ptmp_dev);
 	return status;
 }
 
@@ -381,17 +402,18 @@ static u32 volt_get_volt_devices_table(struct gk20a *g,
 		memcpy(&entry, entry_offset,
 			sizeof(struct vbios_voltage_device_table_1x_entry));
 
-		if (entry.type == NV_VBIOS_VOLTAGE_DEVICE_1X_ENTRY_TYPE_PSV)
+		if (entry.type == NV_VBIOS_VOLTAGE_DEVICE_1X_ENTRY_TYPE_PSV) {
 			status = volt_get_voltage_device_table_1x_psv(g,
 					&entry, pvolt_device_metadata,
 					entry_idx);
+		}
 	}
 
 done:
 	return status;
 }
 
-static u32 _volt_device_devgrp_pmudata_instget(struct gk20a *g,
+static int _volt_device_devgrp_pmudata_instget(struct gk20a *g,
 	struct nv_pmu_boardobjgrp *pmuboardobjgrp,
 	struct nv_pmu_boardobj **ppboardobjpmudata, u8 idx)
 {
@@ -399,20 +421,21 @@ static u32 _volt_device_devgrp_pmudata_instget(struct gk20a *g,
 		(struct nv_pmu_volt_volt_device_boardobj_grp_set *)
 		pmuboardobjgrp;
 
-	gk20a_dbg_info("");
+	nvgpu_log_info(g, " ");
 
 	/*check whether pmuboardobjgrp has a valid boardobj in index*/
 	if (((u32)BIT(idx) &
-		pgrp_set->hdr.data.super.obj_mask.super.data[0]) == 0)
+		pgrp_set->hdr.data.super.obj_mask.super.data[0]) == 0U) {
 		return -EINVAL;
+	}
 
 	*ppboardobjpmudata = (struct nv_pmu_boardobj *)
 		&pgrp_set->objects[idx].data.board_obj;
-	gk20a_dbg_info("Done");
+	nvgpu_log_info(g, "Done");
 	return 0;
 }
 
-static u32 _volt_device_devgrp_pmustatus_instget(struct gk20a *g,
+static int _volt_device_devgrp_pmustatus_instget(struct gk20a *g,
 	void *pboardobjgrppmu,
 	struct nv_pmu_boardobj_query **ppboardobjpmustatus, u8 idx)
 {
@@ -422,8 +445,9 @@ static u32 _volt_device_devgrp_pmustatus_instget(struct gk20a *g,
 
 	/*check whether pmuboardobjgrp has a valid boardobj in index*/
 	if (((u32)BIT(idx) &
-		pgrp_get_status->hdr.data.super.obj_mask.super.data[0]) == 0)
+		pgrp_get_status->hdr.data.super.obj_mask.super.data[0]) == 0U) {
 		return -EINVAL;
+	}
 
 	*ppboardobjpmustatus = (struct nv_pmu_boardobj_query *)
 			&pgrp_get_status->objects[idx].data.board_obj;
@@ -438,7 +462,8 @@ static int volt_device_volt_cmp(const void *a, const void *b)
 	return (int)a_entry->voltage_uv - (int)b_entry->voltage_uv;
 }
 
-u32 volt_device_state_init(struct gk20a *g, struct voltage_device *pvolt_dev)
+static u32 volt_device_state_init(struct gk20a *g,
+			struct voltage_device *pvolt_dev)
 {
 	u32 status = 0;
 	struct voltage_rail *pRail = NULL;
@@ -449,11 +474,12 @@ u32 volt_device_state_init(struct gk20a *g, struct voltage_device *pvolt_dev)
 	     NULL);
 
 	/* Initialize VOLT_DEVICE step size. */
-	if (pvolt_dev->num_entries <= VOLTAGE_TABLE_MAX_ENTRIES_ONE)
+	if (pvolt_dev->num_entries <= VOLTAGE_TABLE_MAX_ENTRIES_ONE) {
 		pvolt_dev->volt_step_uv = NV_PMU_VOLT_VALUE_0V_IN_UV;
-	else
+	} else {
 		pvolt_dev->volt_step_uv = (pvolt_dev->pentry[1]->voltage_uv -
 				pvolt_dev->pentry[0]->voltage_uv);
+	}
 
 	/* Build VOLT_RAIL SW state from VOLT_DEVICE SW state. */
 	/* If VOLT_RAIL isn't supported, exit. */
@@ -461,7 +487,7 @@ u32 volt_device_state_init(struct gk20a *g, struct voltage_device *pvolt_dev)
 		rail_idx = volt_rail_volt_domain_convert_to_idx(g,
 				pvolt_dev->volt_domain);
 		if (rail_idx == CTRL_BOARDOBJ_IDX_INVALID) {
-			gk20a_err(dev_from_gk20a(g),
+			nvgpu_err(g,
 				" could not convert voltage domain to rail index.");
 			status = -EINVAL;
 			goto done;
@@ -469,7 +495,7 @@ u32 volt_device_state_init(struct gk20a *g, struct voltage_device *pvolt_dev)
 
 		pRail = VOLT_GET_VOLT_RAIL(&g->perf_pmu.volt, rail_idx);
 		if (pRail == NULL) {
-			gk20a_err(dev_from_gk20a(g),
+			nvgpu_err(g,
 				"could not obtain ptr to rail object from rail index");
 			status = -EINVAL;
 			goto done;
@@ -478,35 +504,36 @@ u32 volt_device_state_init(struct gk20a *g, struct voltage_device *pvolt_dev)
 		status = volt_rail_volt_dev_register(g, pRail,
 			BOARDOBJ_GET_IDX(pvolt_dev), pvolt_dev->operation_type);
 		if (status) {
-			gk20a_err(dev_from_gk20a(g),
+			nvgpu_err(g,
 				"Failed to register the device with rail obj");
 			goto done;
 		}
 	}
 
 done:
-	if (status)
-		gk20a_err(dev_from_gk20a(g),
-			"Error in building rail sw state device sw");
+	if (status) {
+		nvgpu_err(g, "Error in building rail sw state device sw");
+	}
 
 	return status;
 }
 
-u32 volt_dev_pmu_setup(struct gk20a *g)
+int volt_dev_pmu_setup(struct gk20a *g)
 {
-	u32 status;
+	int status;
 	struct boardobjgrp *pboardobjgrp = NULL;
 
-	gk20a_dbg_info("");
+	nvgpu_log_info(g, " ");
 
 	pboardobjgrp = &g->perf_pmu.volt.volt_dev_metadata.volt_devices.super;
 
-	if (!pboardobjgrp->bconstructed)
+	if (!pboardobjgrp->bconstructed) {
 		return -EINVAL;
+	}
 
 	status = pboardobjgrp->pmuinithandle(g, pboardobjgrp);
 
-	gk20a_dbg_info("Done");
+	nvgpu_log_info(g, "Done");
 	return status;
 }
 
@@ -517,12 +544,12 @@ u32 volt_dev_sw_setup(struct gk20a *g)
 	struct voltage_device *pvolt_device;
 	u8 i;
 
-	gk20a_dbg_info("");
+	nvgpu_log_info(g, " ");
 
-	status = boardobjgrpconstruct_e32(&g->perf_pmu.volt.volt_dev_metadata.
-			volt_devices);
+	status = boardobjgrpconstruct_e32(g,
+			&g->perf_pmu.volt.volt_dev_metadata.volt_devices);
 	if (status) {
-		gk20a_err(dev_from_gk20a(g),
+		nvgpu_err(g,
 			"error creating boardobjgrp for volt rail, status - 0x%x",
 			status);
 		goto done;
@@ -536,8 +563,9 @@ u32 volt_dev_sw_setup(struct gk20a *g)
 	/* Obtain Voltage Rail Table from VBIOS */
 	status = volt_get_volt_devices_table(g, &g->perf_pmu.volt.
 			volt_dev_metadata);
-	if (status)
+	if (status) {
 		goto done;
+	}
 
 	/* Populate data for the VOLT_RAIL PMU interface */
 	BOARDOBJGRP_PMU_CONSTRUCT(pboardobjgrp, VOLT, VOLT_DEVICE);
@@ -545,7 +573,7 @@ u32 volt_dev_sw_setup(struct gk20a *g)
 	status = BOARDOBJGRP_PMU_CMD_GRP_SET_CONSTRUCT(g, pboardobjgrp,
 			volt, VOLT, volt_device, VOLT_DEVICE);
 	if (status) {
-		gk20a_err(dev_from_gk20a(g),
+		nvgpu_err(g,
 			"error constructing PMU_BOARDOBJ_CMD_GRP_SET interface - 0x%x",
 			status);
 		goto done;
@@ -555,7 +583,7 @@ u32 volt_dev_sw_setup(struct gk20a *g)
 			&g->perf_pmu.volt.volt_dev_metadata.volt_devices.super,
 			volt, VOLT, volt_device, VOLT_DEVICE);
 	if (status) {
-		gk20a_err(dev_from_gk20a(g),
+		nvgpu_err(g,
 			"error constructing PMU_BOARDOBJ_CMD_GRP_SET interface - 0x%x",
 			status);
 		goto done;
@@ -567,16 +595,15 @@ u32 volt_dev_sw_setup(struct gk20a *g)
 			     struct voltage_device *, pvolt_device, i) {
 		status = volt_device_state_init(g, pvolt_device);
 		if (status) {
-			gk20a_err(dev_from_gk20a(g),
+			nvgpu_err(g,
 				"failure while executing devices's state init interface");
-			gk20a_err(dev_from_gk20a(g),
+			nvgpu_err(g,
 				" railIdx = %d, status = 0x%x", i, status);
 			goto done;
 		}
 	}
 
 done:
-	gk20a_dbg_info(" done status %x", status);
+	nvgpu_log_info(g, " done status %x", status);
 	return status;
 }
-

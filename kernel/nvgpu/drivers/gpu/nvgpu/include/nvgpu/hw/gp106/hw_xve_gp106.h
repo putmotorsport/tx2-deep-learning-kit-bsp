@@ -1,17 +1,23 @@
 /*
  * Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 /*
  * Function naming determines intended use:
@@ -52,151 +58,150 @@
 
 static inline u32 xve_rom_ctrl_r(void)
 {
-	return 0x00000050;
+	return 0x00000050U;
 }
 static inline u32 xve_rom_ctrl_rom_shadow_f(u32 v)
 {
-	return (v & 0x1) << 0;
+	return (v & 0x1U) << 0U;
 }
 static inline u32 xve_rom_ctrl_rom_shadow_disabled_f(void)
 {
-	return 0x0;
+	return 0x0U;
 }
 static inline u32 xve_rom_ctrl_rom_shadow_enabled_f(void)
 {
-	return 0x1;
+	return 0x1U;
 }
 static inline u32 xve_link_control_status_r(void)
 {
-	return 0x00000088;
+	return 0x00000088U;
 }
 static inline u32 xve_link_control_status_link_speed_m(void)
 {
-	return 0xf << 16;
+	return 0xfU << 16U;
 }
 static inline u32 xve_link_control_status_link_speed_v(u32 r)
 {
-	return (r >> 16) & 0xf;
+	return (r >> 16U) & 0xfU;
 }
 static inline u32 xve_link_control_status_link_speed_link_speed_2p5_v(void)
 {
-	return 0x00000001;
+	return 0x00000001U;
 }
 static inline u32 xve_link_control_status_link_speed_link_speed_5p0_v(void)
 {
-	return 0x00000002;
+	return 0x00000002U;
 }
 static inline u32 xve_link_control_status_link_speed_link_speed_8p0_v(void)
 {
-	return 0x00000003;
+	return 0x00000003U;
 }
 static inline u32 xve_link_control_status_link_width_m(void)
 {
-	return 0x3f << 20;
+	return 0x3fU << 20U;
 }
 static inline u32 xve_link_control_status_link_width_v(u32 r)
 {
-	return (r >> 20) & 0x3f;
+	return (r >> 20U) & 0x3fU;
 }
 static inline u32 xve_link_control_status_link_width_x1_v(void)
 {
-	return 0x00000001;
+	return 0x00000001U;
 }
 static inline u32 xve_link_control_status_link_width_x2_v(void)
 {
-	return 0x00000002;
+	return 0x00000002U;
 }
 static inline u32 xve_link_control_status_link_width_x4_v(void)
 {
-	return 0x00000004;
+	return 0x00000004U;
 }
 static inline u32 xve_link_control_status_link_width_x8_v(void)
 {
-	return 0x00000008;
+	return 0x00000008U;
 }
 static inline u32 xve_link_control_status_link_width_x16_v(void)
 {
-	return 0x00000010;
+	return 0x00000010U;
 }
 static inline u32 xve_priv_xv_r(void)
 {
-	return 0x00000150;
+	return 0x00000150U;
 }
 static inline u32 xve_priv_xv_cya_l0s_enable_f(u32 v)
 {
-	return (v & 0x1) << 7;
+	return (v & 0x1U) << 7U;
 }
 static inline u32 xve_priv_xv_cya_l0s_enable_m(void)
 {
-	return 0x1 << 7;
+	return 0x1U << 7U;
 }
 static inline u32 xve_priv_xv_cya_l0s_enable_v(u32 r)
 {
-	return (r >> 7) & 0x1;
+	return (r >> 7U) & 0x1U;
 }
 static inline u32 xve_priv_xv_cya_l1_enable_f(u32 v)
 {
-	return (v & 0x1) << 8;
+	return (v & 0x1U) << 8U;
 }
 static inline u32 xve_priv_xv_cya_l1_enable_m(void)
 {
-	return 0x1 << 8;
+	return 0x1U << 8U;
 }
 static inline u32 xve_priv_xv_cya_l1_enable_v(u32 r)
 {
-	return (r >> 8) & 0x1;
-}
-static inline u32 xve_reset_r(void)
-{
-	return 0x00000718;
-}
-static inline u32 xve_reset_reset_m(void)
-{
-	return 0x1 << 0;
-}
-static inline u32 xve_reset_gpu_on_sw_reset_m(void)
-{
-	return 0x1 << 1;
-}
-static inline u32 xve_reset_counter_en_m(void)
-{
-	return 0x1 << 2;
-}
-static inline u32 xve_reset_counter_val_f(u32 v)
-{
-	return (v & 0x7ff) << 4;
-}
-static inline u32 xve_reset_counter_val_m(void)
-{
-	return 0x7ff << 4;
-}
-static inline u32 xve_reset_counter_val_v(u32 r)
-{
-	return (r >> 4) & 0x7ff;
-}
-static inline u32 xve_reset_clock_on_sw_reset_m(void)
-{
-	return 0x1 << 15;
-}
-static inline u32 xve_reset_clock_counter_en_m(void)
-{
-	return 0x1 << 16;
-}
-static inline u32 xve_reset_clock_counter_val_f(u32 v)
-{
-	return (v & 0x7ff) << 17;
-}
-static inline u32 xve_reset_clock_counter_val_m(void)
-{
-	return 0x7ff << 17;
-}
-static inline u32 xve_reset_clock_counter_val_v(u32 r)
-{
-	return (r >> 17) & 0x7ff;
+	return (r >> 8U) & 0x1U;
 }
 static inline u32 xve_cya_2_r(void)
 {
-	return 0x00000704;
+	return 0x00000704U;
 }
-
+static inline u32 xve_reset_r(void)
+{
+	return 0x00000718U;
+}
+static inline u32 xve_reset_reset_m(void)
+{
+	return 0x1U << 0U;
+}
+static inline u32 xve_reset_gpu_on_sw_reset_m(void)
+{
+	return 0x1U << 1U;
+}
+static inline u32 xve_reset_counter_en_m(void)
+{
+	return 0x1U << 2U;
+}
+static inline u32 xve_reset_counter_val_f(u32 v)
+{
+	return (v & 0x7ffU) << 4U;
+}
+static inline u32 xve_reset_counter_val_m(void)
+{
+	return 0x7ffU << 4U;
+}
+static inline u32 xve_reset_counter_val_v(u32 r)
+{
+	return (r >> 4U) & 0x7ffU;
+}
+static inline u32 xve_reset_clock_on_sw_reset_m(void)
+{
+	return 0x1U << 15U;
+}
+static inline u32 xve_reset_clock_counter_en_m(void)
+{
+	return 0x1U << 16U;
+}
+static inline u32 xve_reset_clock_counter_val_f(u32 v)
+{
+	return (v & 0x7ffU) << 17U;
+}
+static inline u32 xve_reset_clock_counter_val_m(void)
+{
+	return 0x7ffU << 17U;
+}
+static inline u32 xve_reset_clock_counter_val_v(u32 r)
+{
+	return (r >> 17U) & 0x7ffU;
+}
 #endif

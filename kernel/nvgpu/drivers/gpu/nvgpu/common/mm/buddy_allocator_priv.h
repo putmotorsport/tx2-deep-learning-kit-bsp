@@ -1,27 +1,32 @@
 /*
- * Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef BUDDY_ALLOCATOR_PRIV_H
-#define BUDDY_ALLOCATOR_PRIV_H
+#ifndef NVGPU_MM_BUDDY_ALLOCATOR_PRIV_H
+#define NVGPU_MM_BUDDY_ALLOCATOR_PRIV_H
 
-#include <linux/list.h>
-#include <linux/rbtree.h>
+#include <nvgpu/rbtree.h>
+#include <nvgpu/list.h>
 
-#include <nvgpu/kmem.h>
-
+struct nvgpu_kmem_cache;
 struct nvgpu_allocator;
 struct vm_gk20a;
 
@@ -34,25 +39,41 @@ struct nvgpu_buddy {
 	struct nvgpu_buddy *left;	/* Lower address sub-node. */
 	struct nvgpu_buddy *right;	/* Higher address sub-node. */
 
-	struct list_head buddy_entry;	/* List entry for various lists. */
-	struct rb_node alloced_entry;	/* RB tree of allocations. */
+	struct nvgpu_list_node buddy_entry;	/* List entry for various lists. */
+	struct nvgpu_rbtree_node alloced_entry;	/* RB tree of allocations. */
 
 	u64 start;			/* Start address of this buddy. */
 	u64 end;			/* End address of this buddy. */
 	u64 order;			/* Buddy order. */
 
-#define BALLOC_BUDDY_ALLOCED	0x1
-#define BALLOC_BUDDY_SPLIT	0x2
-#define BALLOC_BUDDY_IN_LIST	0x4
-	int flags;			/* List of associated flags. */
+#define BALLOC_BUDDY_ALLOCED	0x1U
+#define BALLOC_BUDDY_SPLIT	0x2U
+#define BALLOC_BUDDY_IN_LIST	0x4U
+	u32 flags;			/* List of associated flags. */
 
 	/*
 	 * Size of the PDE this buddy is using. This allows for grouping like
-	 * sized allocations into the same PDE. This uses the gmmu_pgsz_gk20a
-	 * enum except for the BALLOC_PTE_SIZE_ANY specifier.
+	 * sized allocations into the same PDE.
 	 */
-#define BALLOC_PTE_SIZE_ANY	-1
-	int pte_size;
+#define BALLOC_PTE_SIZE_ANY	(~0U)
+#define BALLOC_PTE_SIZE_INVALID	0U
+#define BALLOC_PTE_SIZE_SMALL	1U
+#define BALLOC_PTE_SIZE_BIG	2U
+	u32 pte_size;
+};
+
+static inline struct nvgpu_buddy *
+nvgpu_buddy_from_buddy_entry(struct nvgpu_list_node *node)
+{
+	return (struct nvgpu_buddy *)
+		((uintptr_t)node - offsetof(struct nvgpu_buddy, buddy_entry));
+};
+
+static inline struct nvgpu_buddy *
+nvgpu_buddy_from_rbtree_node(struct nvgpu_rbtree_node *node)
+{
+	return (struct nvgpu_buddy *)
+		((uintptr_t)node - offsetof(struct nvgpu_buddy, alloced_entry));
 };
 
 #define __buddy_flag_ops(flag, flag_up)					\
@@ -90,11 +111,18 @@ __buddy_flag_ops(in_list, IN_LIST);
  * Keeps info for a fixed allocation.
  */
 struct nvgpu_fixed_alloc {
-	struct list_head buddies;	/* List of buddies. */
-	struct rb_node alloced_entry;	/* RB tree of fixed allocations. */
+	struct nvgpu_list_node buddies;	/* List of buddies. */
+	struct nvgpu_rbtree_node alloced_entry;	/* RB tree of fixed allocations. */
 
 	u64 start;			/* Start of fixed block. */
 	u64 end;			/* End address. */
+};
+
+static inline struct nvgpu_fixed_alloc *
+nvgpu_fixed_alloc_from_rbtree_node(struct nvgpu_rbtree_node *node)
+{
+	return (struct nvgpu_fixed_alloc *)
+	((uintptr_t)node - offsetof(struct nvgpu_fixed_alloc, alloced_entry));
 };
 
 /*
@@ -123,19 +151,19 @@ struct nvgpu_buddy_allocator {
 	u64 blks;			/* Count of blks in the space. */
 	u64 max_order;			/* Specific maximum order. */
 
-	struct rb_root alloced_buddies;	/* Outstanding allocations. */
-	struct rb_root fixed_allocs;	/* Outstanding fixed allocations. */
+	struct nvgpu_rbtree_node *alloced_buddies;	/* Outstanding allocations. */
+	struct nvgpu_rbtree_node *fixed_allocs;	/* Outstanding fixed allocations. */
 
-	struct list_head co_list;
+	struct nvgpu_list_node co_list;
 
 	struct nvgpu_kmem_cache *buddy_cache;
 
 	/*
 	 * Impose an upper bound on the maximum order.
 	 */
-#define GPU_BALLOC_ORDER_LIST_LEN	(GPU_BALLOC_MAX_ORDER + 1)
+#define GPU_BALLOC_ORDER_LIST_LEN	(GPU_BALLOC_MAX_ORDER + 1U)
 
-	struct list_head buddy_list[GPU_BALLOC_ORDER_LIST_LEN];
+	struct nvgpu_list_node buddy_list[GPU_BALLOC_ORDER_LIST_LEN];
 	u64 buddy_list_len[GPU_BALLOC_ORDER_LIST_LEN];
 	u64 buddy_list_split[GPU_BALLOC_ORDER_LIST_LEN];
 	u64 buddy_list_alloced[GPU_BALLOC_ORDER_LIST_LEN];
@@ -147,8 +175,8 @@ struct nvgpu_buddy_allocator {
 	 */
 	u64 pte_blk_order;
 
-	int initialized;
-	int alloc_made;			/* True after the first alloc. */
+	bool initialized;
+	bool alloc_made;		/* True after the first alloc. */
 
 	u64 flags;
 
@@ -163,8 +191,8 @@ static inline struct nvgpu_buddy_allocator *buddy_allocator(
 	return (struct nvgpu_buddy_allocator *)(a)->priv;
 }
 
-static inline struct list_head *balloc_get_order_list(
-	struct nvgpu_buddy_allocator *a, int order)
+static inline struct nvgpu_list_node *balloc_get_order_list(
+	struct nvgpu_buddy_allocator *a, u64 order)
 {
 	return &a->buddy_list[order];
 }
@@ -193,4 +221,4 @@ static inline struct nvgpu_allocator *balloc_owner(
 	return a->owner;
 }
 
-#endif
+#endif /* NVGPU_MM_BUDDY_ALLOCATOR_PRIV_H */

@@ -1,20 +1,29 @@
 /*
- * Copyright (c) 2014-2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2014-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 
 #ifndef NVGPU_BIOS_H
 #define NVGPU_BIOS_H
 
-#include <linux/types.h>
+#include <nvgpu/types.h>
 
 struct gk20a;
 
@@ -71,8 +80,8 @@ struct fll_descriptor_header {
 	u8 size;
 } __packed;
 
-#define FLL_DESCRIPTOR_HEADER_10_SIZE_4     4
-#define FLL_DESCRIPTOR_HEADER_10_SIZE_6     6
+#define FLL_DESCRIPTOR_HEADER_10_SIZE_4     4U
+#define FLL_DESCRIPTOR_HEADER_10_SIZE_6     6U
 
 struct fll_descriptor_header_10 {
 	u8 version;
@@ -82,7 +91,7 @@ struct fll_descriptor_header_10 {
 	u16 max_min_freq_mhz;
 } __packed;
 
-#define FLL_DESCRIPTOR_ENTRY_10_SIZE     15
+#define FLL_DESCRIPTOR_ENTRY_10_SIZE     15U
 
 struct fll_descriptor_entry_10 {
 	u8 fll_device_type;
@@ -100,6 +109,9 @@ struct fll_descriptor_entry_10 {
 
 #define NV_FLL_DESC_FLL_PARAMS_MDIV_MASK 0x1F
 #define NV_FLL_DESC_FLL_PARAMS_MDIV_SHIFT 0
+
+#define NV_FLL_DESC_FLL_PARAMS_SKIP_PLDIV_BELOW_DVCO_MIN_MASK 0x20
+#define NV_FLL_DESC_FLL_PARAMS_SKIP_PLDIV_BELOW_DVCO_MIN_SHIFT 5
 
 #define NV_FLL_DESC_LUT_PARAMS_VSELECT_MASK 0x3
 #define NV_FLL_DESC_LUT_PARAMS_VSELECT_SHIFT 0
@@ -125,6 +137,9 @@ struct vin_descriptor_entry_10 {
 #define NV_VIN_DESC_FLAGS0_VIN_CAL_REVISION_MASK 0x7
 #define NV_VIN_DESC_FLAGS0_VIN_CAL_REVISION_SHIFT 0
 
+#define NV_VIN_DESC_FLAGS0_VIN_CAL_TYPE_MASK 0xF0
+#define NV_VIN_DESC_FLAGS0_VIN_CAL_TYPE_SHIFT 4
+
 #define NV_VIN_DESC_FLAGS0_DISABLE_CONTROL_MASK 0x8
 #define NV_VIN_DESC_FLAGS0_DISABLE_CONTROL_SHIFT 3
 
@@ -140,7 +155,13 @@ struct vin_descriptor_entry_10 {
 #define NV_VIN_DESC_VIN_CAL_INTERCEPT_INTEGER_MASK 0xFFC0000
 #define NV_VIN_DESC_VIN_CAL_INTERCEPT_INTEGER_SHIFT 18
 
-#define VBIOS_CLOCKS_TABLE_1X_HEADER_SIZE_07 0x07
+#define NV_VIN_DESC_VIN_CAL_OFFSET_MASK 0x7F
+#define NV_VIN_DESC_VIN_CAL_OFFSET_SHIFT 0
+
+#define NV_VIN_DESC_VIN_CAL_GAIN_MASK 0xF80
+#define NV_VIN_DESC_VIN_CAL_GAIN_SHIFT 7
+
+#define VBIOS_CLOCKS_TABLE_1X_HEADER_SIZE_07 0x07U
 struct vbios_clocks_table_1x_header {
 	u8 version;
 	u8 header_size;
@@ -150,12 +171,32 @@ struct vbios_clocks_table_1x_header {
 	u16 cntr_sampling_periodms;
 } __packed;
 
-#define VBIOS_CLOCKS_TABLE_1X_ENTRY_SIZE_09                                 0x09
+#define VBIOS_CLOCKS_TABLE_35_HEADER_SIZE_09 0x09U
+struct vbios_clocks_table_35_header {
+	u8 version;
+	u8 header_size;
+	u8 entry_size;
+	u8 entry_count;
+	u8 clocks_hal;
+	u16 cntr_sampling_periodms;
+	u16 reference_window;
+} __packed;
+
+#define VBIOS_CLOCKS_TABLE_1X_ENTRY_SIZE_09                                0x09U
 struct vbios_clocks_table_1x_entry {
 	u8 flags0;
 	u16 param0;
 	u32 param1;
 	u16 param2;
+} __packed;
+
+#define VBIOS_CLOCKS_TABLE_35_ENTRY_SIZE_11                                0x0BU
+struct vbios_clocks_table_35_entry {
+	u8 flags0;
+	u16 param0;
+	u32 param1;
+	u16 param2;
+	u16 param3;
 } __packed;
 
 #define NV_VBIOS_CLOCKS_TABLE_1X_ENTRY_FLAGS0_USAGE_MASK                    0x1F
@@ -191,7 +232,18 @@ struct vbios_clocks_table_1x_entry {
 #define NV_VBIOS_CLOCKS_TABLE_1X_ENTRY_PARAM2_PROG_FORCE_NOISE_UNAWARE_ORDERING_FALSE   0x00
 #define NV_VBIOS_CLOCKS_TABLE_1X_ENTRY_PARAM2_PROG_FORCE_NOISE_UNAWARE_ORDERING_TRUE    0x01
 
-#define VBIOS_CLOCK_PROGRAMMING_TABLE_1X_HEADER_SIZE_08                              0x08
+#define NV_VBIOS_CLOCKS_TABLE_35_ENTRY_PARAM2_PROG_PRE_VOLT_ORDERING_IDX_MASK 0xF
+#define NV_VBIOS_CLOCKS_TABLE_35_ENTRY_PARAM2_PROG_PRE_VOLT_ORDERING_IDX_SHIFT 0
+
+#define NV_VBIOS_CLOCKS_TABLE_35_ENTRY_PARAM2_PROG_POST_VOLT_ORDERING_IDX_MASK     0xF0
+#define NV_VBIOS_CLOCKS_TABLE_35_ENTRY_PARAM2_PROG_POST_VOLT_ORDERING_IDX_SHIFT   4
+
+#define NV_VBIOS_CLOCKS_TABLE_35_ENTRY_PARAM3_CLK_MONITOR_THRESHOLD_MIN_MASK  0xFF
+#define NV_VBIOS_CLOCKS_TABLE_35_ENTRY_PARAM3_CLK_MONITOR_THRESHOLD_MIN_SHIFT  0
+#define NV_VBIOS_CLOCKS_TABLE_35_ENTRY_PARAM3_CLK_MONITOR_THRESHOLD_MAX_MASK  0xFF00
+#define NV_VBIOS_CLOCKS_TABLE_35_ENTRY_PARAM3_CLK_MONITOR_THRESHOLD_MAX_SHIFT 0x08
+
+#define VBIOS_CLOCK_PROGRAMMING_TABLE_1X_HEADER_SIZE_08                    0x08U
 struct vbios_clock_programming_table_1x_header {
 	u8 version;
 	u8 header_size;
@@ -203,8 +255,8 @@ struct vbios_clock_programming_table_1x_header {
 	u8 vf_entry_count;
 } __packed;
 
-#define VBIOS_CLOCK_PROGRAMMING_TABLE_1X_ENTRY_SIZE_05                      0x05
-#define VBIOS_CLOCK_PROGRAMMING_TABLE_1X_ENTRY_SIZE_0D                      0x0D
+#define VBIOS_CLOCK_PROGRAMMING_TABLE_1X_ENTRY_SIZE_05                     0x05U
+#define VBIOS_CLOCK_PROGRAMMING_TABLE_1X_ENTRY_SIZE_0D                     0x0DU
 struct vbios_clock_programming_table_1x_entry {
 	u8 flags0;
 	u16 freq_max_mhz;
@@ -237,7 +289,7 @@ struct vbios_clock_programming_table_1x_entry {
 #define NV_VBIOS_CLOCK_PROGRAMMING_TABLE_1X_ENTRY_PARAM1_PLL_FREQ_STEP_SIZE_MASK   0xFF
 #define NV_VBIOS_CLOCK_PROGRAMMING_TABLE_1X_ENTRY_PARAM1_PLL_FREQ_STEP_SIZE_SHIFT  0
 
-#define VBIOS_CLOCK_PROGRAMMING_TABLE_1X_SLAVE_ENTRY_SIZE_03              0x03
+#define VBIOS_CLOCK_PROGRAMMING_TABLE_1X_SLAVE_ENTRY_SIZE_03               0x03U
 struct vbios_clock_programming_table_1x_slave_entry {
 	u8 clk_dom_idx;
 	u16 param0;
@@ -249,7 +301,7 @@ struct vbios_clock_programming_table_1x_slave_entry {
 #define NV_VBIOS_CLOCK_PROGRAMMING_TABLE_1X_SLAVE_ENTRY_PARAM0_MASTER_TABLE_FREQ_MASK  0x3FFF
 #define NV_VBIOS_CLOCK_PROGRAMMING_TABLE_1X_SLAVE_ENTRY_PARAM0_MASTER_TABLE_FREQ_SHIFT  0
 
-#define VBIOS_CLOCK_PROGRAMMING_TABLE_1X_VF_ENTRY_SIZE_02                   0x02
+#define VBIOS_CLOCK_PROGRAMMING_TABLE_1X_VF_ENTRY_SIZE_02                  0x02U
 struct vbios_clock_programming_table_1x_vf_entry {
 	u8 vfe_idx;
 	u8 param0;
@@ -268,8 +320,8 @@ struct vbios_vfe_3x_header_struct {
 	u8 polling_periodms;
 } __packed;
 
-#define VBIOS_VFE_3X_VAR_ENTRY_SIZE_11                                      0x11
-#define VBIOS_VFE_3X_VAR_ENTRY_SIZE_19                                      0x19
+#define VBIOS_VFE_3X_VAR_ENTRY_SIZE_11                                     0x11U
+#define VBIOS_VFE_3X_VAR_ENTRY_SIZE_19                                     0x19U
 struct vbios_vfe_3x_var_entry_struct {
 	u8 type;
 	u32 out_range_min;
@@ -280,13 +332,13 @@ struct vbios_vfe_3x_var_entry_struct {
 	u32 param3;
 } __packed;
 
-#define VBIOS_VFE_3X_VAR_ENTRY_TYPE_DISABLED                                0x00
-#define VBIOS_VFE_3X_VAR_ENTRY_TYPE_SINGLE_FREQUENCY                        0x01
-#define VBIOS_VFE_3X_VAR_ENTRY_TYPE_SINGLE_VOLTAGE                          0x02
-#define VBIOS_VFE_3X_VAR_ENTRY_TYPE_SINGLE_SENSED_TEMP                      0x03
-#define VBIOS_VFE_3X_VAR_ENTRY_TYPE_SINGLE_SENSED_FUSE                      0x04
-#define VBIOS_VFE_3X_VAR_ENTRY_TYPE_DERIVED_PRODUCT                         0x05
-#define VBIOS_VFE_3X_VAR_ENTRY_TYPE_DERIVED_SUM                             0x06
+#define VBIOS_VFE_3X_VAR_ENTRY_TYPE_DISABLED                               0x00U
+#define VBIOS_VFE_3X_VAR_ENTRY_TYPE_SINGLE_FREQUENCY                       0x01U
+#define VBIOS_VFE_3X_VAR_ENTRY_TYPE_SINGLE_VOLTAGE                         0x02U
+#define VBIOS_VFE_3X_VAR_ENTRY_TYPE_SINGLE_SENSED_TEMP                     0x03U
+#define VBIOS_VFE_3X_VAR_ENTRY_TYPE_SINGLE_SENSED_FUSE                     0x04U
+#define VBIOS_VFE_3X_VAR_ENTRY_TYPE_DERIVED_PRODUCT                        0x05U
+#define VBIOS_VFE_3X_VAR_ENTRY_TYPE_DERIVED_SUM                            0x06U
 
 #define VBIOS_VFE_3X_VAR_ENTRY_PAR0_SSTEMP_TH_CH_IDX_MASK 0xFF
 #define VBIOS_VFE_3X_VAR_ENTRY_PAR0_SSTEMP_TH_CH_IDX_SHIFT 0
@@ -308,6 +360,9 @@ struct vbios_vfe_3x_var_entry_struct {
 
 #define VBIOS_VFE_3X_VAR_ENTRY_PAR0_SSFUSE_USE_DEFAULT_ON_VER_CHECK_FAIL_MASK 0x1000000
 #define VBIOS_VFE_3X_VAR_ENTRY_PAR0_SSFUSE_USE_DEFAULT_ON_VER_CHECK_FAIL_SHIFT 24
+
+#define VBIOS_VFE_3X_VAR_ENTRY_PAR0_SSFUSE_VALUE_SIGNED_INTEGER_MASK 0x2000000
+#define VBIOS_VFE_3X_VAR_ENTRY_PAR0_SSFUSE_VALUE_SIGNED_INTEGER_SHIFT 25
 
 #define VBIOS_VFE_3X_VAR_ENTRY_PAR0_SSFUSE_USE_DEFAULT_ON_VER_CHECK_FAIL_YES 0x00000001
 #define VBIOS_VFE_3X_VAR_ENTRY_PAR0_SSFUSE_USE_DEFAULT_ON_VER_CHECK_FAIL_NO 0x00000000
@@ -332,8 +387,8 @@ struct vbios_vfe_3x_var_entry_struct {
 #define VBIOS_VFE_3X_VAR_ENTRY_PAR1_SSFUSE_HW_CORRECTION_OFFSET_MASK 0xFFFFFFFF
 #define VBIOS_VFE_3X_VAR_ENTRY_PAR1_SSFUSE_HW_CORRECTION_OFFSET_SHIFT 0
 
-#define VBIOS_VFE_3X_EQU_ENTRY_SIZE_17                                      0x17
-#define VBIOS_VFE_3X_EQU_ENTRY_SIZE_18                                      0x18
+#define VBIOS_VFE_3X_EQU_ENTRY_SIZE_17                                     0x17U
+#define VBIOS_VFE_3X_EQU_ENTRY_SIZE_18                                     0x18U
 
 struct vbios_vfe_3x_equ_entry_struct {
 	u8 type;
@@ -348,14 +403,14 @@ struct vbios_vfe_3x_equ_entry_struct {
 } __packed;
 
 
-#define VBIOS_VFE_3X_EQU_ENTRY_TYPE_DISABLED                                0x00
-#define VBIOS_VFE_3X_EQU_ENTRY_TYPE_QUADRATIC                               0x01
-#define VBIOS_VFE_3X_EQU_ENTRY_TYPE_MINMAX                                  0x02
-#define VBIOS_VFE_3X_EQU_ENTRY_TYPE_COMPARE                                 0x03
-#define VBIOS_VFE_3X_EQU_ENTRY_TYPE_QUADRATIC_FXP                           0x04
-#define VBIOS_VFE_3X_EQU_ENTRY_TYPE_MINMAX_FXP                              0x05
+#define VBIOS_VFE_3X_EQU_ENTRY_TYPE_DISABLED                               0x00U
+#define VBIOS_VFE_3X_EQU_ENTRY_TYPE_QUADRATIC                              0x01U
+#define VBIOS_VFE_3X_EQU_ENTRY_TYPE_MINMAX                                 0x02U
+#define VBIOS_VFE_3X_EQU_ENTRY_TYPE_COMPARE                                0x03U
+#define VBIOS_VFE_3X_EQU_ENTRY_TYPE_QUADRATIC_FXP                          0x04U
+#define VBIOS_VFE_3X_EQU_ENTRY_TYPE_MINMAX_FXP                             0x05U
 
-#define VBIOS_VFE_3X_EQU_ENTRY_IDX_INVALID                                  0xFF
+#define VBIOS_VFE_3X_EQU_ENTRY_IDX_INVALID                                 0xFFU
 
 #define VBIOS_VFE_3X_EQU_ENTRY_PAR0_QUADRATIC_C0_MASK 0xFFFFFFFF
 #define VBIOS_VFE_3X_EQU_ENTRY_PAR0_QUADRATIC_C0_SHIFT 0
@@ -397,35 +452,35 @@ struct vbios_vfe_3x_equ_entry_struct {
 #define VBIOS_VFE_3X_EQU_ENTRY_PAR3_OUTPUT_TYPE_VF_GAIN                      0x3
 #define VBIOS_VFE_3X_EQU_ENTRY_PAR3_OUTPUT_TYPE_VOLT_DELTA_UV                0x4
 
-#define NV_VFIELD_DESC_SIZE_BYTE            0x00000000
-#define NV_VFIELD_DESC_SIZE_WORD            0x00000001
-#define NV_VFIELD_DESC_SIZE_DWORD           0x00000002
-#define VFIELD_SIZE(pvregentry) ((pvregentry->strap_reg_desc & 0x18) >> 3)
+#define NV_VFIELD_DESC_SIZE_BYTE            0x00000000U
+#define NV_VFIELD_DESC_SIZE_WORD            0x00000001U
+#define NV_VFIELD_DESC_SIZE_DWORD           0x00000002U
+#define VFIELD_SIZE(pvregentry) ((pvregentry->strap_reg_desc & 0x18U) >> 3U)
 
-#define NV_PMU_BIOS_VFIELD_DESC_CODE_INVALID         0x00000000
-#define NV_PMU_BIOS_VFIELD_DESC_CODE_REG             0x00000001
-#define NV_PMU_BIOS_VFIELD_DESC_CODE_INDEX_REG       0x00000002
+#define NV_PMU_BIOS_VFIELD_DESC_CODE_INVALID         0x00000000U
+#define NV_PMU_BIOS_VFIELD_DESC_CODE_REG             0x00000001U
+#define NV_PMU_BIOS_VFIELD_DESC_CODE_INDEX_REG       0x00000002U
 
 #define NV_VFIELD_DESC_CODE_INVALID         NV_PMU_BIOS_VFIELD_DESC_CODE_INVALID
 #define NV_VFIELD_DESC_CODE_REG             NV_PMU_BIOS_VFIELD_DESC_CODE_REG
 #define NV_VFIELD_DESC_CODE_INDEX_REG       NV_PMU_BIOS_VFIELD_DESC_CODE_INDEX_REG
 
-#define VFIELD_CODE(pvregentry) ((pvregentry->strap_reg_desc & 0xE0) >> 5)
+#define VFIELD_CODE(pvregentry) ((pvregentry->strap_reg_desc & 0xE0U) >> 5U)
 
-#define VFIELD_ID_STRAP_IDDQ                    0x09
-#define VFIELD_ID_STRAP_IDDQ_1                  0x0B
+#define VFIELD_ID_STRAP_IDDQ                    0x09U
+#define VFIELD_ID_STRAP_IDDQ_1                  0x0BU
 
-#define VFIELD_REG_HEADER_SIZE 3
+#define VFIELD_REG_HEADER_SIZE 3U
 struct vfield_reg_header {
 	u8 version;
 	u8 entry_size;
 	u8 count;
 } __packed;
 
-#define VBIOS_VFIELD_REG_TABLE_VERSION_1_0  0x10
+#define VBIOS_VFIELD_REG_TABLE_VERSION_1_0  0x10U
 
 
-#define VFIELD_REG_ENTRY_SIZE 13
+#define VFIELD_REG_ENTRY_SIZE 13U
 struct vfield_reg_entry {
 	u8 strap_reg_desc;
 	u32 reg;
@@ -433,7 +488,7 @@ struct vfield_reg_entry {
 	u32 index;
 } __packed;
 
-#define VFIELD_HEADER_SIZE 3
+#define VFIELD_HEADER_SIZE 3U
 
 struct vfield_header {
 	u8 version;
@@ -441,24 +496,24 @@ struct vfield_header {
 	u8 count;
 } __packed;
 
-#define VBIOS_VFIELD_TABLE_VERSION_1_0  0x10
+#define VBIOS_VFIELD_TABLE_VERSION_1_0  0x10U
 
-#define VFIELD_BIT_START(ventry) (ventry.strap_desc & 0x1F)
-#define VFIELD_BIT_STOP(ventry)	((ventry.strap_desc & 0x3E0) >> 5)
-#define VFIELD_BIT_REG(ventry) ((ventry.strap_desc & 0x3C00) >> 10)
+#define VFIELD_BIT_START(ventry) (ventry.strap_desc & 0x1FU)
+#define VFIELD_BIT_STOP(ventry)	((ventry.strap_desc & 0x3E0U) >> 5U)
+#define VFIELD_BIT_REG(ventry) ((ventry.strap_desc & 0x3C00U) >> 10U)
 
-#define VFIELD_ENTRY_SIZE 3
+#define VFIELD_ENTRY_SIZE 3U
 
 struct vfield_entry {
 	u8 strap_id;
 	u16 strap_desc;
 } __packed;
 
-#define PERF_CLK_DOMAINS_IDX_MAX		(32)
+#define PERF_CLK_DOMAINS_IDX_MAX		(32U)
 #define PERF_CLK_DOMAINS_IDX_INVALID		PERF_CLK_DOMAINS_IDX_MAX
 
-#define VBIOS_PSTATE_TABLE_VERSION_5X		0x50
-#define VBIOS_PSTATE_HEADER_5X_SIZE_10		(10)
+#define VBIOS_PSTATE_TABLE_VERSION_5X		0x50U
+#define VBIOS_PSTATE_HEADER_5X_SIZE_10		(10U)
 
 struct vbios_pstate_header_5x {
 	u8 version;
@@ -473,10 +528,10 @@ struct vbios_pstate_header_5x {
 u8 cpi_features;
 } __packed;
 
-#define VBIOS_PSTATE_CLOCK_ENTRY_5X_SIZE_6	6
+#define VBIOS_PSTATE_CLOCK_ENTRY_5X_SIZE_6	6U
 
-#define VBIOS_PSTATE_BASE_ENTRY_5X_SIZE_2	0x2
-#define VBIOS_PSTATE_BASE_ENTRY_5X_SIZE_3	0x3
+#define VBIOS_PSTATE_BASE_ENTRY_5X_SIZE_2	0x2U
+#define VBIOS_PSTATE_BASE_ENTRY_5X_SIZE_3	0x3U
 
 struct vbios_pstate_entry_clock_5x {
 	u16 param0;
@@ -499,13 +554,13 @@ struct vbios_pstate_entry_5x {
 #define VBIOS_PSTATE_5X_CLOCK_PROG_PARAM1_MAX_FREQ_MHZ_SHIFT	14
 #define VBIOS_PSTATE_5X_CLOCK_PROG_PARAM1_MAX_FREQ_MHZ_MASK	0x0FFFC000
 
-#define VBIOS_PERFLEVEL_SKIP_ENTRY				0xFF
+#define VBIOS_PERFLEVEL_SKIP_ENTRY				0xFFU
 
-#define VBIOS_MEMORY_CLOCK_HEADER_11_VERSION				0x11
+#define VBIOS_MEMORY_CLOCK_HEADER_11_VERSION				0x11U
 
-#define VBIOS_MEMORY_CLOCK_HEADER_11_0_SIZE				16
-#define VBIOS_MEMORY_CLOCK_HEADER_11_1_SIZE				21
-#define VBIOS_MEMORY_CLOCK_HEADER_11_2_SIZE				26
+#define VBIOS_MEMORY_CLOCK_HEADER_11_0_SIZE				16U
+#define VBIOS_MEMORY_CLOCK_HEADER_11_1_SIZE				21U
+#define VBIOS_MEMORY_CLOCK_HEADER_11_2_SIZE				26U
 
 struct vbios_memory_clock_header_1x {
 	u8 version;
@@ -525,7 +580,7 @@ struct vbios_memory_clock_header_1x {
 	u8 cmd_script_list_count;
 } __packed;
 
-#define VBIOS_MEMORY_CLOCK_BASE_ENTRY_11_2_SIZE				20
+#define VBIOS_MEMORY_CLOCK_BASE_ENTRY_11_2_SIZE				20U
 
 struct vbios_memory_clock_base_entry_11 {
 	u16 minimum;
@@ -541,14 +596,16 @@ struct vbios_memory_clock_base_entry_11 {
 
 /* Script Pointer Index */
 /* #define VBIOS_MEMORY_CLOCK_BASE_ENTRY_11_FLAGS1_SCRIPT_INDEX		3:2*/
-#define VBIOS_MEMORY_CLOCK_BASE_ENTRY_11_FLAGS1_SCRIPT_INDEX_MASK	0xc
+#define VBIOS_MEMORY_CLOCK_BASE_ENTRY_11_FLAGS1_SCRIPT_INDEX_MASK	\
+							((u8)0xc)
 #define VBIOS_MEMORY_CLOCK_BASE_ENTRY_11_FLAGS1_SCRIPT_INDEX_SHIFT	2
 /* #define VBIOS_MEMORY_CLOCK_BASE_ENTRY_12_FLAGS2_CMD_SCRIPT_INDEX	1:0*/
-#define VBIOS_MEMORY_CLOCK_BASE_ENTRY_12_FLAGS2_CMD_SCRIPT_INDEX_MASK	0x3
+#define VBIOS_MEMORY_CLOCK_BASE_ENTRY_12_FLAGS2_CMD_SCRIPT_INDEX_MASK \
+							((u8)0x3)
 #define VBIOS_MEMORY_CLOCK_BASE_ENTRY_12_FLAGS2_CMD_SCRIPT_INDEX_SHIFT	0
 
-#define VBIOS_POWER_SENSORS_VERSION_2X                                      0x20
-#define VBIOS_POWER_SENSORS_2X_HEADER_SIZE_08                         0x00000008
+#define VBIOS_POWER_SENSORS_VERSION_2X                                     0x20U
+#define VBIOS_POWER_SENSORS_2X_HEADER_SIZE_08                        0x00000008U
 
 struct pwr_sensors_2x_header {
 	u8 version;
@@ -558,7 +615,7 @@ struct pwr_sensors_2x_header {
 	u32 ba_script_pointer;
 } __packed;
 
-#define VBIOS_POWER_SENSORS_2X_ENTRY_SIZE_15                          0x00000015
+#define VBIOS_POWER_SENSORS_2X_ENTRY_SIZE_15                         0x00000015U
 
 struct pwr_sensors_2x_entry {
 	u8 flags0;
@@ -571,7 +628,7 @@ struct pwr_sensors_2x_entry {
 
 #define NV_VBIOS_POWER_SENSORS_2X_ENTRY_FLAGS0_CLASS_MASK                   0xF
 #define NV_VBIOS_POWER_SENSORS_2X_ENTRY_FLAGS0_CLASS_SHIFT                    0
-#define NV_VBIOS_POWER_SENSORS_2X_ENTRY_FLAGS0_CLASS_I2C              0x00000001
+#define NV_VBIOS_POWER_SENSORS_2X_ENTRY_FLAGS0_CLASS_I2C             0x00000001U
 
 #define NV_VBIOS_POWER_SENSORS_2X_ENTRY_CLASS_PARAM0_I2C_INDEX_MASK        0xFF
 #define NV_VBIOS_POWER_SENSORS_2X_ENTRY_CLASS_PARAM0_I2C_INDEX_SHIFT          0
@@ -596,8 +653,8 @@ struct pwr_sensors_2x_entry {
 #define NV_VBIOS_POWER_SENSORS_2X_ENTRY_SENSOR_PARAM3_INA3221_CURR_CORRECT_B_MASK  0xFFFF0000
 #define NV_VBIOS_POWER_SENSORS_2X_ENTRY_SENSOR_PARAM3_INA3221_CURR_CORRECT_B_SHIFT  16
 
-#define VBIOS_POWER_TOPOLOGY_VERSION_2X                                      0x20
-#define VBIOS_POWER_TOPOLOGY_2X_HEADER_SIZE_06                         0x00000006
+#define VBIOS_POWER_TOPOLOGY_VERSION_2X                                    0x20U
+#define VBIOS_POWER_TOPOLOGY_2X_HEADER_SIZE_06                       0x00000006U
 
 struct pwr_topology_2x_header {
 	u8 version;
@@ -608,7 +665,7 @@ struct pwr_topology_2x_header {
 	u8 num_rel_entries;
 } __packed;
 
-#define VBIOS_POWER_TOPOLOGY_2X_ENTRY_SIZE_16                          0x00000016
+#define VBIOS_POWER_TOPOLOGY_2X_ENTRY_SIZE_16                        0x00000016U
 
 struct pwr_topology_2x_entry {
 	u8 flags0;
@@ -622,15 +679,15 @@ struct pwr_topology_2x_entry {
 
 #define NV_VBIOS_POWER_TOPOLOGY_2X_ENTRY_FLAGS0_CLASS_MASK                  0xF
 #define NV_VBIOS_POWER_TOPOLOGY_2X_ENTRY_FLAGS0_CLASS_SHIFT                   0
-#define NV_VBIOS_POWER_TOPOLOGY_2X_ENTRY_FLAGS0_CLASS_SENSOR                0x00000001
+#define NV_VBIOS_POWER_TOPOLOGY_2X_ENTRY_FLAGS0_CLASS_SENSOR      U8(0x00000001)
 
 #define NV_VBIOS_POWER_TOPOLOGY_2X_ENTRY_PARAM1_SENSOR_INDEX_MASK          0xFF
 #define NV_VBIOS_POWER_TOPOLOGY_2X_ENTRY_PARAM1_SENSOR_INDEX_SHIFT            0
 #define NV_VBIOS_POWER_TOPOLOGY_2X_ENTRY_PARAM1_SENSOR_PROVIDER_INDEX_MASK 0xFF00
 #define NV_VBIOS_POWER_TOPOLOGY_2X_ENTRY_PARAM1_SENSOR_PROVIDER_INDEX_SHIFT   8
 
-#define VBIOS_POWER_POLICY_VERSION_3X                                       0x30
-#define VBIOS_POWER_POLICY_3X_HEADER_SIZE_25                          0x00000025
+#define VBIOS_POWER_POLICY_VERSION_3X                                      0x30U
+#define VBIOS_POWER_POLICY_3X_HEADER_SIZE_25                         0x00000025U
 
 struct pwr_policy_3x_header_struct {
 	u8 version;
@@ -657,7 +714,7 @@ struct pwr_policy_3x_header_struct {
 	u8 num_table_viol_entries;
 } __packed;
 
-#define VBIOS_POWER_POLICY_3X_ENTRY_SIZE_2E                           0x0000002E
+#define VBIOS_POWER_POLICY_3X_ENTRY_SIZE_2E                          0x0000002EU
 
 struct pwr_policy_3x_entry_struct {
 	u8 flags0;
@@ -681,7 +738,7 @@ struct pwr_policy_3x_entry_struct {
 
 #define NV_VBIOS_POWER_POLICY_3X_ENTRY_FLAGS0_CLASS_MASK                    0xF
 #define NV_VBIOS_POWER_POLICY_3X_ENTRY_FLAGS0_CLASS_SHIFT                    0
-#define NV_VBIOS_POWER_POLICY_3X_ENTRY_FLAGS0_CLASS_HW_THRESHOLD        0x00000005
+#define NV_VBIOS_POWER_POLICY_3X_ENTRY_FLAGS0_CLASS_HW_THRESHOLD     0x00000005U
 #define NV_VBIOS_POWER_POLICY_3X_ENTRY_FLAGS0_LIMIT_UNIT_MASK              0x10
 #define NV_VBIOS_POWER_POLICY_3X_ENTRY_FLAGS0_LIMIT_UNIT_SHIFT                4
 
@@ -711,11 +768,12 @@ struct vbios_voltage_rail_table_1x_header {
 	u8 volt_domain_hal;
 } __packed;
 
-#define NV_VBIOS_VOLTAGE_RAIL_1X_ENTRY_SIZE_07		0X00000007
-#define NV_VBIOS_VOLTAGE_RAIL_1X_ENTRY_SIZE_08		0X00000008
-#define NV_VBIOS_VOLTAGE_RAIL_1X_ENTRY_SIZE_09		0X00000009
-#define NV_VBIOS_VOLTAGE_RAIL_1X_ENTRY_SIZE_0A		0X0000000A
-#define NV_VBIOS_VOLTAGE_RAIL_1X_ENTRY_SIZE_0B		0X0000000B
+#define NV_VBIOS_VOLTAGE_RAIL_1X_ENTRY_SIZE_07		0X00000007U
+#define NV_VBIOS_VOLTAGE_RAIL_1X_ENTRY_SIZE_08		0X00000008U
+#define NV_VBIOS_VOLTAGE_RAIL_1X_ENTRY_SIZE_09		0X00000009U
+#define NV_VBIOS_VOLTAGE_RAIL_1X_ENTRY_SIZE_0A		0X0000000AU
+#define NV_VBIOS_VOLTAGE_RAIL_1X_ENTRY_SIZE_0B		0X0000000BU
+#define NV_VBIOS_VOLTAGE_RAIL_1X_ENTRY_SIZE_0C		0X0000000CU
 
 struct vbios_voltage_rail_table_1x_entry {
 	u32 boot_voltage_uv;
@@ -726,6 +784,7 @@ struct vbios_voltage_rail_table_1x_entry {
 	u8 boot_volt_vfe_equ_idx;
 	u8 vmin_limit_vfe_equ_idx;
 	u8 volt_margin_limit_vfe_equ_idx;
+	u8 volt_scale_exp_pwr_equ_idx;
 } __packed;
 
 /* Voltage Device Table */
@@ -734,7 +793,7 @@ struct vbios_voltage_device_table_1x_header {
 	u8 header_size;
 	u8 table_entry_size;
 	u8 num_table_entries;
-};
+} __packed;
 
 struct vbios_voltage_device_table_1x_entry {
 	u8 type;
@@ -745,10 +804,10 @@ struct vbios_voltage_device_table_1x_entry {
 	u32 param2;
 	u32 param3;
 	u32 param4;
-};
+} __packed;
 
-#define NV_VBIOS_VOLTAGE_DEVICE_1X_ENTRY_TYPE_INVALID	0x00
-#define NV_VBIOS_VOLTAGE_DEVICE_1X_ENTRY_TYPE_PSV		0x02
+#define NV_VBIOS_VOLTAGE_DEVICE_1X_ENTRY_TYPE_INVALID		0x00U
+#define NV_VBIOS_VOLTAGE_DEVICE_1X_ENTRY_TYPE_PSV		0x02U
 
 #define NV_VBIOS_VDT_1X_ENTRY_PARAM0_PSV_INPUT_FREQUENCY_MASK	\
 		GENMASK(23, 0)
@@ -796,18 +855,21 @@ struct vbios_voltage_policy_table_1x_header {
 	u8 table_entry_size;
 	u8 num_table_entries;
 	u8 perf_core_vf_seq_policy_idx;
-};
+} __packed;
 
 struct vbios_voltage_policy_table_1x_entry {
 	u8 type;
 	u32 param0;
 	u32 param1;
-};
+	u32 param2;
+	u32 param3;
+} __packed;
 
-#define NV_VBIOS_VOLTAGE_POLICY_1X_ENTRY_TYPE_INVALID		0x00
-#define NV_VBIOS_VOLTAGE_POLICY_1X_ENTRY_TYPE_SINGLE_RAIL	0x01
-#define NV_VBIOS_VOLTAGE_POLICY_1X_ENTRY_TYPE_SR_MULTI_STEP	0x02
-#define NV_VBIOS_VOLTAGE_POLICY_1X_ENTRY_TYPE_SR_SINGLE_STEP	0x03
+#define NV_VBIOS_VOLTAGE_POLICY_1X_ENTRY_TYPE_INVALID			0x00U
+#define NV_VBIOS_VOLTAGE_POLICY_1X_ENTRY_TYPE_SINGLE_RAIL		0x01U
+#define NV_VBIOS_VOLTAGE_POLICY_1X_ENTRY_TYPE_SR_MULTI_STEP		0x02U
+#define NV_VBIOS_VOLTAGE_POLICY_1X_ENTRY_TYPE_SR_SINGLE_STEP		0x03U
+#define NV_VBIOS_VOLTAGE_POLICY_1X_ENTRY_TYPE_SINGLE_RAIL_MULTI_STEP	0x04U
 
 #define NV_VBIOS_VPT_ENTRY_PARAM0_SINGLE_RAIL_VOLT_DOMAIN_MASK \
 		GENMASK(7, 0)
@@ -828,15 +890,25 @@ struct vbios_voltage_policy_table_1x_entry {
 		GENMASK(31, 24)
 #define NV_VBIOS_VPT_ENTRY_PARAM0_SR_DELTA_SM_MAX_SHIFT 24
 
+#define NV_VBIOS_VPT_ENTRY_PARAM1_SR_SETTLE_TIME_INTERMEDIATE_MASK \
+		GENMASK(15, 0)
+#define NV_VBIOS_VPT_ENTRY_PARAM1_SR_SETTLE_TIME_INTERMEDIATE_SHIFT 0
+#define NV_VBIOS_VPT_ENTRY_PARAM2_SR_RAMP_UP_STEP_SIZE_UV_MASK \
+		GENMASK(31, 0)
+#define NV_VBIOS_VPT_ENTRY_PARAM2_SR_RAMP_UP_STEP_SIZE_UV_SHIFT 0
+#define NV_VBIOS_VPT_ENTRY_PARAM3_SR_RAMP_DOWN_STEP_SIZE_UV_MASK \
+		GENMASK(31, 0)
+#define NV_VBIOS_VPT_ENTRY_PARAM3_SR_RAMP_DOWN_STEP_SIZE_UV_SHIFT 0
+
 /* Type-Specific Parameter DWORD 0 - Type = _SR_MULTI_STEP */
 #define NV_VBIOS_VPT_ENTRY_PARAM1_SR_SETTLE_TIME_INTERMEDIATE_MASK \
 		GENMASK(15, 0)
 #define NV_VBIOS_VPT_ENTRY_PARAM1_SR_SETTLE_TIME_INTERMEDIATE_SHIFT \
 		0
 
-#define VBIOS_THERM_DEVICE_VERSION_1X                                      0x10
+#define VBIOS_THERM_DEVICE_VERSION_1X                                      0x10U
 
-#define VBIOS_THERM_DEVICE_1X_HEADER_SIZE_04                         0x00000004
+#define VBIOS_THERM_DEVICE_1X_HEADER_SIZE_04                         0x00000004U
 
 struct therm_device_1x_header {
 	u8 version;
@@ -851,14 +923,19 @@ struct therm_device_1x_entry {
 	u8 flags;
 } ;
 
-#define NV_VBIOS_THERM_DEVICE_1X_ENTRY_CLASS_GPU                               0x01
+#define NV_VBIOS_THERM_DEVICE_1X_ENTRY_CLASS_INVALID		0x00U
+#define NV_VBIOS_THERM_DEVICE_1X_ENTRY_CLASS_GPU			0x01U
+#define NV_VBIOS_THERM_DEVICE_1X_ENTRY_CLASS_GPU_GPC_TSOSC	0x02U
+#define NV_VBIOS_THERM_DEVICE_1X_ENTRY_CLASS_GPU_GPC_SCI	0x03U
+#define NV_VBIOS_THERM_DEVICE_1X_ENTRY_CLASS_HBM2_SITE		0x70U
+#define NV_VBIOS_THERM_DEVICE_1X_ENTRY_CLASS_HBM2_COMBINED	0x71U
 
 #define NV_VBIOS_THERM_DEVICE_1X_ENTRY_PARAM0_I2C_DEVICE_INDEX_MASK        0xFF
 #define NV_VBIOS_THERM_DEVICE_1X_ENTRY_PARAM0_I2C_DEVICE_INDEX_SHIFT          0
 
-#define VBIOS_THERM_CHANNEL_VERSION_1X                                     0x10
+#define VBIOS_THERM_CHANNEL_VERSION_1X                                     0x10U
 
-#define VBIOS_THERM_CHANNEL_1X_HEADER_SIZE_09                        0x00000009
+#define VBIOS_THERM_CHANNEL_1X_HEADER_SIZE_09                        0x00000009U
 
 struct therm_channel_1x_header {
 	u8 version;
@@ -870,7 +947,7 @@ struct therm_channel_1x_header {
 	u8 board_pri_ch_idx;
 	u8 mem_pri_ch_idx;
 	u8 pwr_supply_pri_ch_idx;
-};
+} __packed;
 
 struct therm_channel_1x_entry {
 	u8 class_id;
@@ -878,9 +955,9 @@ struct therm_channel_1x_entry {
 	u8 param1;
 	u8 param2;
 	u8 flags;
-};
+} __packed;
 
-#define NV_VBIOS_THERM_CHANNEL_1X_ENTRY_CLASS_DEVICE                       0x01
+#define NV_VBIOS_THERM_CHANNEL_1X_ENTRY_CLASS_DEVICE                       0x01U
 
 #define NV_VBIOS_THERM_CHANNEL_1X_ENTRY_PARAM0_DEVICE_INDEX_MASK           0xFF
 #define NV_VBIOS_THERM_CHANNEL_1X_ENTRY_PARAM0_DEVICE_INDEX_SHIFT             0
@@ -1042,5 +1119,5 @@ u32 nvgpu_bios_read_u32(struct gk20a *g, u32 offset);
 void *nvgpu_bios_get_perf_table_ptrs(struct gk20a *g,
 		struct bit_token *ptoken, u8 table_id);
 int nvgpu_bios_execute_script(struct gk20a *g, u32 offset);
-
+u32 nvgpu_bios_get_nvlink_config_data(struct gk20a *g);
 #endif

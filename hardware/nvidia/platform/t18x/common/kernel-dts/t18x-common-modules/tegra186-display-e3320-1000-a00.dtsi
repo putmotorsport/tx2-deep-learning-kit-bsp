@@ -56,9 +56,9 @@
 			vcc-supply = <&battery_reg>;
 			vpp-vmm-rails {
 				gpio-hog;
-				gpios = <2 0 3 0>;
+				gpios = <2 0>;
 				output-high;
-				label = "vmm-en-rail", "vmm-en-rail";
+				label = "vmm-en-rail";
 			};
 		};
 

@@ -17,10 +17,6 @@
 #include <dt-bindings/gpio/tegra186-gpio.h>
 #include <dt-bindings/thermal/thermal.h>
 #include <dt-bindings/interrupt-controller/irq.h>
-#include <dt-bindings/linux/driver-info.h>
-#if defined(KERNEL_VERSION_3_18)
-#include "tegra186-spmic-override-property.dtsi"
-#endif
 
 / {
 	bpmp_i2c {
@@ -29,9 +25,7 @@
 			compatible = "maxim,max77620";
 			reg = <0x3c>;
 
-#ifdef WAKEUP_VIA_PM_IRQ_INTERRUPT_CONTROLLER
 			interrupt-parent = <&pm_irq>;
-#endif
 			interrupts = <0 209 IRQ_TYPE_NONE>;
 
 			#interrupt-cells = <2>;
@@ -116,14 +110,14 @@
 
 			fps {
 				fps0 {
-					maxim,shutdown-fps-time-period-us = <640>;
+					shutdown-fps-time-period-us = <640>;
 					maxim,fps-event-source = <MAX77620_FPS_EVENT_SRC_EN0>;
 				};
 
 				fps1 {
-					maxim,shutdown-fps-time-period-us = <640>;
+					shutdown-fps-time-period-us = <640>;
 					maxim,fps-event-source = <MAX77620_FPS_EVENT_SRC_EN1>;
-					maxim,device-state-on-disabled-event = <MAX77620_FPS_INACTIVE_STATE_SLEEP>;
+					device-state-on-disabled-event = <MAX77620_FPS_INACTIVE_STATE_SLEEP>;
 				};
 
 				fps2 {
@@ -133,9 +127,9 @@
 			};
 
 			backup-battery {
-				maxim,backup-battery-charging-current = <100>;
-				maxim,backup-battery-charging-voltage = <3000000>;
-				maxim,backup-battery-output-resister = <100>;
+				backup-battery-charging-current = <100>;
+				backup-battery-charging-voltage = <3000000>;
+				backup-battery-output-resister = <100>;
 				status = "disabled";
 			};
 
@@ -229,9 +223,9 @@
 				};
 
 				spmic_ldo7: ldo7 {
-					regulator-name = "vdd-pex-1v05";
-					regulator-min-microvolt = <1050000>;
-					regulator-max-microvolt = <1050000>;
+					regulator-name = "vdd-pex-1v00";
+					regulator-min-microvolt = <1000000>;
+					regulator-max-microvolt = <1000000>;
 					maxim,active-fps-source = <MAX77620_FPS_SRC_DEF>;
 					regulator-always-on;
 					regulator-boot-on;
@@ -268,8 +262,8 @@
 			cooling-maps {
 				map0 {
 					trip = <&die_temp_thresh>;
-					cooling-device = <&dummy_cool_dev THERMAL_NO_LIMIT
-								THERMAL_NO_LIMIT>;
+					cooling-device = <&{/bthrot_cdev/emergency_balanced}
+							THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
 					contribution = <100>;
 					cdev-type = "emergency-balanced";
 				};

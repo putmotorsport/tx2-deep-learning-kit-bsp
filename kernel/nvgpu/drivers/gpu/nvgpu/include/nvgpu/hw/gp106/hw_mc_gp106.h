@@ -1,17 +1,23 @@
 /*
- * Copyright (c) 2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 /*
  * Function naming determines intended use:
@@ -52,194 +58,194 @@
 
 static inline u32 mc_boot_0_r(void)
 {
-	return 0x00000000;
+	return 0x00000000U;
 }
 static inline u32 mc_boot_0_architecture_v(u32 r)
 {
-	return (r >> 24) & 0x1f;
+	return (r >> 24U) & 0x1fU;
 }
 static inline u32 mc_boot_0_implementation_v(u32 r)
 {
-	return (r >> 20) & 0xf;
+	return (r >> 20U) & 0xfU;
 }
 static inline u32 mc_boot_0_major_revision_v(u32 r)
 {
-	return (r >> 4) & 0xf;
+	return (r >> 4U) & 0xfU;
 }
 static inline u32 mc_boot_0_minor_revision_v(u32 r)
 {
-	return (r >> 0) & 0xf;
+	return (r >> 0U) & 0xfU;
 }
 static inline u32 mc_intr_r(u32 i)
 {
-	return 0x00000100 + i*4;
+	return 0x00000100U + i*4U;
 }
 static inline u32 mc_intr_pfifo_pending_f(void)
 {
-	return 0x100;
+	return 0x100U;
 }
 static inline u32 mc_intr_replayable_fault_pending_f(void)
 {
-	return 0x200;
+	return 0x200U;
 }
 static inline u32 mc_intr_pgraph_pending_f(void)
 {
-	return 0x1000;
+	return 0x1000U;
 }
 static inline u32 mc_intr_pmu_pending_f(void)
 {
-	return 0x1000000;
+	return 0x1000000U;
 }
 static inline u32 mc_intr_ltc_pending_f(void)
 {
-	return 0x2000000;
+	return 0x2000000U;
 }
 static inline u32 mc_intr_priv_ring_pending_f(void)
 {
-	return 0x40000000;
+	return 0x40000000U;
 }
 static inline u32 mc_intr_pbus_pending_f(void)
 {
-	return 0x10000000;
+	return 0x10000000U;
 }
 static inline u32 mc_intr_en_r(u32 i)
 {
-	return 0x00000140 + i*4;
+	return 0x00000140U + i*4U;
 }
 static inline u32 mc_intr_en_set_r(u32 i)
 {
-	return 0x00000160 + i*4;
+	return 0x00000160U + i*4U;
 }
 static inline u32 mc_intr_en_clear_r(u32 i)
 {
-	return 0x00000180 + i*4;
+	return 0x00000180U + i*4U;
 }
 static inline u32 mc_enable_r(void)
 {
-	return 0x00000200;
+	return 0x00000200U;
 }
 static inline u32 mc_enable_xbar_enabled_f(void)
 {
-	return 0x4;
+	return 0x4U;
 }
 static inline u32 mc_enable_l2_enabled_f(void)
 {
-	return 0x8;
+	return 0x8U;
 }
 static inline u32 mc_enable_pmedia_s(void)
 {
-	return 1;
+	return 1U;
 }
 static inline u32 mc_enable_pmedia_f(u32 v)
 {
-	return (v & 0x1) << 4;
+	return (v & 0x1U) << 4U;
 }
 static inline u32 mc_enable_pmedia_m(void)
 {
-	return 0x1 << 4;
+	return 0x1U << 4U;
 }
 static inline u32 mc_enable_pmedia_v(u32 r)
 {
-	return (r >> 4) & 0x1;
+	return (r >> 4U) & 0x1U;
 }
 static inline u32 mc_enable_priv_ring_enabled_f(void)
 {
-	return 0x20;
+	return 0x20U;
 }
 static inline u32 mc_enable_ce0_m(void)
 {
-	return 0x1 << 6;
+	return 0x1U << 6U;
 }
 static inline u32 mc_enable_pfifo_enabled_f(void)
 {
-	return 0x100;
+	return 0x100U;
 }
 static inline u32 mc_enable_pgraph_enabled_f(void)
 {
-	return 0x1000;
+	return 0x1000U;
 }
 static inline u32 mc_enable_pwr_v(u32 r)
 {
-	return (r >> 13) & 0x1;
+	return (r >> 13U) & 0x1U;
 }
 static inline u32 mc_enable_pwr_disabled_v(void)
 {
-	return 0x00000000;
+	return 0x00000000U;
 }
 static inline u32 mc_enable_pwr_enabled_f(void)
 {
-	return 0x2000;
+	return 0x2000U;
 }
 static inline u32 mc_enable_pfb_enabled_f(void)
 {
-	return 0x100000;
+	return 0x100000U;
 }
 static inline u32 mc_enable_ce2_m(void)
 {
-	return 0x1 << 21;
+	return 0x1U << 21U;
 }
 static inline u32 mc_enable_ce2_enabled_f(void)
 {
-	return 0x200000;
+	return 0x200000U;
 }
 static inline u32 mc_enable_blg_enabled_f(void)
 {
-	return 0x8000000;
+	return 0x8000000U;
 }
 static inline u32 mc_enable_perfmon_enabled_f(void)
 {
-	return 0x10000000;
+	return 0x10000000U;
 }
 static inline u32 mc_enable_hub_enabled_f(void)
 {
-	return 0x20000000;
+	return 0x20000000U;
 }
 static inline u32 mc_intr_ltc_r(void)
 {
-	return 0x000001c0;
+	return 0x000001c0U;
 }
 static inline u32 mc_enable_pb_r(void)
 {
-	return 0x00000204;
+	return 0x00000204U;
 }
 static inline u32 mc_enable_pb_0_s(void)
 {
-	return 1;
+	return 1U;
 }
 static inline u32 mc_enable_pb_0_f(u32 v)
 {
-	return (v & 0x1) << 0;
+	return (v & 0x1U) << 0U;
 }
 static inline u32 mc_enable_pb_0_m(void)
 {
-	return 0x1 << 0;
+	return 0x1U << 0U;
 }
 static inline u32 mc_enable_pb_0_v(u32 r)
 {
-	return (r >> 0) & 0x1;
+	return (r >> 0U) & 0x1U;
 }
 static inline u32 mc_enable_pb_0_enabled_v(void)
 {
-	return 0x00000001;
+	return 0x00000001U;
 }
 static inline u32 mc_enable_pb_sel_f(u32 v, u32 i)
 {
-	return (v & 0x1) << (0 + i*1);
+	return (v & 0x1U) << (0U + i*1U);
 }
 static inline u32 mc_elpg_enable_r(void)
 {
-	return 0x0000020c;
+	return 0x0000020cU;
 }
 static inline u32 mc_elpg_enable_xbar_enabled_f(void)
 {
-	return 0x4;
+	return 0x4U;
 }
 static inline u32 mc_elpg_enable_pfb_enabled_f(void)
 {
-	return 0x100000;
+	return 0x100000U;
 }
 static inline u32 mc_elpg_enable_hub_enabled_f(void)
 {
-	return 0x20000000;
+	return 0x20000000U;
 }
 #endif

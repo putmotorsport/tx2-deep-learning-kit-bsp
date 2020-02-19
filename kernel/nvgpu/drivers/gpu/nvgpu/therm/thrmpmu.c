@@ -1,17 +1,26 @@
 /*
- * Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
+#include <nvgpu/gk20a.h>
 
-#include "gk20a/gk20a.h"
 #include "boardobj/boardobjgrp.h"
 #include "boardobj/boardobjgrp_e32.h"
 #include "thrmpmu.h"
@@ -29,30 +38,29 @@ static void therm_pmucmdhandler(struct gk20a *g, struct pmu_msg *msg,
 		(struct therm_pmucmdhandler_params *)param;
 
 	if (msg->msg.therm.msg_type != NV_PMU_THERM_MSG_ID_RPC) {
-		gk20a_err(dev_from_gk20a(g),
-			"unknow msg %x",
+		nvgpu_err(g, "unknow msg %x",
 			msg->msg.pmgr.msg_type);
 		return;
 	}
 
-	if (!phandlerparams->prpccall->b_supported)
-		gk20a_err(dev_from_gk20a(g),
-			"RPC msg %x failed",
+	if (!phandlerparams->prpccall->b_supported) {
+		nvgpu_err(g, "RPC msg %x failed",
 			msg->msg.pmgr.msg_type);
-	else
+	} else {
 		phandlerparams->success = 1;
+	}
 }
 
-u32 therm_send_pmgr_tables_to_pmu(struct gk20a *g)
+int therm_send_pmgr_tables_to_pmu(struct gk20a *g)
 {
-	u32 status = 0;
+	int status = 0;
 	struct boardobjgrp *pboardobjgrp = NULL;
 
 	if (!BOARDOBJGRP_IS_EMPTY(&g->therm_pmu.therm_deviceobjs.super.super)) {
 		pboardobjgrp = &g->therm_pmu.therm_deviceobjs.super.super;
 		status = pboardobjgrp->pmuinithandle(g, pboardobjgrp);
 		if (status) {
-			gk20a_err(dev_from_gk20a(g),
+			nvgpu_err(g,
 				"therm_send_pmgr_tables_to_pmu - therm_device failed %x",
 				status);
 			goto exit;
@@ -64,7 +72,7 @@ u32 therm_send_pmgr_tables_to_pmu(struct gk20a *g)
 		pboardobjgrp = &g->therm_pmu.therm_channelobjs.super.super;
 		status = pboardobjgrp->pmuinithandle(g, pboardobjgrp);
 		if (status) {
-			gk20a_err(dev_from_gk20a(g),
+			nvgpu_err(g,
 				"therm_send_pmgr_tables_to_pmu - therm_channel failed %x",
 				status);
 			goto exit;
@@ -83,14 +91,14 @@ static u32 therm_pmu_cmd_post(struct gk20a *g, struct pmu_cmd *cmd,
 	u32 status;
 	struct therm_pmucmdhandler_params *handlerparams = NULL;
 
-	status = gk20a_pmu_cmd_post(g, cmd, msg, payload,
+	status = nvgpu_pmu_cmd_post(g, cmd, msg, payload,
 				queue_id,
 				callback,
 				cb_param,
 				seq_desc,
 				timeout);
 	if (status) {
-		gk20a_err(dev_from_gk20a(g),
+		nvgpu_err(g,
 			"unable to post therm cmd for unit %x cmd id %x size %x",
 			cmd->hdr.unit_id, cmd->cmd.therm.cmd_type, cmd->hdr.size);
 		goto exit;
@@ -104,7 +112,7 @@ static u32 therm_pmu_cmd_post(struct gk20a *g, struct pmu_cmd *cmd,
 				&handlerparams->success, 1);
 
 		if (handlerparams->success == 0) {
-			gk20a_err(dev_from_gk20a(g), "could not process cmd\n");
+			nvgpu_err(g, "could not process cmd");
 			status = -ETIMEDOUT;
 			goto exit;
 		}
@@ -117,11 +125,17 @@ exit:
 static u32 therm_set_warn_temp_limit(struct gk20a *g)
 {
 	u32 seqdesc = 0;
-	struct pmu_cmd cmd = { {0} };
-	struct pmu_msg msg = { {0} };
-	struct pmu_payload payload = { {0} };
-	struct nv_pmu_therm_rpc rpccall = {0};
-	struct therm_pmucmdhandler_params handlerparams = {0};
+	struct pmu_cmd cmd;
+	struct pmu_msg msg;
+	struct pmu_payload payload;
+	struct nv_pmu_therm_rpc rpccall;
+	struct therm_pmucmdhandler_params handlerparams;
+
+	memset(&payload, 0, sizeof(struct pmu_payload));
+	memset(&cmd, 0, sizeof(struct pmu_cmd));
+	memset(&msg, 0, sizeof(struct pmu_msg));
+	memset(&rpccall, 0, sizeof(struct nv_pmu_therm_rpc));
+	memset(&handlerparams, 0, sizeof(struct therm_pmucmdhandler_params));
 
 	rpccall.function = NV_PMU_THERM_RPC_ID_SLCT_EVENT_TEMP_TH_SET;
 	rpccall.params.slct_event_temp_th_set.event_id =
@@ -180,11 +194,17 @@ static u32 therm_enable_slct_notification_request(struct gk20a *g)
 static u32 therm_send_slct_configuration_to_pmu(struct gk20a *g)
 {
 	u32 seqdesc = 0;
-	struct pmu_cmd cmd = { {0} };
-	struct pmu_msg msg = { {0} };
-	struct pmu_payload payload = { {0} };
-	struct nv_pmu_therm_rpc rpccall = {0};
-	struct therm_pmucmdhandler_params handlerparams = {0};
+	struct pmu_cmd cmd;
+	struct pmu_msg msg;
+	struct pmu_payload payload;
+	struct nv_pmu_therm_rpc rpccall;
+	struct therm_pmucmdhandler_params handlerparams;
+
+	memset(&payload, 0, sizeof(struct pmu_payload));
+	memset(&cmd, 0, sizeof(struct pmu_cmd));
+	memset(&msg, 0, sizeof(struct pmu_msg));
+	memset(&rpccall, 0, sizeof(struct nv_pmu_therm_rpc));
+	memset(&handlerparams, 0, sizeof(struct therm_pmucmdhandler_params));
 
 	rpccall.function = NV_PMU_THERM_RPC_ID_SLCT;
 	rpccall.params.slct.mask_enabled =
@@ -225,7 +245,7 @@ u32 therm_configure_therm_alert(struct gk20a *g)
 
 	status = therm_enable_slct_notification_request(g);
 	if (status) {
-		gk20a_err(dev_from_gk20a(g),
+		nvgpu_err(g,
 			"therm_enable_slct_notification_request-failed %d",
 			status);
 		goto exit;
@@ -233,7 +253,7 @@ u32 therm_configure_therm_alert(struct gk20a *g)
 
 	status = therm_send_slct_configuration_to_pmu(g);
 	if (status) {
-		gk20a_err(dev_from_gk20a(g),
+		nvgpu_err(g,
 			"therm_send_slct_configuration_to_pmu-failed %d",
 			status);
 		goto exit;
@@ -241,7 +261,7 @@ u32 therm_configure_therm_alert(struct gk20a *g)
 
 	status = therm_set_warn_temp_limit(g);
 	if (status) {
-		gk20a_err(dev_from_gk20a(g),
+		nvgpu_err(g,
 			"therm_set_warn_temp_limit-failed %d",
 			status);
 		goto exit;

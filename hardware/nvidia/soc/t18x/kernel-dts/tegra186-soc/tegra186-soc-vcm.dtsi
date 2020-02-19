@@ -2,7 +2,7 @@
  * tegra186-soc-vcm.dtsi: Mobile family SoC specific DTSI file with
  * required node enabled for VCM modules.
  *
- * Copyright (c) 2015-2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2015-2017, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,7 +15,6 @@
  *
  */
 
-#include "tegra186-soc/tegra186-cpus-2D4A.dtsi"
 #include "tegra186-soc/tegra186-soc-base.dtsi"
 #include "tegra186-soc/tegra186-soc-prod.dtsi"
 #include "tegra186-soc/tegra186-soc-audio.dtsi"
@@ -26,6 +25,7 @@
 		spi0 = &spi0;
 		spi2 = &spi2;
 		spi3 = &spi3;
+		spi6 = &qspi6;
 		serial0 = &uarta;
 		serial1 = &uartb;
 		serial2 = &uartc;
@@ -33,7 +33,6 @@
 		serial4 = &uarte;
 		serial5 = &uartf;
 		serial6 = &uartg;
-		qspi6 = &qspi6;
 		rtc1 = "/rtc@c2a0000";
 		rtc0 = "/bpmp_i2c/spmic@3c";
 	};
@@ -193,6 +192,13 @@
 		};
 	};
 
+#if TEGRA_AUDIO_BUS_DT_VERSION >= DT_VERSION_2
+	aconnect@2a41000 {
+#endif
+	agic-controller@2a41000 {
+		status = "okay";
+	};
+
 	ahub {
 		status = "okay";
 
@@ -205,6 +211,13 @@
 		};
 	};
 
+	adsp@2993000 {
+		status = "okay";
+	};
+
+#if TEGRA_AUDIO_BUS_DT_VERSION >= DT_VERSION_2
+	};
+#endif
 	hsp_top {
 		status = "okay";
 	};
@@ -218,10 +231,6 @@
 	};
 
 	interrupt-controller@3881000 {
-		status = "okay";
-	};
-
-	agic-controller@2a41000 {
 		status = "okay";
 	};
 
@@ -250,10 +259,6 @@
 	};
 
 	dma@2600000 {
-		status = "okay";
-	};
-
-	adsp@2993000 {
 		status = "okay";
 	};
 
@@ -328,14 +333,6 @@
 		};
 	};
 
-	clocks {
-		status = "okay";
-
-		clk32k_in@0 {
-			status = "okay";
-		};
-	};
-
 	pmc@c360000 {
 		status = "okay";
 	};
@@ -357,10 +354,6 @@
 		efuse-burn {
 			status = "okay";
 		};
-	};
-
-	cluster_clk_priv@e090000 {
-		status = "okay";
 	};
 
 	reserved-memory {
@@ -487,33 +480,5 @@
 
 	tpiu@8060000 {
 		status = "okay";
-	};
-
-	pwm@3280000 {
-		clock-names = "pwm";
-	};
-
-	pwm@3290000 {
-		clock-names = "pwm";
-	};
-
-	pwm@32a0000 {
-		clock-names = "pwm";
-	};
-
-	pwm@32c0000 {
-		clock-names = "pwm";
-	};
-
-	pwm@32d0000 {
-		clock-names = "pwm";
-	};
-
-	pwm@32e0000 {
-		clock-names = "pwm";
-	};
-
-	pwm@32f0000 {
-		clock-names = "pwm";
 	};
 };

@@ -1,26 +1,35 @@
 /*
-* Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
+* Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
 *
-* This program is free software; you can redistribute it and/or modify it
-* under the terms and conditions of the GNU General Public License,
-* version 2, as published by the Free Software Foundation.
-*
-* This program is distributed in the hope it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-* more details.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef _CLKFLL_H_
-#define _CLKFLL_H_
+#ifndef NVGPU_CLK_FLL_H
+#define NVGPU_CLK_FLL_H
 
 #include <nvgpu/pmuif/nvgpu_gpmu_cmdif.h>
 #include "boardobj/boardobjgrp_e32.h"
 #include "boardobj/boardobjgrpmask.h"
 
 /*data and function definition to talk to driver*/
-u32 clk_fll_sw_setup(struct gk20a *g);
-u32 clk_fll_pmu_setup(struct gk20a *g);
+int clk_fll_sw_setup(struct gk20a *g);
+int clk_fll_pmu_setup(struct gk20a *g);
 
 struct avfsfllobjs {
 	struct boardobjgrp_e32 super;
@@ -52,9 +61,14 @@ struct fll_device {
 	u8 min_freq_vfe_idx;
 	u8 freq_ctrl_idx;
 	u8 target_regime_id_override;
+	bool b_skip_pldiv_below_dvco_min;
+	bool b_dvco_1x;
 	struct boardobjgrpmask_e32 lut_prog_broadcast_slave_mask;
 	fll_lut_broadcast_slave_register *lut_broadcast_slave_register;
 };
+
+u32 nvgpu_clk_get_vbios_clk_domain_gv10x( u32 vbios_domain);
+u32 nvgpu_clk_get_vbios_clk_domain_gp10x( u32 vbios_domain);
 
 #define CLK_FLL_LUT_VF_NUM_ENTRIES(pclk) \
 	(pclk->avfs_fllobjs.lut_num_entries)
@@ -64,5 +78,4 @@ struct fll_device {
 #define CLK_FLL_LUT_STEP_SIZE_UV(pclk) \
 	(pclk->avfs_fllobjs.lut_step_size_uv)
 
-#endif
-
+#endif /* NVGPU_CLK_FLL_H */

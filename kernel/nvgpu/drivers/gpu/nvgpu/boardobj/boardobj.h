@@ -1,26 +1,35 @@
 /*
-* Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
+* Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
 *
-* This program is free software; you can redistribute it and/or modify it
-* under the terms and conditions of the GNU General Public License,
-* version 2, as published by the Free Software Foundation.
-*
-* This program is distributed in the hope it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-* more details.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef _BOARDOBJ_H_
-#define _BOARDOBJ_H_
+#ifndef NVGPU_BOARDOBJ_H
+#define NVGPU_BOARDOBJ_H
+
+#include <nvgpu/list.h>
+#include <nvgpu/pmuif/nvgpu_gpmu_cmdif.h>
+
+#include "ctrl/ctrlboardobj.h"
 
 struct boardobj;
-
-#include <linux/nvgpu.h>
-#include "gk20a/gk20a.h"
-#include "gk20a/pmu_gk20a.h"
-#include "ctrl/ctrlboardobj.h"
-#include <nvgpu/pmuif/nvgpu_gpmu_cmdif.h>
+struct nvgpu_list_node;
 
 /*
 * check whether the specified BOARDOBJ object implements the queried
@@ -34,14 +43,14 @@ typedef bool boardobj_implements(struct gk20a *g, struct boardobj *pboardobj,
 * description structure, describing this BOARDOBJ board device to the PMU.
 *
 */
-typedef u32 boardobj_pmudatainit(struct gk20a *g, struct boardobj *pboardobj,
+typedef int boardobj_pmudatainit(struct gk20a *g, struct boardobj *pboardobj,
 				struct nv_pmu_boardobj *pmudata);
 
 /*
 * Constructor for the base Board Object. Called by each device-specific
 * implementation of the BOARDOBJ interface to initialize the board object.
 */
-typedef u32 boardobj_construct(struct gk20a *g, struct boardobj **pboardobj,
+typedef int boardobj_construct(struct gk20a *g, struct boardobj **pboardobj,
 				u16 size, void *args);
 
 /*
@@ -50,7 +59,7 @@ typedef u32 boardobj_construct(struct gk20a *g, struct boardobj **pboardobj,
 * This has to be explicitly set by each device that extends from the
 * board object.
 */
-typedef u32 boardobj_destruct(struct boardobj *pboardobj);
+typedef int boardobj_destruct(struct boardobj *pboardobj);
 
 /*
 * Base Class for all physical or logical device on the PCB.
@@ -60,8 +69,12 @@ typedef u32 boardobj_destruct(struct boardobj *pboardobj);
 */
 
 struct boardobj {
+	struct gk20a *g;
+
 	u8 type; /*type of the device*/
 	u8 idx;  /*index of boardobj within in its group*/
+	/* true if allocated in constructor. destructor should free */
+	u8 allocated;
 	u32 type_mask; /*mask of types this boardobjimplements*/
 	boardobj_implements  *implements;
 	boardobj_destruct    *destruct;
@@ -70,6 +83,7 @@ struct boardobj {
 	* that inherit from BOARDOBJ
 	*/
 	boardobj_pmudatainit *pmudatainit;
+	struct nvgpu_list_node node;
 };
 
 boardobj_construct   boardobj_construct_super;
@@ -80,4 +94,11 @@ boardobj_pmudatainit boardobj_pmudatainit_super;
 #define BOARDOBJ_GET_TYPE(pobj) (((struct boardobj *)(pobj))->type)
 #define BOARDOBJ_GET_IDX(pobj) (((struct boardobj *)(pobj))->idx)
 
-#endif
+static inline struct boardobj *
+boardobj_from_node(struct nvgpu_list_node *node)
+{
+	return (struct boardobj *)
+		((uintptr_t)node - offsetof(struct boardobj, node));
+};
+
+#endif /* NVGPU_BOARDOBJ_H */

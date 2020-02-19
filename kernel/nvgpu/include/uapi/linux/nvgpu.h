@@ -1,7 +1,7 @@
 /*
  * NVGPU Public Interface Header
  *
- * Copyright (c) 2011-2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2011-2018, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms and conditions of the GNU General Public License,
@@ -21,7 +21,13 @@
 
 #if !defined(__KERNEL__)
 #define __user
-#endif
+
+/* Some userspace builds have __packed defined already */
+#if !defined(__packed)
+#define __packed __attribute__((packed))
+#endif /* __packed */
+
+#endif /* __KERNEL__ */
 
 /*
  * /dev/nvhost-ctrl-gpu device
@@ -81,25 +87,22 @@ struct nvgpu_gpu_zbc_query_table_args {
 
 /* This contains the minimal set by which the userspace can
    determine all the properties of the GPU */
-#define NVGPU_GPU_ARCH_GK100 0x000000E0
-#define NVGPU_GPU_ARCH_GM200 0x00000120
-#define NVGPU_GPU_ARCH_GP100 0x00000130
+#define NVGPU_GPU_ARCH_GK100	0x000000E0
+#define NVGPU_GPU_ARCH_GM200	0x00000120
+#define NVGPU_GPU_ARCH_GP100	0x00000130
+#define NVGPU_GPU_ARCH_GV110	0x00000150
+#define NVGPU_GPU_ARCH_GV100	0x00000140
 
-#define NVGPU_GPU_IMPL_GK20A 0x0000000A
-#define NVGPU_GPU_IMPL_GM204 0x00000004
-#define NVGPU_GPU_IMPL_GM206 0x00000006
-#define NVGPU_GPU_IMPL_GM20B 0x0000000B
-#define NVGPU_GPU_IMPL_GP104 0x00000004
-#define NVGPU_GPU_IMPL_GP106 0x00000006
-#define NVGPU_GPU_IMPL_GP10B 0x0000000B
-
-#ifdef CONFIG_ARCH_TEGRA_18x_SOC
-#include <linux/nvgpu-t18x.h>
-#endif
-
-#ifdef CONFIG_TEGRA_19x_GPU
-#include <linux/nvgpu-t19x.h>
-#endif
+#define NVGPU_GPU_IMPL_GK20A	0x0000000A
+#define NVGPU_GPU_IMPL_GM204	0x00000004
+#define NVGPU_GPU_IMPL_GM206	0x00000006
+#define NVGPU_GPU_IMPL_GM20B	0x0000000B
+#define NVGPU_GPU_IMPL_GM20B_B	0x0000000E
+#define NVGPU_GPU_IMPL_GP104	0x00000004
+#define NVGPU_GPU_IMPL_GP106	0x00000006
+#define NVGPU_GPU_IMPL_GP10B	0x0000000B
+#define NVGPU_GPU_IMPL_GV11B	0x0000000B
+#define NVGPU_GPU_IMPL_GV100	0x00000000
 
 #define NVGPU_GPU_BUS_TYPE_NONE         0
 #define NVGPU_GPU_BUS_TYPE_AXI         32
@@ -137,6 +140,46 @@ struct nvgpu_gpu_zbc_query_table_args {
 #define NVGPU_GPU_FLAGS_SUPPORT_FECS_CTXSW_TRACE	(1ULL << 16)
 /* NVGPU_AS_IOCTL_MAP_BUFFER_COMPBITS is available */
 #define NVGPU_GPU_FLAGS_SUPPORT_MAP_COMPBITS		(1ULL << 17)
+/* Fast deterministic submits with no job tracking are supported */
+#define NVGPU_GPU_FLAGS_SUPPORT_DETERMINISTIC_SUBMIT_NO_JOBTRACKING (1ULL << 18)
+/* Deterministic submits are supported even with job tracking */
+#define NVGPU_GPU_FLAGS_SUPPORT_DETERMINISTIC_SUBMIT_FULL (1ULL << 19)
+/* IO coherence support is available */
+#define NVGPU_GPU_FLAGS_SUPPORT_IO_COHERENCE		(1ULL << 20)
+/* NVGPU_IOCTL_CHANNEL_RESCHEDULE_RUNLIST is available */
+#define NVGPU_GPU_FLAGS_SUPPORT_RESCHEDULE_RUNLIST	(1ULL << 21)
+/*  subcontexts are available */
+#define NVGPU_GPU_FLAGS_SUPPORT_TSG_SUBCONTEXTS         (1ULL << 22)
+/* Direct PTE kind control is supported (map_buffer_ex) */
+#define NVGPU_GPU_FLAGS_SUPPORT_MAP_DIRECT_KIND_CTRL	(1ULL << 23)
+/* NVGPU_GPU_IOCTL_SET_DETERMINISTIC_OPTS is available */
+#define NVGPU_GPU_FLAGS_SUPPORT_DETERMINISTIC_OPTS	(1ULL << 24)
+/* SCG support is available */
+#define NVGPU_GPU_FLAGS_SUPPORT_SCG			(1ULL << 25)
+/* GPU_VA address of a syncpoint is supported */
+#define NVGPU_GPU_FLAGS_SUPPORT_SYNCPOINT_ADDRESS	(1ULL << 26)
+/* VPR is supported */
+#define NVGPU_GPU_FLAGS_SUPPORT_VPR			(1ULL << 27)
+/* Allocating per-channel syncpoint in user space is supported */
+#define NVGPU_GPU_FLAGS_SUPPORT_USER_SYNCPOINT		(1ULL << 28)
+/* Railgating (powering the GPU off completely) is supported and enabled */
+#define NVGPU_GPU_FLAGS_CAN_RAILGATE			(1ULL << 29)
+/* Usermode submit is available */
+#define NVGPU_GPU_FLAGS_SUPPORT_USERMODE_SUBMIT		(1ULL << 30)
+/* SM LRF ECC is enabled */
+#define NVGPU_GPU_FLAGS_ECC_ENABLED_SM_LRF	(1ULL << 60)
+/* SM SHM ECC is enabled */
+#define NVGPU_GPU_FLAGS_ECC_ENABLED_SM_SHM	(1ULL << 61)
+/* TEX ECC is enabled */
+#define NVGPU_GPU_FLAGS_ECC_ENABLED_TEX		(1ULL << 62)
+/* L2 ECC is enabled */
+#define NVGPU_GPU_FLAGS_ECC_ENABLED_LTC		(1ULL << 63)
+/* All types of ECC are enabled */
+#define NVGPU_GPU_FLAGS_ALL_ECC_ENABLED	\
+				(NVGPU_GPU_FLAGS_ECC_ENABLED_SM_LRF |	\
+				NVGPU_GPU_FLAGS_ECC_ENABLED_SM_SHM |	\
+				NVGPU_GPU_FLAGS_ECC_ENABLED_TEX    |	\
+				NVGPU_GPU_FLAGS_ECC_ENABLED_LTC)
 
 struct nvgpu_gpu_characteristics {
 	__u32 arch;
@@ -233,7 +276,9 @@ struct nvgpu_gpu_characteristics {
 	__u32 reserved1;
 
 	__s16 event_ioctl_nr_last;
-	__u16 pad[3];
+	__u16 pad;
+
+	__u32 max_css_buffer_size;
 
 	/* Notes:
 	   - This struct can be safely appended with new fields. However, always
@@ -361,11 +406,6 @@ struct nvgpu_gpu_l2_fb_args {
 	__u32 reserved;
 } __packed;
 
-struct nvgpu_gpu_inval_icache_args {
-	int channel_fd;
-	__u32 reserved;
-} __packed;
-
 struct nvgpu_gpu_mmu_debug_mode_args {
 	__u32 state;
 	__u32 reserved;
@@ -423,8 +463,6 @@ struct nvgpu_gpu_get_buffer_info_args {
 
 #define NVGPU_GPU_GET_CPU_TIME_CORRELATION_INFO_MAX_COUNT		16
 #define NVGPU_GPU_GET_CPU_TIME_CORRELATION_INFO_SRC_ID_TSC		1
-#define NVGPU_GPU_GET_CPU_TIME_CORRELATION_INFO_SRC_ID_JIFFIES		2
-#define NVGPU_GPU_GET_CPU_TIME_CORRELATION_INFO_SRC_ID_TIMEOFDAY	3
 
 struct nvgpu_gpu_get_cpu_time_correlation_sample {
 	/* gpu timestamp value */
@@ -789,6 +827,42 @@ struct nvgpu_gpu_set_therm_alert_limit_args {
 	__s32 temp_f24_8;
 };
 
+/*
+ * Adjust options of deterministic channels in channel batches.
+ *
+ * This supports only one option currently: relax railgate blocking by
+ * "disabling" the channel.
+ *
+ * Open deterministic channels do not allow the GPU to railgate by default. It
+ * may be preferable to hold preopened channel contexts open and idle and still
+ * railgate the GPU, taking the channels back into use dynamically in userspace
+ * as an optimization. This ioctl allows to drop or reacquire the requirement
+ * to hold GPU power on for individual channels. If allow_railgate is set on a
+ * channel, no work can be submitted to it.
+ *
+ * num_channels is updated to signify how many channels were updated
+ * successfully. It can be used to test which was the first update to fail.
+ */
+struct nvgpu_gpu_set_deterministic_opts_args {
+	__u32 num_channels; /* in/out */
+/*
+ * Set or unset the railgating reference held by deterministic channels. If
+ * the channel status is already the same as the flag, this is a no-op. Both
+ * of these flags cannot be set at the same time. If none are set, the state
+ * is left as is.
+ */
+#define NVGPU_GPU_SET_DETERMINISTIC_OPTS_FLAGS_ALLOW_RAILGATING    (1 << 0)
+#define NVGPU_GPU_SET_DETERMINISTIC_OPTS_FLAGS_DISALLOW_RAILGATING (1 << 1)
+	__u32 flags;        /* in */
+	/*
+	 * This is a pointer to an array of size num_channels.
+	 *
+	 * The channels have to be valid fds and be previously set as
+	 * deterministic.
+	 */
+	__u64 channels; /* in */
+};
+
 #define NVGPU_GPU_IOCTL_ZCULL_GET_CTX_SIZE \
 	_IOR(NVGPU_GPU_IOCTL_MAGIC, 1, struct nvgpu_gpu_zcull_get_ctx_size_args)
 #define NVGPU_GPU_IOCTL_ZCULL_GET_INFO \
@@ -813,8 +887,6 @@ struct nvgpu_gpu_set_therm_alert_limit_args {
 	_IOWR(NVGPU_GPU_IOCTL_MAGIC, 11, struct nvgpu_gpu_open_channel_args)
 #define NVGPU_GPU_IOCTL_FLUSH_L2 \
 	_IOWR(NVGPU_GPU_IOCTL_MAGIC, 12, struct nvgpu_gpu_l2_fb_args)
-#define NVGPU_GPU_IOCTL_INVAL_ICACHE \
-	_IOWR(NVGPU_GPU_IOCTL_MAGIC, 13, struct nvgpu_gpu_inval_icache_args)
 #define NVGPU_GPU_IOCTL_SET_MMUDEBUG_MODE \
 	_IOWR(NVGPU_GPU_IOCTL_MAGIC, 14, struct nvgpu_gpu_mmu_debug_mode_args)
 #define NVGPU_GPU_IOCTL_SET_SM_DEBUG_MODE \
@@ -827,8 +899,6 @@ struct nvgpu_gpu_set_therm_alert_limit_args {
 	_IOWR(NVGPU_GPU_IOCTL_MAGIC, 18, struct nvgpu_gpu_num_vsms)
 #define NVGPU_GPU_IOCTL_VSMS_MAPPING \
 	_IOWR(NVGPU_GPU_IOCTL_MAGIC, 19, struct nvgpu_gpu_vsms_mapping)
-#define NVGPU_GPU_IOCTL_GET_BUFFER_INFO \
-	_IOWR(NVGPU_GPU_IOCTL_MAGIC, 20, struct nvgpu_gpu_get_buffer_info_args)
 #define NVGPU_GPU_IOCTL_RESUME_FROM_PAUSE \
 	_IO(NVGPU_GPU_IOCTL_MAGIC, 21)
 #define NVGPU_GPU_IOCTL_TRIGGER_SUSPEND \
@@ -873,8 +943,11 @@ struct nvgpu_gpu_set_therm_alert_limit_args {
 #define NVGPU_GPU_IOCTL_SET_THERM_ALERT_LIMIT \
 		_IOWR(NVGPU_GPU_IOCTL_MAGIC, 39, \
 			struct nvgpu_gpu_set_therm_alert_limit_args)
+#define NVGPU_GPU_IOCTL_SET_DETERMINISTIC_OPTS \
+	_IOWR(NVGPU_GPU_IOCTL_MAGIC, 40, \
+			struct nvgpu_gpu_set_deterministic_opts_args)
 #define NVGPU_GPU_IOCTL_LAST		\
-	_IOC_NR(NVGPU_GPU_IOCTL_SET_THERM_ALERT_LIMIT)
+	_IOC_NR(NVGPU_GPU_IOCTL_SET_DETERMINISTIC_OPTS)
 #define NVGPU_GPU_IOCTL_MAX_ARG_SIZE	\
 	sizeof(struct nvgpu_gpu_get_cpu_time_correlation_info_args)
 
@@ -946,6 +1019,49 @@ struct nvgpu_gpu_set_event_filter_args {
 
 #define NVGPU_TSG_IOCTL_MAGIC 'T'
 
+struct nvgpu_tsg_bind_channel_ex_args {
+	/* in: channel fd */
+	__s32 channel_fd;
+
+	/* in: VEID in Volta */
+	__u32 subcontext_id;
+	__u32 num_active_tpcs;
+	__u8 tpc_pg_enabled;
+	__u8 reserved[11];
+};
+
+/*
+ * This struct helps to report the SM error state of a single SM.
+ * This acts upon the currently resident TSG context.
+ * Global Error status register
+ * Warp Error status register
+ * Warp Error status register PC
+ * Global Error status register Report Mask
+ * Warp Error status register Report Mask
+ */
+struct nvgpu_tsg_sm_error_state_record {
+	__u32 global_esr;
+	__u32 warp_esr;
+	__u64 warp_esr_pc;
+	__u32 global_esr_report_mask;
+	__u32 warp_esr_report_mask;
+};
+
+/*
+ * This struct helps to read the SM error state.
+ */
+struct nvgpu_tsg_read_single_sm_error_state_args {
+	/* Valid SM ID */
+	__u32 sm_id;
+	__u32 reserved;
+	/*
+	 * This is pointer to the struct nvgpu_gpu_sm_error_state_record
+	 */
+	__u64 record_mem;
+	/* size of the record size to read */
+	__u64 record_size;
+};
+
 #define NVGPU_TSG_IOCTL_BIND_CHANNEL \
 	_IOW(NVGPU_TSG_IOCTL_MAGIC, 1, int)
 #define NVGPU_TSG_IOCTL_UNBIND_CHANNEL \
@@ -956,20 +1072,23 @@ struct nvgpu_gpu_set_event_filter_args {
 	_IO(NVGPU_TSG_IOCTL_MAGIC, 4)
 #define NVGPU_IOCTL_TSG_PREEMPT \
 	_IO(NVGPU_TSG_IOCTL_MAGIC, 5)
-#define NVGPU_IOCTL_TSG_SET_PRIORITY \
-	_IOW(NVGPU_TSG_IOCTL_MAGIC, 6, struct nvgpu_set_priority_args)
 #define NVGPU_IOCTL_TSG_EVENT_ID_CTRL \
 	_IOWR(NVGPU_TSG_IOCTL_MAGIC, 7, struct nvgpu_event_id_ctrl_args)
 #define NVGPU_IOCTL_TSG_SET_RUNLIST_INTERLEAVE \
 	_IOW(NVGPU_TSG_IOCTL_MAGIC, 8, struct nvgpu_runlist_interleave_args)
 #define NVGPU_IOCTL_TSG_SET_TIMESLICE \
 	_IOW(NVGPU_TSG_IOCTL_MAGIC, 9, struct nvgpu_timeslice_args)
-
+#define NVGPU_IOCTL_TSG_GET_TIMESLICE \
+	_IOR(NVGPU_TSG_IOCTL_MAGIC, 10, struct nvgpu_timeslice_args)
+#define NVGPU_TSG_IOCTL_BIND_CHANNEL_EX \
+	_IOWR(NVGPU_TSG_IOCTL_MAGIC, 11, struct nvgpu_tsg_bind_channel_ex_args)
+#define NVGPU_TSG_IOCTL_READ_SINGLE_SM_ERROR_STATE \
+	_IOR(NVGPU_TSG_IOCTL_MAGIC, 12, \
+			struct nvgpu_tsg_read_single_sm_error_state_args)
 #define NVGPU_TSG_IOCTL_MAX_ARG_SIZE	\
-	sizeof(struct nvgpu_event_id_ctrl_args)
+		sizeof(struct nvgpu_tsg_bind_channel_ex_args)
 #define NVGPU_TSG_IOCTL_LAST		\
-	_IOC_NR(NVGPU_IOCTL_TSG_SET_TIMESLICE)
-
+	_IOC_NR(NVGPU_TSG_IOCTL_READ_SINGLE_SM_ERROR_STATE)
 
 /*
  * /dev/nvhost-dbg-gpu device
@@ -1052,7 +1171,7 @@ struct nvgpu_dbg_gpu_reg_op {
 struct nvgpu_dbg_gpu_exec_reg_ops_args {
 	__u64 ops; /* pointer to nvgpu_reg_op operations */
 	__u32 num_ops;
-	__u32 _pad0[1];
+	__u32 gr_ctx_resident;
 };
 
 #define NVGPU_DBG_GPU_IOCTL_REG_OPS					\
@@ -1162,8 +1281,12 @@ struct nvgpu_dbg_gpu_set_next_stop_trigger_type_args {
 
 
 /* PM Context Switch Mode */
+/*This mode says that the pms are not to be context switched. */
 #define NVGPU_DBG_GPU_HWPM_CTXSW_MODE_NO_CTXSW               (0x00000000)
+/* This mode says that the pms in Mode-B are to be context switched */
 #define NVGPU_DBG_GPU_HWPM_CTXSW_MODE_CTXSW                  (0x00000001)
+/* This mode says that the pms in Mode-E (stream out) are to be context switched. */
+#define NVGPU_DBG_GPU_HWPM_CTXSW_MODE_STREAM_OUT_CTXSW       (0x00000002)
 
 struct nvgpu_dbg_gpu_hwpm_ctxsw_mode_args {
 	__u32 mode;
@@ -1207,17 +1330,6 @@ struct nvgpu_dbg_gpu_clear_single_sm_error_state_args {
 
 #define NVGPU_DBG_GPU_IOCTL_CLEAR_SINGLE_SM_ERROR_STATE			\
 	_IOW(NVGPU_DBG_GPU_IOCTL_MAGIC, 15, struct nvgpu_dbg_gpu_clear_single_sm_error_state_args)
-
-
-struct nvgpu_dbg_gpu_write_single_sm_error_state_args {
-	__u32 sm_id;
-	__u32 padding;
-	__u64 sm_error_state_record_mem;
-	__u64 sm_error_state_record_size;
-};
-
-#define NVGPU_DBG_GPU_IOCTL_WRITE_SINGLE_SM_ERROR_STATE			\
-	_IOW(NVGPU_DBG_GPU_IOCTL_MAGIC, 16, struct nvgpu_dbg_gpu_write_single_sm_error_state_args)
 
 /*
  * Unbinding/detaching a debugger session from a nvgpu channel
@@ -1283,8 +1395,27 @@ struct nvgpu_dbg_gpu_profiler_reserve_args {
 #define NVGPU_DBG_GPU_IOCTL_PROFILER_RESERVE			\
 	_IOWR(NVGPU_DBG_GPU_IOCTL_MAGIC, 22, struct nvgpu_dbg_gpu_profiler_reserve_args)
 
+/*
+ * This struct helps to set the exception mask. If mask is not set
+ * or set to NVGPU_DBG_GPU_IOCTL_SET_SM_EXCEPTION_TYPE_MASK_NONE
+ * then kernel code will follow recovery path on sm exception.
+ * If mask is set to NVGPU_DBG_GPU_IOCTL_SET_SM_EXCEPTION_TYPE_MASK_FATAL, then
+ * kernel code will skip recovery path on sm exception.
+ */
+struct nvgpu_dbg_gpu_set_sm_exception_type_mask_args {
+#define NVGPU_DBG_GPU_IOCTL_SET_SM_EXCEPTION_TYPE_MASK_NONE	(0x0U)
+#define NVGPU_DBG_GPU_IOCTL_SET_SM_EXCEPTION_TYPE_MASK_FATAL	(0x1U << 0U)
+	/* exception type mask value */
+	__u32 exception_type_mask;
+	__u32 reserved;
+};
+
+#define NVGPU_DBG_GPU_IOCTL_SET_SM_EXCEPTION_TYPE_MASK \
+	_IOW(NVGPU_DBG_GPU_IOCTL_MAGIC, 23, \
+			struct nvgpu_dbg_gpu_set_sm_exception_type_mask_args)
+
 #define NVGPU_DBG_GPU_IOCTL_LAST		\
-	_IOC_NR(NVGPU_DBG_GPU_IOCTL_PROFILER_RESERVE)
+	_IOC_NR(NVGPU_DBG_GPU_IOCTL_SET_SM_EXCEPTION_TYPE_MASK)
 
 #define NVGPU_DBG_GPU_IOCTL_MAX_ARG_SIZE		\
 	sizeof(struct nvgpu_dbg_gpu_access_fb_memory_args)
@@ -1294,10 +1425,7 @@ struct nvgpu_dbg_gpu_profiler_reserve_args {
  */
 
 #define NVGPU_IOCTL_MAGIC 'H'
-#define NVGPU_NO_TIMEOUT ((u32)~0)
-#define NVGPU_PRIORITY_LOW 50
-#define NVGPU_PRIORITY_MEDIUM 100
-#define NVGPU_PRIORITY_HIGH 150
+#define NVGPU_NO_TIMEOUT ((__u32)~0U)
 #define NVGPU_TIMEOUT_FLAG_DISABLE_DUMP		0
 
 /* this is also the hardware memory format */
@@ -1332,6 +1460,9 @@ struct nvgpu_set_nvmap_fd_args {
 } __packed;
 
 #define NVGPU_ALLOC_OBJ_FLAGS_LOCKBOOST_ZERO	(1 << 0)
+/* Flags in nvgpu_alloc_obj_ctx_args.flags */
+#define NVGPU_ALLOC_OBJ_FLAGS_GFXP		(1 << 1)
+#define NVGPU_ALLOC_OBJ_FLAGS_CILP		(1 << 2)
 
 struct nvgpu_alloc_obj_ctx_args {
 	__u32 class_num; /* kepler3d, 2d, compute, etc       */
@@ -1339,25 +1470,71 @@ struct nvgpu_alloc_obj_ctx_args {
 	__u64 obj_id;    /* output, used to free later       */
 };
 
+/* Deprecated. Use the SETUP_BIND IOCTL instead. */
 struct nvgpu_alloc_gpfifo_args {
 	__u32 num_entries;
-#define NVGPU_ALLOC_GPFIFO_FLAGS_VPR_ENABLED	(1 << 0) /* set owner channel of this gpfifo as a vpr channel */
+#define NVGPU_ALLOC_GPFIFO_FLAGS_VPR_ENABLED	(1 << 0)
+#define NVGPU_ALLOC_GPFIFO_FLAGS_REPLAYABLE_FAULTS_ENABLE   (1 << 2)
 	__u32 flags;
 };
 
+/* Deprecated. Use the SETUP_BIND IOCTL instead. */
 struct nvgpu_alloc_gpfifo_ex_args {
 	__u32 num_entries;
 	__u32 num_inflight_jobs;
-#define NVGPU_ALLOC_GPFIFO_EX_FLAGS_VPR_ENABLED		(1 << 0) /* set owner channel of this gpfifo as a vpr channel */
-#define NVGPU_ALLOC_GPFIFO_EX_FLAGS_DETERMINISTIC	(1 << 1) /* channel shall exhibit deterministic behavior in the submit path */
+#define NVGPU_ALLOC_GPFIFO_EX_FLAGS_VPR_ENABLED		(1 << 0)
+#define NVGPU_ALLOC_GPFIFO_EX_FLAGS_DETERMINISTIC	(1 << 1)
 	__u32 flags;
 	__u32 reserved[5];
 };
 
-struct gk20a_sync_pt_info {
-	__u64 hw_op_ns;
+/*
+ * Setup the channel and bind it (enable).
+ */
+struct nvgpu_channel_setup_bind_args {
+	__u32 num_gpfifo_entries;
+	__u32 num_inflight_jobs;
+/* Set owner channel of this gpfifo as a vpr channel. */
+#define NVGPU_CHANNEL_SETUP_BIND_FLAGS_VPR_ENABLED		(1 << 0)
+/*
+ * Channel shall exhibit deterministic behavior in the submit path.
+ *
+ * NOTE: as an exception, VPR resize may still cause the GPU to reset at any
+ * time, which is not deterministic behavior. If this is not acceptable, the
+ * user has to make sure that VPR resize does not occur.
+ *
+ * With this flag, any submits with in-kernel job tracking also require that
+ * num_inflight_jobs is nonzero, and additionally that
+ * NVGPU_GPU_FLAGS_SUPPORT_DETERMINISTIC_SUBMIT_FULL is found in gpu
+ * characteristics.flags.
+ *
+ * Note that fast submits (with no in-kernel job tracking) are also
+ * deterministic and are supported if the characteristics flags contain
+ * NVGPU_GPU_FLAGS_SUPPORT_DETERMINISTIC_SUBMIT_NO_JOBTRACKING; this flag or
+ * num_inflight_jobs are not necessary in that case.
+ */
+#define NVGPU_CHANNEL_SETUP_BIND_FLAGS_DETERMINISTIC	(1 << 1)
+/* enable replayable gmmu faults for this channel */
+#define NVGPU_CHANNEL_SETUP_BIND_FLAGS_REPLAYABLE_FAULTS_ENABLE   (1 << 2)
+/*
+ * Enable usermode submits on this channel.
+ *
+ * Submits in usermode are supported in some environments. If supported and
+ * this flag is set + USERD and GPFIFO buffers are provided here, a submit
+ * token is passed back to be written in the doorbell register in the usermode
+ * region to notify the GPU for new work on this channel. Usermode and
+ * kernelmode submit modes are mutually exclusive; by passing this flag, the
+ * SUBMIT_GPFIFO IOCTL cannot be used.
+ */
+#define NVGPU_CHANNEL_SETUP_BIND_FLAGS_USERMODE_SUPPORT	(1 << 3)
+	__u32 flags;
+	__s32 userd_dmabuf_fd;	/* in */
+	__s32 gpfifo_dmabuf_fd;	/* in */
+	__u32 work_submit_token; /* out */
+	__u64 userd_dmabuf_offset; /* in */
+	__u64 gpfifo_dmabuf_offset; /* in */
+	__u32 reserved[9];
 };
-
 struct nvgpu_fence {
 	__u32 id;        /* syncpoint id or sync fence fd */
 	__u32 value;     /* syncpoint value (discarded when using sync fence) */
@@ -1382,27 +1559,6 @@ struct nvgpu_submit_gpfifo_args {
 	__u32 num_entries;
 	__u32 flags;
 	struct nvgpu_fence fence;
-};
-
-struct nvgpu_map_buffer_args {
-	__u32 flags;
-#define NVGPU_MAP_BUFFER_FLAGS_ALIGN		0x0
-#define NVGPU_MAP_BUFFER_FLAGS_OFFSET		(1 << 0)
-#define NVGPU_MAP_BUFFER_FLAGS_KIND_PITCH	0x0
-#define NVGPU_MAP_BUFFER_FLAGS_KIND_SPECIFIED	(1 << 1)
-#define NVGPU_MAP_BUFFER_FLAGS_CACHEABLE_FALSE	0x0
-#define NVGPU_MAP_BUFFER_FLAGS_CACHEABLE_TRUE	(1 << 2)
-	__u32 nvmap_handle;
-	union {
-		__u64 offset; /* valid if _offset flag given (in|out) */
-		__u64 align;  /* alignment multiple (0:={1 or n/a})   */
-	} offset_alignment;
-	__u32 kind;
-#define NVGPU_MAP_BUFFER_KIND_GENERIC_16BX2 0xfe
-};
-
-struct nvgpu_unmap_buffer_args {
-	__u64 offset;
 };
 
 struct nvgpu_wait_args {
@@ -1443,10 +1599,6 @@ struct nvgpu_set_timeout_ex_args {
 	__u32 flags;
 };
 
-struct nvgpu_set_priority_args {
-	__u32 priority;
-} __packed;
-
 #define NVGPU_ZCULL_MODE_GLOBAL		0
 #define NVGPU_ZCULL_MODE_NO_CTXSW		1
 #define NVGPU_ZCULL_MODE_SEPARATE_BUFFER	2
@@ -1470,13 +1622,16 @@ struct nvgpu_notification {
 		__u32 nanoseconds[2];	/* nanoseconds since Jan. 1, 1970 */
 	} time_stamp;			/* -0007 */
 	__u32 info32;	/* info returned depends on method 0008-000b */
-#define	NVGPU_CHANNEL_FIFO_ERROR_IDLE_TIMEOUT	8
-#define	NVGPU_CHANNEL_GR_ERROR_SW_NOTIFY	13
-#define	NVGPU_CHANNEL_GR_SEMAPHORE_TIMEOUT	24
-#define	NVGPU_CHANNEL_GR_ILLEGAL_NOTIFY	25
-#define	NVGPU_CHANNEL_FIFO_ERROR_MMU_ERR_FLT	31
-#define	NVGPU_CHANNEL_PBDMA_ERROR		32
-#define	NVGPU_CHANNEL_RESETCHANNEL_VERIF_ERROR	43
+#define	NVGPU_CHANNEL_FIFO_ERROR_IDLE_TIMEOUT		8
+#define	NVGPU_CHANNEL_GR_ERROR_SW_METHOD		12
+#define	NVGPU_CHANNEL_GR_ERROR_SW_NOTIFY		13
+#define	NVGPU_CHANNEL_GR_EXCEPTION			13
+#define	NVGPU_CHANNEL_GR_SEMAPHORE_TIMEOUT		24
+#define	NVGPU_CHANNEL_GR_ILLEGAL_NOTIFY			25
+#define	NVGPU_CHANNEL_FIFO_ERROR_MMU_ERR_FLT		31
+#define	NVGPU_CHANNEL_PBDMA_ERROR			32
+#define NVGPU_CHANNEL_FECS_ERR_UNIMP_FIRMWARE_METHOD	37
+#define	NVGPU_CHANNEL_RESETCHANNEL_VERIF_ERROR		43
 #define	NVGPU_CHANNEL_PBDMA_PUSHBUFFER_CRC_MISMATCH	80
 	__u16 info16;	/* info returned depends on method 000c-000d */
 	__u16 status;	/* user sets bit 15, NV sets status 000e-000f */
@@ -1497,13 +1652,15 @@ struct nvgpu_cycle_stats_snapshot_args {
 #define NVGPU_IOCTL_CHANNEL_CYCLE_STATS_SNAPSHOT_CMD_ATTACH  1
 #define NVGPU_IOCTL_CHANNEL_CYCLE_STATS_SNAPSHOT_CMD_DETACH  2
 
-/* disable watchdog per-channel */
+/* configure watchdog per-channel */
 struct nvgpu_channel_wdt_args {
 	__u32 wdt_status;
-	__u32 padding;
+	__u32 timeout_ms;
 };
-#define NVGPU_IOCTL_CHANNEL_DISABLE_WDT		1
-#define NVGPU_IOCTL_CHANNEL_ENABLE_WDT		2
+#define NVGPU_IOCTL_CHANNEL_DISABLE_WDT		  (1 << 0)
+#define NVGPU_IOCTL_CHANNEL_ENABLE_WDT		  (1 << 1)
+#define NVGPU_IOCTL_CHANNEL_WDT_FLAG_SET_TIMEOUT  (1 << 2)
+#define NVGPU_IOCTL_CHANNEL_WDT_FLAG_DISABLE_DUMP (1 << 3)
 
 /*
  * Interleaving channels in a runlist is an approach to improve
@@ -1542,6 +1699,8 @@ struct nvgpu_event_id_ctrl_args {
 #define NVGPU_IOCTL_CHANNEL_EVENT_ID_BPT_INT		0
 #define NVGPU_IOCTL_CHANNEL_EVENT_ID_BPT_PAUSE		1
 #define NVGPU_IOCTL_CHANNEL_EVENT_ID_BLOCKING_SYNC	2
+#define NVGPU_IOCTL_CHANNEL_EVENT_ID_CILP_PREEMPTION_STARTED	3
+#define NVGPU_IOCTL_CHANNEL_EVENT_ID_CILP_PREEMPTION_COMPLETE	4
 #define NVGPU_IOCTL_CHANNEL_EVENT_ID_GR_SEMAPHORE_WRITE_AWAKEN	5
 #define NVGPU_IOCTL_CHANNEL_EVENT_ID_MAX		6
 
@@ -1550,11 +1709,14 @@ struct nvgpu_event_id_ctrl_args {
 struct nvgpu_preemption_mode_args {
 /* only one should be enabled at a time */
 #define NVGPU_GRAPHICS_PREEMPTION_MODE_WFI              (1 << 0)
+#define NVGPU_GRAPHICS_PREEMPTION_MODE_GFXP		(1 << 1)
 	__u32 graphics_preempt_mode; /* in */
 
 /* only one should be enabled at a time */
 #define NVGPU_COMPUTE_PREEMPTION_MODE_WFI               (1 << 0)
 #define NVGPU_COMPUTE_PREEMPTION_MODE_CTA               (1 << 1)
+#define NVGPU_COMPUTE_PREEMPTION_MODE_CILP		(1 << 2)
+
 	__u32 compute_preempt_mode; /* in */
 };
 
@@ -1565,14 +1727,23 @@ struct nvgpu_boosted_ctx_args {
 	__u32 padding;
 };
 
+struct nvgpu_get_user_syncpoint_args {
+	__u64 gpu_va;		/* out */
+	__u32 syncpoint_id;	/* out */
+	__u32 syncpoint_max;	/* out */
+};
+
+struct nvgpu_reschedule_runlist_args {
+#define NVGPU_RESCHEDULE_RUNLIST_PREEMPT_NEXT           (1 << 0)
+	__u32 flags;
+};
+
 #define NVGPU_IOCTL_CHANNEL_SET_NVMAP_FD	\
 	_IOW(NVGPU_IOCTL_MAGIC, 5, struct nvgpu_set_nvmap_fd_args)
 #define NVGPU_IOCTL_CHANNEL_SET_TIMEOUT	\
 	_IOW(NVGPU_IOCTL_MAGIC, 11, struct nvgpu_set_timeout_args)
 #define NVGPU_IOCTL_CHANNEL_GET_TIMEDOUT	\
 	_IOR(NVGPU_IOCTL_MAGIC, 12, struct nvgpu_get_param_args)
-#define NVGPU_IOCTL_CHANNEL_SET_PRIORITY	\
-	_IOW(NVGPU_IOCTL_MAGIC, 13, struct nvgpu_set_priority_args)
 #define NVGPU_IOCTL_CHANNEL_SET_TIMEOUT_EX	\
 	_IOWR(NVGPU_IOCTL_MAGIC, 18, struct nvgpu_set_timeout_ex_args)
 #define NVGPU_IOCTL_CHANNEL_ALLOC_GPFIFO	\
@@ -1615,10 +1786,19 @@ struct nvgpu_boosted_ctx_args {
 	_IOW(NVGPU_IOCTL_MAGIC, 123, struct nvgpu_alloc_gpfifo_ex_args)
 #define NVGPU_IOCTL_CHANNEL_SET_BOOSTED_CTX	\
 	_IOW(NVGPU_IOCTL_MAGIC, 124, struct nvgpu_boosted_ctx_args)
+#define NVGPU_IOCTL_CHANNEL_GET_TIMESLICE \
+	_IOW(NVGPU_IOCTL_MAGIC, 125, struct nvgpu_timeslice_args)
+#define NVGPU_IOCTL_CHANNEL_GET_USER_SYNCPOINT \
+	_IOR(NVGPU_IOCTL_MAGIC, 126, struct nvgpu_get_user_syncpoint_args)
+#define NVGPU_IOCTL_CHANNEL_RESCHEDULE_RUNLIST	\
+	_IOW(NVGPU_IOCTL_MAGIC, 127, struct nvgpu_reschedule_runlist_args)
+#define NVGPU_IOCTL_CHANNEL_SETUP_BIND	\
+	_IOWR(NVGPU_IOCTL_MAGIC, 128, struct nvgpu_channel_setup_bind_args)
 
 #define NVGPU_IOCTL_CHANNEL_LAST	\
-	_IOC_NR(NVGPU_IOCTL_CHANNEL_SET_BOOSTED_CTX)
-#define NVGPU_IOCTL_CHANNEL_MAX_ARG_SIZE sizeof(struct nvgpu_alloc_gpfifo_ex_args)
+	_IOC_NR(NVGPU_IOCTL_CHANNEL_SETUP_BIND)
+#define NVGPU_IOCTL_CHANNEL_MAX_ARG_SIZE \
+	sizeof(struct nvgpu_channel_setup_bind_args)
 
 /*
  * /dev/nvhost-as-gpu device
@@ -1707,34 +1887,133 @@ struct nvgpu_as_bind_channel_args {
  * chosen will be returned back to the caller in the 'page_size' parameter in
  * that case.
  */
-struct nvgpu_as_map_buffer_args {
-	__u32 flags;		/* in/out */
 #define NVGPU_AS_MAP_BUFFER_FLAGS_FIXED_OFFSET	    (1 << 0)
 #define NVGPU_AS_MAP_BUFFER_FLAGS_CACHEABLE	    (1 << 2)
+#define NVGPU_AS_MAP_BUFFER_FLAGS_IO_COHERENT	    (1 << 4)
 #define NVGPU_AS_MAP_BUFFER_FLAGS_UNMAPPED_PTE	    (1 << 5)
 #define NVGPU_AS_MAP_BUFFER_FLAGS_MAPPABLE_COMPBITS (1 << 6)
-	__u32 reserved;		/* in */
-	__u32 dmabuf_fd;	/* in */
-	__u32 page_size;	/* inout, 0:= best fit to buffer */
-	union {
-		__u64 offset; /* inout, byte address valid iff _FIXED_OFFSET */
-		__u64 align;  /* in, alignment multiple (0:={1 or n/a})   */
-	} o_a;
-};
+#define NVGPU_AS_MAP_BUFFER_FLAGS_L3_ALLOC          (1 << 7)
+#define NVGPU_AS_MAP_BUFFER_FLAGS_DIRECT_KIND_CTRL  (1 << 8)
 
- /*
- * Mapping dmabuf fds into an address space:
+/*
+ * VM map buffer IOCTL
  *
- * The caller requests a mapping to a particular page 'kind'.
+ * This ioctl maps a buffer - generally a dma_buf FD - into the VM's address
+ * space. Usage of this API is as follows.
  *
- * If 'page_size' is set to 0 the dmabuf's alignment/sizing will be used to
- * determine the page size (largest possible).  The page size chosen will be
- * returned back to the caller in the 'page_size' parameter in that case.
+ * @flags  [IN]
+ *
+ *   These are the flags passed to the IOCTL to modify the IOCTL behavior. The
+ *   following flags are supported:
+ *
+ *   %NVGPU_AS_MAP_BUFFER_FLAGS_FIXED_OFFSET
+ *
+ *     Specify that the mapping already has an address. The mapping address
+ *     must reside in an area already reserved with the as_alloc_space IOCTL.
+ *     If this flag is set then the @offset field must be populated with the
+ *     address to map to.
+ *
+ *   %NVGPU_AS_MAP_BUFFER_FLAGS_CACHEABLE
+ *
+ *     Specify that a mapping shall be GPU cachable.
+ *
+ *   %NVGPU_AS_MAP_BUFFER_FLAGS_IO_COHERENT
+ *
+ *     Specify that a mapping shall be IO coherent.
+ *
+ *   %NVGPU_AS_MAP_BUFFER_FLAGS_UNMAPPED_PTE
+ *
+ *     Specify that a mapping shall be marked as invalid but otherwise
+ *     populated. This flag doesn't actually make a lot of sense. The
+ *     only reason to specify it is for testing replayable faults but
+ *     an actual useful implementation of such a feature would likely
+ *     not use this.
+ *
+ *     DEPRECATED: do not use! This will be removed in a future update.
+ *
+ *   %NVGPU_AS_MAP_BUFFER_FLAGS_MAPPABLE_COMPBITS
+ *
+ *     Deprecated.
+ *
+ *   %NVGPU_AS_MAP_BUFFER_FLAGS_DIRECT_KIND_CTRL
+ *
+ *     Set when userspace plans to pass in @compr_kind and @incompr_kind
+ *     instead of letting the kernel work out kind fields.
+ *
+ * @kind  [IN]
+ *
+ *   Specify the kind to use for the mapping.
+ *
+ * @compr_kind  [IN]
+ * @incompr_kind  [IN]
+ *
+ *   Specify the compressible and incompressible kinds to be used for the
+ *   mapping. Requires that %NVGPU_AS_MAP_BUFFER_FLAGS_DIRECT_KIND_CTRL is
+ *   set in @flags. The kernel will attempt to use @comp_kind and if for
+ *   some reason that is not possible will then fall back to using the
+ *   @incompr_kind.
+ *
+ * @dmabuf_fd  [IN]
+ *
+ *   FD pointing to the dmabuf that will be mapped into the GMMU.
+ *
+ * @page_size  [IN]
+ *
+ *   Specify the page size for the mapping. Must be set to a valid, supported
+ *   page size. If left unset this IOCTL will return -EINVAL. In general, a
+ *   small page size mapping will always be supported, but in certain cases of
+ *   compression this will not be the case.
+ *
+ * @buffer_offset  [IN]
+ *
+ *   Specify an offset into the physical buffer to being the mapping at. For
+ *   example imagine a DMA buffer 32KB long. However, you wish to only  this
+ *   buffer starting at 8KB. In such a case you would pass 8KB as the
+ *   @buffer_offset. This is only available with fixed address mappings. All
+ *   regular (non-fixed) mappings require this field to be set to 0. This field
+ *   is in bytes.
+ *
+ * @mapping_size  [IN]
+ *
+ *   The size of the mapping in bytes. This is from the @buffer_offset position.
+ *   So for example, assuming you have a 32KB physical buffer and you want to
+ *   map only 8KB of it, starting at some offset, then you would specify 8192 in
+ *   this field. Of course this size + the buffer_offset must be less than the
+ *   length of the physical buffer; otherwise -EINVAL is returned. This is only
+ *   supported for fixed mappings.
+ *
+ * @offset  [IN, OUT]
+ *
+ *   The offset of the buffer in the GPU virtual address space. In other words
+ *   the virtual address of the buffer. If the
+ *   %NVGPU_AS_MAP_BUFFER_FLAGS_FIXED_OFFSET flag is set then this field must be
+ *   populated by userspace. In all cases the ultimate mapped address is
+ *   returned in this field. The field is in bytes.
  */
 struct nvgpu_as_map_buffer_ex_args {
+	/* NVGPU_AS_MAP_BUFFER_FLAGS_DIRECT_KIND_CTRL must be set */
 	__u32 flags;		/* in/out */
-#define NV_KIND_DEFAULT -1
-	__s32 kind;		/* in (-1 represents default) */
+
+	/*
+	 * - If both compr_kind and incompr_kind are set
+	 *   (i.e., value is other than NV_KIND_INVALID),
+	 *   kernel attempts to use compr_kind first.
+	 *
+	 * - If compr_kind is set, kernel attempts to allocate
+	 *   comptags for the buffer. If successful,
+	 *   compr_kind is used as the PTE kind.
+	 *
+	 * - If incompr_kind is set, kernel uses incompr_kind as the
+	 *   PTE kind, if compr_kind cannot be used. Comptags are not
+	 *   allocated.
+	 *
+	 * - If neither compr_kind or incompr_kind is set, the
+	 *   map call will fail.
+	 */
+#define NV_KIND_INVALID -1
+	__s16 compr_kind;
+	__s16 incompr_kind;
+
 	__u32 dmabuf_fd;	/* in */
 	__u32 page_size;	/* inout, 0:= best fit to buffer */
 
@@ -1861,7 +2140,7 @@ struct nvgpu_as_get_va_regions_args {
 };
 
 struct nvgpu_as_map_buffer_batch_args {
-	__u64 unmaps; /* ptr to array of nvgpu_unmap_buffer_args */
+	__u64 unmaps; /* ptr to array of nvgpu_as_unmap_buffer_args */
 	__u64 maps;   /* ptr to array of nvgpu_as_map_buffer_ex_args */
 	__u32 num_unmaps; /* in: number of unmaps
 			   * out: on error, number of successful unmaps */
@@ -1870,14 +2149,18 @@ struct nvgpu_as_map_buffer_batch_args {
 	__u64 reserved;
 };
 
+struct nvgpu_as_get_sync_ro_map_args {
+	__u64 base_gpuva;
+	__u32 sync_size;
+	__u32 padding;
+};
+
 #define NVGPU_AS_IOCTL_BIND_CHANNEL \
 	_IOWR(NVGPU_AS_IOCTL_MAGIC, 1, struct nvgpu_as_bind_channel_args)
 #define NVGPU32_AS_IOCTL_ALLOC_SPACE \
 	_IOWR(NVGPU_AS_IOCTL_MAGIC, 2, struct nvgpu32_as_alloc_space_args)
 #define NVGPU_AS_IOCTL_FREE_SPACE \
 	_IOWR(NVGPU_AS_IOCTL_MAGIC, 3, struct nvgpu_as_free_space_args)
-#define NVGPU_AS_IOCTL_MAP_BUFFER \
-	_IOWR(NVGPU_AS_IOCTL_MAGIC, 4, struct nvgpu_as_map_buffer_args)
 #define NVGPU_AS_IOCTL_UNMAP_BUFFER \
 	_IOWR(NVGPU_AS_IOCTL_MAGIC, 5, struct nvgpu_as_unmap_buffer_args)
 #define NVGPU_AS_IOCTL_ALLOC_SPACE \
@@ -1892,9 +2175,11 @@ struct nvgpu_as_map_buffer_batch_args {
 	_IOWR(NVGPU_AS_IOCTL_MAGIC, 10, struct nvgpu_as_map_buffer_compbits_args)
 #define NVGPU_AS_IOCTL_MAP_BUFFER_BATCH	\
 	_IOWR(NVGPU_AS_IOCTL_MAGIC, 11, struct nvgpu_as_map_buffer_batch_args)
+#define NVGPU_AS_IOCTL_GET_SYNC_RO_MAP	\
+	_IOR(NVGPU_AS_IOCTL_MAGIC,  12, struct nvgpu_as_get_sync_ro_map_args)
 
 #define NVGPU_AS_IOCTL_LAST            \
-	_IOC_NR(NVGPU_AS_IOCTL_MAP_BUFFER_BATCH)
+	_IOC_NR(NVGPU_AS_IOCTL_GET_SYNC_RO_MAP)
 #define NVGPU_AS_IOCTL_MAX_ARG_SIZE	\
 	sizeof(struct nvgpu_as_map_buffer_ex_args)
 

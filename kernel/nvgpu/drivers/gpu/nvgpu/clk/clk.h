@@ -1,19 +1,28 @@
 /*
  * general clock structures & definitions
  *
- * Copyright (c) 2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
-#ifndef _CLK_H_
-#define _CLK_H_
+#ifndef NVGPU_CLK_H
+#define NVGPU_CLK_H
 
 #include "clk_vin.h"
 #include "clk_fll.h"
@@ -22,11 +31,15 @@
 #include "clk_vf_point.h"
 #include "clk_mclk.h"
 #include "clk_freq_controller.h"
-#include "gk20a/gk20a.h"
 
 #define NV_PERF_DOMAIN_4X_CLOCK_DOMAIN_SKIP 0x10
 #define NV_PERF_DOMAIN_4X_CLOCK_DOMAIN_MASK 0x1F
 #define NV_PERF_DOMAIN_4X_CLOCK_DOMAIN_SHIFT 0
+#define BOOT_GPCCLK_MHZ 952
+
+struct gk20a;
+
+int clk_set_boot_fll_clk(struct gk20a *g);
 
 /* clock related defines for GPUs supporting clock control from pmu*/
 struct clk_pmupstate {
@@ -44,6 +57,12 @@ struct clockentry {
 		u8 clk_which;
 		u8 perf_index;
 		u32 api_clk_domain;
+};
+
+struct change_fll_clk {
+		u32 api_clk_domain;
+		u16 clkmhz;
+		u32 voltuv;
 };
 
 struct set_fll_clk {
@@ -70,6 +89,7 @@ struct vbios_clock_domain {
 struct vbios_clocks_table_1x_hal_clock_entry {
 	enum nv_pmu_clk_clkwhich domain;
 	bool b_noise_aware_capable;
+	u8 clk_vf_curve_count;
 };
 
 #define NV_PERF_HEADER_4X_CLOCKS_DOMAINS_4_GPC2CLK           0
@@ -108,13 +128,17 @@ u32 clk_domain_get_f_or_v(
 	u32 *pvoltuv,
 	u8 railidx
 );
-u32 clk_domain_get_f_points(
-	struct gk20a *g,
-	u32 clkapidomain,
-	u32 *fpointscount,
-	u16 *freqpointsinmhz
-);
 int clk_get_fll_clks(struct gk20a *g, struct set_fll_clk *fllclk);
 int clk_set_fll_clks(struct gk20a *g, struct set_fll_clk *fllclk);
-int clk_pmu_freq_controller_load(struct gk20a *g, bool bload);
-#endif
+int clk_pmu_freq_controller_load(struct gk20a *g, bool bload, u8 bit_idx);
+u32 nvgpu_clk_vf_change_inject_data_fill_gv10x(struct gk20a *g,
+	struct nv_pmu_clk_rpc *rpccall,
+	struct set_fll_clk *setfllclk);
+u32 nvgpu_clk_vf_change_inject_data_fill_gp10x(struct gk20a *g,
+	struct nv_pmu_clk_rpc *rpccall,
+	struct set_fll_clk *setfllclk);
+u32 nvgpu_clk_set_boot_fll_clk_gv10x(struct gk20a *g);
+int nvgpu_clk_set_fll_clk_gv10x(struct gk20a *g);
+int clk_pmu_freq_effective_avg_load(struct gk20a *g, bool bload);
+u32 clk_freq_effective_avg(struct gk20a *g, u32  clkDomainMask);
+#endif /* NVGPU_CLK_H */

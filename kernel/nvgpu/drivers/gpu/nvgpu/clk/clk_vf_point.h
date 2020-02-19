@@ -1,27 +1,36 @@
 /*
-* Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
+* Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
 *
-* This program is free software; you can redistribute it and/or modify it
-* under the terms and conditions of the GNU General Public License,
-* version 2, as published by the Free Software Foundation.
-*
-* This program is distributed in the hope it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-* more details.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef _CLKVFPOINT_H_
-#define _CLKVFPOINT_H_
+#ifndef NVGPU_CLK_VF_POINT_H
+#define NVGPU_CLK_VF_POINT_H
 #include "ctrl/ctrlclk.h"
 #include "ctrl/ctrlboardobj.h"
 #include <nvgpu/pmuif/nvgpu_gpmu_cmdif.h>
 #include "boardobj/boardobjgrp_e32.h"
 #include "boardobj/boardobjgrpmask.h"
 
-u32 clk_vf_point_sw_setup(struct gk20a *g);
-u32 clk_vf_point_pmu_setup(struct gk20a *g);
-u32 clk_vf_point_cache(struct gk20a *g);
+int clk_vf_point_sw_setup(struct gk20a *g);
+int clk_vf_point_pmu_setup(struct gk20a *g);
+int clk_vf_point_cache(struct gk20a *g);
 
 struct clk_vf_points {
 	struct boardobjgrp_e255 super;
@@ -37,7 +46,7 @@ struct clk_vf_point {
 struct clk_vf_point_volt {
 	struct clk_vf_point super;
 	u32 source_voltage_uv;
-	int freq_delta_khz;
+	struct ctrl_clk_freq_delta freq_delta;
 };
 
 struct clk_vf_point_freq {
@@ -71,4 +80,4 @@ struct clk_vf_point_freq {
 
 struct clk_vf_point *construct_clk_vf_point(struct gk20a *g, void *pargs);
 
-#endif
+#endif /* NVGPU_CLK_VF_POINT_H */

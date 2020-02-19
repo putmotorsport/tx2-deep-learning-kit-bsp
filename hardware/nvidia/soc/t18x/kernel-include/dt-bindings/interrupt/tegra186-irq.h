@@ -1,14 +1,23 @@
 /*
- * Copyright (c) 2015-2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2015-2017, NVIDIA CORPORATION. All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 
 #ifndef _DT_BINDINGS_INTERRUPT_TEGRA186_IRQ_H
@@ -33,4 +42,31 @@
 #define TEGRA186_IRQ_UARTG			118
 #define TEGRA186_IRQ_SATA			197
 #define TEGRA186_IRQ_ACTMON			210
+
+#define TEGRA186_IRQ_TOP0_HSP_SHARED_0		120
+#define TEGRA186_IRQ_TOP0_HSP_SHARED_1		121
+#define TEGRA186_IRQ_TOP0_HSP_SHARED_2		122
+#define TEGRA186_IRQ_TOP0_HSP_SHARED_3		123
+#define TEGRA186_IRQ_TOP0_HSP_SHARED_4		124
+#define TEGRA186_IRQ_TOP0_HSP_SHARED_5		125
+#define TEGRA186_IRQ_TOP0_HSP_SHARED_6		126
+#define TEGRA186_IRQ_TOP0_HSP_SHARED_7		127
+#define TEGRA186_IRQ_TOP1_HSP_SHARED_0		128
+#define TEGRA186_IRQ_TOP1_HSP_SHARED_1		129
+#define TEGRA186_IRQ_TOP1_HSP_SHARED_2		130
+#define TEGRA186_IRQ_TOP1_HSP_SHARED_3		131
+#define TEGRA186_IRQ_TOP1_HSP_SHARED_4		132
+#define TEGRA186_IRQ_AON_HSP_SHARED_1		133
+#define TEGRA186_IRQ_AON_HSP_SHARED_2		134
+#define TEGRA186_IRQ_AON_HSP_SHARED_3		135
+#define TEGRA186_IRQ_AON_HSP_SHARED_4		136
+#define TEGRA186_IRQ_BPMP_HSP_SHARED_1		137
+#define TEGRA186_IRQ_BPMP_HSP_SHARED_2		138
+#define TEGRA186_IRQ_BPMP_HSP_SHARED_3		139
+#define TEGRA186_IRQ_BPMP_HSP_SHARED_4		140
+#define TEGRA186_IRQ_SCE_HSP_SHARED_1		141
+#define TEGRA186_IRQ_SCE_HSP_SHARED_2		142
+#define TEGRA186_IRQ_SCE_HSP_SHARED_3		143
+#define TEGRA186_IRQ_SCE_HSP_SHARED_4		144
+
 #endif

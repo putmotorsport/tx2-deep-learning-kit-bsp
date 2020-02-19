@@ -1,17 +1,23 @@
 /*
- * Copyright (c) 2012-2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2012-2017, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 /*
  * Function naming determines intended use:
@@ -52,206 +58,206 @@
 
 static inline u32 fb_mmu_ctrl_r(void)
 {
-	return 0x00100c80;
+	return 0x00100c80U;
 }
 static inline u32 fb_mmu_ctrl_vm_pg_size_f(u32 v)
 {
-	return (v & 0x1) << 0;
+	return (v & 0x1U) << 0U;
 }
 static inline u32 fb_mmu_ctrl_vm_pg_size_128kb_f(void)
 {
-	return 0x0;
+	return 0x0U;
 }
 static inline u32 fb_mmu_ctrl_vm_pg_size_64kb_f(void)
 {
-	return 0x1;
+	return 0x1U;
 }
 static inline u32 fb_mmu_ctrl_pri_fifo_empty_v(u32 r)
 {
-	return (r >> 15) & 0x1;
+	return (r >> 15U) & 0x1U;
 }
 static inline u32 fb_mmu_ctrl_pri_fifo_empty_false_f(void)
 {
-	return 0x0;
+	return 0x0U;
 }
 static inline u32 fb_mmu_ctrl_pri_fifo_space_v(u32 r)
 {
-	return (r >> 16) & 0xff;
+	return (r >> 16U) & 0xffU;
 }
 static inline u32 fb_mmu_invalidate_pdb_r(void)
 {
-	return 0x00100cb8;
+	return 0x00100cb8U;
 }
 static inline u32 fb_mmu_invalidate_pdb_aperture_vid_mem_f(void)
 {
-	return 0x0;
+	return 0x0U;
 }
 static inline u32 fb_mmu_invalidate_pdb_aperture_sys_mem_f(void)
 {
-	return 0x2;
+	return 0x2U;
 }
 static inline u32 fb_mmu_invalidate_pdb_addr_f(u32 v)
 {
-	return (v & 0xfffffff) << 4;
+	return (v & 0xfffffffU) << 4U;
 }
 static inline u32 fb_mmu_invalidate_r(void)
 {
-	return 0x00100cbc;
+	return 0x00100cbcU;
 }
 static inline u32 fb_mmu_invalidate_all_va_true_f(void)
 {
-	return 0x1;
+	return 0x1U;
 }
 static inline u32 fb_mmu_invalidate_all_pdb_true_f(void)
 {
-	return 0x2;
+	return 0x2U;
 }
 static inline u32 fb_mmu_invalidate_trigger_s(void)
 {
-	return 1;
+	return 1U;
 }
 static inline u32 fb_mmu_invalidate_trigger_f(u32 v)
 {
-	return (v & 0x1) << 31;
+	return (v & 0x1U) << 31U;
 }
 static inline u32 fb_mmu_invalidate_trigger_m(void)
 {
-	return 0x1 << 31;
+	return 0x1U << 31U;
 }
 static inline u32 fb_mmu_invalidate_trigger_v(u32 r)
 {
-	return (r >> 31) & 0x1;
+	return (r >> 31U) & 0x1U;
 }
 static inline u32 fb_mmu_invalidate_trigger_true_f(void)
 {
-	return 0x80000000;
+	return 0x80000000U;
 }
 static inline u32 fb_mmu_debug_wr_r(void)
 {
-	return 0x00100cc8;
+	return 0x00100cc8U;
 }
 static inline u32 fb_mmu_debug_wr_aperture_s(void)
 {
-	return 2;
+	return 2U;
 }
 static inline u32 fb_mmu_debug_wr_aperture_f(u32 v)
 {
-	return (v & 0x3) << 0;
+	return (v & 0x3U) << 0U;
 }
 static inline u32 fb_mmu_debug_wr_aperture_m(void)
 {
-	return 0x3 << 0;
+	return 0x3U << 0U;
 }
 static inline u32 fb_mmu_debug_wr_aperture_v(u32 r)
 {
-	return (r >> 0) & 0x3;
+	return (r >> 0U) & 0x3U;
 }
 static inline u32 fb_mmu_debug_wr_aperture_vid_mem_f(void)
 {
-	return 0x0;
+	return 0x0U;
 }
 static inline u32 fb_mmu_debug_wr_aperture_sys_mem_coh_f(void)
 {
-	return 0x2;
+	return 0x2U;
 }
 static inline u32 fb_mmu_debug_wr_aperture_sys_mem_ncoh_f(void)
 {
-	return 0x3;
+	return 0x3U;
 }
 static inline u32 fb_mmu_debug_wr_vol_false_f(void)
 {
-	return 0x0;
+	return 0x0U;
 }
 static inline u32 fb_mmu_debug_wr_vol_true_v(void)
 {
-	return 0x00000001;
+	return 0x00000001U;
 }
 static inline u32 fb_mmu_debug_wr_vol_true_f(void)
 {
-	return 0x4;
+	return 0x4U;
 }
 static inline u32 fb_mmu_debug_wr_addr_f(u32 v)
 {
-	return (v & 0xfffffff) << 4;
+	return (v & 0xfffffffU) << 4U;
 }
 static inline u32 fb_mmu_debug_wr_addr_alignment_v(void)
 {
-	return 0x0000000c;
+	return 0x0000000cU;
 }
 static inline u32 fb_mmu_debug_rd_r(void)
 {
-	return 0x00100ccc;
+	return 0x00100cccU;
 }
 static inline u32 fb_mmu_debug_rd_aperture_vid_mem_f(void)
 {
-	return 0x0;
+	return 0x0U;
 }
 static inline u32 fb_mmu_debug_rd_aperture_sys_mem_coh_f(void)
 {
-	return 0x2;
+	return 0x2U;
 }
 static inline u32 fb_mmu_debug_rd_aperture_sys_mem_ncoh_f(void)
 {
-	return 0x3;
+	return 0x3U;
 }
 static inline u32 fb_mmu_debug_rd_vol_false_f(void)
 {
-	return 0x0;
+	return 0x0U;
 }
 static inline u32 fb_mmu_debug_rd_addr_f(u32 v)
 {
-	return (v & 0xfffffff) << 4;
+	return (v & 0xfffffffU) << 4U;
 }
 static inline u32 fb_mmu_debug_rd_addr_alignment_v(void)
 {
-	return 0x0000000c;
+	return 0x0000000cU;
 }
 static inline u32 fb_mmu_debug_ctrl_r(void)
 {
-	return 0x00100cc4;
+	return 0x00100cc4U;
 }
 static inline u32 fb_mmu_debug_ctrl_debug_v(u32 r)
 {
-	return (r >> 16) & 0x1;
+	return (r >> 16U) & 0x1U;
 }
 static inline u32 fb_mmu_debug_ctrl_debug_m(void)
 {
-	return 0x1 << 16;
+	return 0x1U << 16U;
 }
 static inline u32 fb_mmu_debug_ctrl_debug_enabled_v(void)
 {
-	return 0x00000001;
+	return 0x00000001U;
 }
 static inline u32 fb_mmu_debug_ctrl_debug_enabled_f(void)
 {
-	return 0x10000;
+	return 0x10000U;
 }
 static inline u32 fb_mmu_debug_ctrl_debug_disabled_v(void)
 {
-	return 0x00000000;
+	return 0x00000000U;
 }
 static inline u32 fb_mmu_debug_ctrl_debug_disabled_f(void)
 {
-	return 0x0;
+	return 0x0U;
 }
 static inline u32 fb_mmu_vpr_info_r(void)
 {
-	return 0x00100cd0;
+	return 0x00100cd0U;
 }
 static inline u32 fb_mmu_vpr_info_fetch_v(u32 r)
 {
-	return (r >> 2) & 0x1;
+	return (r >> 2U) & 0x1U;
 }
 static inline u32 fb_mmu_vpr_info_fetch_false_v(void)
 {
-	return 0x00000000;
+	return 0x00000000U;
 }
 static inline u32 fb_mmu_vpr_info_fetch_true_v(void)
 {
-	return 0x00000001;
+	return 0x00000001U;
 }
 static inline u32 fb_niso_flush_sysmem_addr_r(void)
 {
-	return 0x00100c10;
+	return 0x00100c10U;
 }
 #endif

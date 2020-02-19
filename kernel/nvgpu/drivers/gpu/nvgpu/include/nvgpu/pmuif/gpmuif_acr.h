@@ -1,17 +1,26 @@
 /*
- * Copyright (c) 2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2017-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
-#ifndef _GPMUIFACR_H_
-#define _GPMUIFACR_H_
+#ifndef NVGPU_PMUIF_GPMUIF_ACR_H
+#define NVGPU_PMUIF_GPMUIF_ACR_H
 
 /* ACR Commands/Message structures */
 
@@ -101,4 +110,50 @@ struct pmu_acr_msg {
 	};
 };
 
-#endif /* _GPMUIFACR_H_ */
+/* ACR RPC */
+#define NV_PMU_RPC_ID_ACR_INIT_WPR_REGION      0x00
+#define NV_PMU_RPC_ID_ACR_WRITE_CBC_BASE       0x01
+#define NV_PMU_RPC_ID_ACR_BOOTSTRAP_FALCON     0x02
+#define NV_PMU_RPC_ID_ACR_BOOTSTRAP_GR_FALCONS 0x03
+#define NV_PMU_RPC_ID_ACR__COUNT               0x04
+
+/*
+ * structure that holds data used
+ * to execute INIT_WPR_REGION RPC.
+ */
+struct nv_pmu_rpc_struct_acr_init_wpr_region {
+	/*[IN/OUT] Must be first field in RPC structure */
+	struct nv_pmu_rpc_header hdr;
+	/*[IN] ACR region ID of WPR region */
+	u32 wpr_regionId;
+	/* [IN] WPR offset from startAddress */
+	u32 wpr_offset;
+	u32 scratch[1];
+};
+
+/*
+ * structure that holds data used to
+ * execute BOOTSTRAP_GR_FALCONS RPC.
+ */
+struct nv_pmu_rpc_struct_acr_bootstrap_gr_falcons {
+	/*[IN/OUT] Must be first field in RPC structure */
+	struct nv_pmu_rpc_header hdr;
+	/* [IN] Mask of falcon IDs @ref LSF_FALCON_ID_<XYZ> */
+	u32  falcon_id_mask;
+	/*
+	 * [IN] Boostrapping flags @ref
+	 * PMU_ACR_CMD_BOOTSTRAP_FALCON_FLAGS_<XYZ>
+	 */
+	u32 flags;
+	/* [IN] Indicate whether the particular falon uses VA */
+	u32  falcon_va_mask;
+	/*
+	 * [IN] WPR Base Address in VA. The Inst Block containing
+	 * this VA should be bound to both PMU and GR falcons
+	 * during the falcon boot
+	 */
+	struct falc_u64  wpr_base_virtual;
+	u32  scratch[1];
+};
+
+#endif /* NVGPU_PMUIF_GPMUIF_ACR_H */

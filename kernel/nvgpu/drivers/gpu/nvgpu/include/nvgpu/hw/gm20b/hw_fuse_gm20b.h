@@ -1,17 +1,23 @@
 /*
- * Copyright (c) 2014-2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2014-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 /*
  * Function naming determines intended use:
@@ -50,88 +56,92 @@
 #ifndef _hw_fuse_gm20b_h_
 #define _hw_fuse_gm20b_h_
 
+static inline u32 fuse_status_opt_gpc_r(void)
+{
+	return 0x00021c1cU;
+}
 static inline u32 fuse_status_opt_tpc_gpc_r(u32 i)
 {
-	return 0x00021c38 + i*4;
+	return 0x00021c38U + i*4U;
 }
 static inline u32 fuse_ctrl_opt_tpc_gpc_r(u32 i)
 {
-	return 0x00021838 + i*4;
+	return 0x00021838U + i*4U;
 }
 static inline u32 fuse_ctrl_opt_ram_svop_pdp_r(void)
 {
-	return 0x00021944;
+	return 0x00021944U;
 }
 static inline u32 fuse_ctrl_opt_ram_svop_pdp_data_f(u32 v)
 {
-	return (v & 0x3) << 0;
+	return (v & 0x3U) << 0U;
 }
 static inline u32 fuse_ctrl_opt_ram_svop_pdp_data_m(void)
 {
-	return 0x3 << 0;
+	return 0x3U << 0U;
 }
 static inline u32 fuse_ctrl_opt_ram_svop_pdp_data_v(u32 r)
 {
-	return (r >> 0) & 0x3;
+	return (r >> 0U) & 0x3U;
 }
 static inline u32 fuse_ctrl_opt_ram_svop_pdp_override_r(void)
 {
-	return 0x00021948;
+	return 0x00021948U;
 }
 static inline u32 fuse_ctrl_opt_ram_svop_pdp_override_data_f(u32 v)
 {
-	return (v & 0x1) << 0;
+	return (v & 0x1U) << 0U;
 }
 static inline u32 fuse_ctrl_opt_ram_svop_pdp_override_data_m(void)
 {
-	return 0x1 << 0;
+	return 0x1U << 0U;
 }
 static inline u32 fuse_ctrl_opt_ram_svop_pdp_override_data_v(u32 r)
 {
-	return (r >> 0) & 0x1;
+	return (r >> 0U) & 0x1U;
 }
 static inline u32 fuse_ctrl_opt_ram_svop_pdp_override_data_yes_f(void)
 {
-	return 0x1;
+	return 0x1U;
 }
 static inline u32 fuse_ctrl_opt_ram_svop_pdp_override_data_no_f(void)
 {
-	return 0x0;
+	return 0x0U;
 }
 static inline u32 fuse_status_opt_fbio_r(void)
 {
-	return 0x00021c14;
+	return 0x00021c14U;
 }
 static inline u32 fuse_status_opt_fbio_data_f(u32 v)
 {
-	return (v & 0xffff) << 0;
+	return (v & 0xffffU) << 0U;
 }
 static inline u32 fuse_status_opt_fbio_data_m(void)
 {
-	return 0xffff << 0;
+	return 0xffffU << 0U;
 }
 static inline u32 fuse_status_opt_fbio_data_v(u32 r)
 {
-	return (r >> 0) & 0xffff;
+	return (r >> 0U) & 0xffffU;
 }
 static inline u32 fuse_status_opt_rop_l2_fbp_r(u32 i)
 {
-	return 0x00021d70 + i*4;
+	return 0x00021d70U + i*4U;
 }
 static inline u32 fuse_status_opt_fbp_r(void)
 {
-	return 0x00021d38;
+	return 0x00021d38U;
 }
 static inline u32 fuse_status_opt_fbp_idx_v(u32 r, u32 i)
 {
-	return (r >> (0 + i*0)) & 0x1;
+	return (r >> (0U + i*1U)) & 0x1U;
 }
 static inline u32 fuse_opt_sec_debug_en_r(void)
 {
-	return 0x00021218;
+	return 0x00021218U;
 }
 static inline u32 fuse_opt_priv_sec_en_r(void)
 {
-	return 0x00021434;
+	return 0x00021434U;
 }
 #endif

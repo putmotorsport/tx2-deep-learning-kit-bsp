@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2016-2019, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,10 +14,13 @@
 
 #include "t18x-common-platforms/tegra186-quill-camera-e3326-a00.dtsi"
 #include "t18x-common-platforms/tegra186-quill-camera-e3323-a00.dtsi"
+#include "t18x-common-platforms/tegra186-quill-camera-e3331-a00.dtsi"
 #include "t18x-common-platforms/tegra186-quill-camera-e3333-a00.dtsi"
 #include "t18x-common-platforms/tegra186-quill-camera-e3322-a00.dtsi"
-#include "t18x-common-platforms/tegra186-quill-camera-li-mipi-adpt-a00.dtsi"
+#include "t18x-common-platforms/tegra186-quill-camera-imx185-a00.dtsi"
 #include "t18x-common-platforms/tegra186-quill-camera-imx274-a00.dtsi"
+#include "t18x-common-platforms/tegra186-quill-camera-imx274-dual.dtsi"
+#include "t18x-common-platforms/tegra186-quill-camera-imx390-a00.dtsi"
 #include "t18x-common-platforms/tegra186-quill-camera-vivid.dtsi"
 
 #define CAM0_RST_L	TEGRA_MAIN_GPIO(R, 5)
@@ -56,36 +59,42 @@
 				vi_port0: port@0 {
 					status = "disabled";
 					vi_in0: endpoint {
+						vc-id = <0>;
 						status = "disabled";
 					};
 				};
 				vi_port1: port@1 {
 					status = "disabled";
 					vi_in1: endpoint {
+						vc-id = <0>;
 						status = "disabled";
 					};
 				};
 				vi_port2: port@2 {
 					status = "disabled";
 					vi_in2: endpoint {
+						vc-id = <0>;
 						status = "disabled";
 					};
 				};
 				vi_port3: port@3 {
 					status = "disabled";
 					vi_in3: endpoint {
+						vc-id = <0>;
 						status = "disabled";
 					};
 				};
 				vi_port4: port@4 {
 					status = "disabled";
 					vi_in4: endpoint {
+						vc-id = <0>;
 						status = "disabled";
 					};
 				};
 				vi_port5: port@5 {
 					status = "disabled";
 					vi_in5: endpoint {
+						vc-id = <0>;
 						status = "disabled";
 					};
 				};
@@ -204,9 +213,6 @@
 		e3323_cam0: ov23850_a@10 {
 			status = "disabled";
 		};
-		e3323_vcm0: lc898212@72 {
-			status = "disabled";
-		};
 		tca6408@21 {
 			status = "disabled";
 		};
@@ -264,15 +270,39 @@
 		tca9546_70: tca9546@70 {
 			status = "disabled";
 			i2c@0 {
+				pca9570_a_24: pca9570_a@24 {
+					status = "disabled";
+				};
 				imx185_cam0: imx185_a@1a {
 					status = "disabled";
 				};
-			};
-		};
-		tca9546_70: tca9546@70 {
-			status = "disabled";
-			i2c@0 {
 				imx274_cam0: imx274_a@1a {
+					status = "disabled";
+				};
+				e3331_cam0: imx318_a@10 {
+					status = "disabled";
+				};
+				max9296_dser: max9296@48 {
+					status = "disabled";
+				};
+				max9295_prim: max9295_prim@62 {
+					status = "disabled";
+				};
+				max9295_ser0: max9295_a@40 {
+					status = "disabled";
+				};
+				max9295_ser1: max9295_b@60 {
+					status = "disabled";
+				};
+				imx390_cam0: imx390_a@1b {
+					status = "disabled";
+				};
+				imx390_cam1: imx390_b@1c {
+					status = "disabled";
+				};
+			};
+			i2c@1 {
+				imx274_cam1: imx274_c@1a {
 					status = "disabled";
 				};
 			};
@@ -281,9 +311,6 @@
 
 	i2c@c240000 {
 		e3323_cam1: ov23850_c@36 {
-			status = "disabled";
-		};
-		e3323_vcm1: lc898212@72 {
 			status = "disabled";
 		};
 	};

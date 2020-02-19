@@ -60,8 +60,15 @@
                 #address-cells = <2>;
                 #size-cells = <2>;
 
-		#stream-id-cells = <9>;
-		power-domains = <&host1x_pd>;
+		iommus = <&smmu TEGRA_SID_HC>,
+			<&smmu TEGRA_SID_HC_VM0>,
+			<&smmu TEGRA_SID_HC_VM1>,
+			<&smmu TEGRA_SID_HC_VM2>,
+			<&smmu TEGRA_SID_HC_VM3>,
+			<&smmu TEGRA_SID_HC_VM4>,
+			<&smmu TEGRA_SID_HC_VM5>,
+			<&smmu TEGRA_SID_HC_VM6>,
+			<&smmu TEGRA_SID_HC_VM7>;
 
 		ranges;
 
@@ -78,81 +85,79 @@
 
 		isp@15600000 {
 			compatible = "nvidia,tegra186-isp";
-			power-domains = <&ispa_pd>;
+			power-domains = <&bpmp TEGRA186_POWER_DOMAIN_ISPA>;
 			reg = <0x0 0x15600000 0x0 0x00040000>;
 			interrupts = <0 205 0x04>;
 			resets = <&tegra_car TEGRA186_RESET_ISP>;
 			clocks = <&tegra_car TEGRA186_CLK_ISP>;
 			clock-names = "isp";
-			#stream-id-cells = <1>;
+			iommus = <&smmu TEGRA_SID_ISP>;
 			status = "okay";
 		};
 
 		vic@15340000 {
 			compatible = "nvidia,tegra186-vhost-vic";
-			power-domains = <&vic03_pd>;
+			power-domains = <&bpmp TEGRA186_POWER_DOMAIN_VIC>;
 			reg = <0x0 0x15340000 0x0 0x00040000>;
 			resets = <&tegra_car TEGRA186_RESET_VIC>;
 			clocks = <&tegra_car TEGRA186_CLK_VIC>;
 			clock-names = "vic";
-			#stream-id-cells = <1>;
+			iommus = <&smmu TEGRA_SID_VIC>;
 			status = "okay";
 		};
 
 		nvenc@154c0000 {
 			compatible = "nvidia,tegra186-vhost-nvenc";
-			power-domains = <&msenc_pd>;
+			power-domains = <&bpmp TEGRA186_POWER_DOMAIN_MPE>;
 			reg = <0x0 0x154c0000 0x0 0x00040000>;
 			resets = <&tegra_car TEGRA186_RESET_NVENC>;
 			clocks = <&tegra_car TEGRA186_CLK_NVENC>;
 			clock-names = "nvenc";
-			#stream-id-cells = <1>;
+			iommus = <&smmu TEGRA_SID_NVENC>;
 			status = "okay";
 		};
 
 		nvdec@15480000 {
 			compatible = "nvidia,tegra186-vhost-nvdec";
-			power-domains = <&nvdec_pd>;
+			power-domains = <&bpmp TEGRA186_POWER_DOMAIN_NVDEC>;
 			reg = <0x0 0x15480000 0x0 0x00040000>;
 			resets = <&tegra_car TEGRA186_RESET_NVDEC>;
 			clocks = <&tegra_car TEGRA186_CLK_NVDEC>,
 				 <&tegra_car TEGRA186_CLK_KFUSE>;
 			clock-names = "nvdec", "kfuse";
-			#stream-id-cells = <1>;
+			iommus = <&smmu TEGRA_SID_NVDEC>;
 			status = "okay";
 		};
 
 		nvjpg@15380000 {
 			compatible = "nvidia,tegra186-vhost-nvjpg";
-			power-domains = <&nvjpg_pd>;
+			power-domains = <&bpmp TEGRA186_POWER_DOMAIN_NVJPG>;
 			reg = <0x0 0x15380000 0x0 0x00040000>;
 			resets = <&tegra_car TEGRA186_RESET_NVJPG>;
 			clocks = <&tegra_car TEGRA186_CLK_NVJPG>;
 			clock-names = "nvjpg";
-			#stream-id-cells = <1>;
+			iommus = <&smmu TEGRA_SID_NVJPG>;
 			status = "okay";
 			interrupts = <0 198 0x04>;
 		};
 
 		tsec@15500000 {
 			compatible = "nvidia,tegra186-tsec";
-			power-domains = <&tsec_pd>;
 			reg = <0x0 0x15500000 0x0 0x00040000>;
 			resets = <&tegra_car TEGRA186_RESET_TSEC>;
 			clocks = <&tegra_car TEGRA186_CLK_TSEC>;
 			clock-names = "tsec";
-			#stream-id-cells = <1>;
+			iommus = <&smmu TEGRA_SID_TSEC>;
 			status = "okay";
 		};
 
 		tsecb@15100000 {
 			compatible = "nvidia,tegra186-tsec";
-			power-domains = <&tsec_pd>;
 			reg = <0x0 0x15100000 0x0 0x00040000>;
 			resets = <&tegra_car TEGRA186_RESET_TSECB>;
 			clocks = <&tegra_car TEGRA186_CLK_TSECB>;
 			clock-names = "tsecb";
-			#stream-id-cells = <1>;
+			iommus = <&smmu TEGRA_SID_TSECB>;
 			status = "okay";
 		};
 	};

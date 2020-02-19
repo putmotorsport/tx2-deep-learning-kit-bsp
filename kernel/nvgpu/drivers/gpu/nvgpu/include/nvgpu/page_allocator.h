@@ -1,27 +1,33 @@
 /*
  * Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 
 #ifndef PAGE_ALLOCATOR_PRIV_H
 #define PAGE_ALLOCATOR_PRIV_H
 
-#include <linux/list.h>
-#include <linux/rbtree.h>
-
 #include <nvgpu/allocator.h>
+#include <nvgpu/nvgpu_mem.h>
 #include <nvgpu/kmem.h>
+#include <nvgpu/list.h>
+#include <nvgpu/rbtree.h>
 
 struct nvgpu_allocator;
 
@@ -45,9 +51,9 @@ struct nvgpu_allocator;
  * assumed to be 64k) the allocation is satisfied by one of the buckets.
  */
 struct page_alloc_slab {
-	struct list_head empty;
-	struct list_head partial;
-	struct list_head full;
+	struct nvgpu_list_node empty;
+	struct nvgpu_list_node partial;
+	struct nvgpu_list_node full;
 
 	int nr_empty;
 	int nr_partial;
@@ -74,14 +80,14 @@ struct page_alloc_slab_page {
 	enum slab_page_state state;
 
 	struct page_alloc_slab *owner;
-	struct list_head list_entry;
+	struct nvgpu_list_node list_entry;
 };
 
-struct page_alloc_chunk {
-	struct list_head list_entry;
-
-	u64 base;
-	u64 length;
+static inline struct page_alloc_slab_page *
+page_alloc_slab_page_from_list_entry(struct nvgpu_list_node *node)
+{
+	return (struct page_alloc_slab_page *)
+	((uintptr_t)node - offsetof(struct page_alloc_slab_page, list_entry));
 };
 
 /*
@@ -90,7 +96,11 @@ struct page_alloc_chunk {
  * scatter gather table.
  */
 struct nvgpu_page_alloc {
-	struct list_head alloc_chunks;
+	/*
+	 * nvgpu_sgt for describing the actual allocation. Convenient for
+	 * GMMU mapping.
+	 */
+	struct nvgpu_sgt sgt;
 
 	int nr_chunks;
 	u64 length;
@@ -102,7 +112,7 @@ struct nvgpu_page_alloc {
 	 */
 	u64 base;
 
-	struct rb_node tree_entry;
+	struct nvgpu_rbtree_node tree_entry;
 
 	/*
 	 * Set if this is a slab alloc. Points back to the slab page that owns
@@ -110,6 +120,13 @@ struct nvgpu_page_alloc {
 	 * set.
 	 */
 	struct page_alloc_slab_page *slab_page;
+};
+
+static inline struct nvgpu_page_alloc *
+nvgpu_page_alloc_from_rbtree_node(struct nvgpu_rbtree_node *node)
+{
+	return (struct nvgpu_page_alloc *)
+	      ((uintptr_t)node - offsetof(struct nvgpu_page_alloc, tree_entry));
 };
 
 struct nvgpu_page_allocator {
@@ -130,13 +147,12 @@ struct nvgpu_page_allocator {
 	u64 page_size;
 	u32 page_shift;
 
-	struct rb_root allocs;		/* Outstanding allocations. */
+	struct nvgpu_rbtree_node *allocs;	/* Outstanding allocations. */
 
 	struct page_alloc_slab *slabs;
 	int nr_slabs;
 
 	struct nvgpu_kmem_cache *alloc_cache;
-	struct nvgpu_kmem_cache *chunk_cache;
 	struct nvgpu_kmem_cache *slab_page_cache;
 
 	u64 flags;

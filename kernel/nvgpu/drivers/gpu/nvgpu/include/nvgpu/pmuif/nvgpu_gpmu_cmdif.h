@@ -1,17 +1,26 @@
 /*
- * Copyright (c) 2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2017-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
-#ifndef _NVGPUGPMUCMDIF_H_
-#define _NVGPUGPMUCMDIF_H_
+#ifndef NVGPU_PMUIF_NVGPU_GPMU_CMDIF_H
+#define NVGPU_PMUIF_NVGPU_GPMU_CMDIF_H
 
 #include <nvgpu/flcnif_cmn.h>
 #include "gpmuif_cmn.h"
@@ -29,6 +38,48 @@
 #include "gpmuiftherm.h"
 #include "gpmuifthermsensor.h"
 #include "gpmuifseq.h"
+#include "gpmu_super_surf_if.h"
+
+/*
+ * Command requesting execution of the RPC (Remote Procedure Call)
+ */
+struct nv_pmu_rpc_cmd {
+	/* Must be set to @ref NV_PMU_RPC_CMD_ID */
+	u8 cmd_type;
+	/* RPC call flags (@see PMU_RPC_FLAGS) */
+	u8 flags;
+	/* Size of RPC structure allocated
+	 *  within NV managed DMEM heap
+	 */
+	u16 rpc_dmem_size;
+	/*
+	 * DMEM pointer of RPC structure allocated
+	 * within RM managed DMEM heap.
+	 */
+	u32 rpc_dmem_ptr;
+};
+
+#define NV_PMU_RPC_CMD_ID 0x80U
+
+/* Message carrying the result of the RPC execution */
+struct nv_pmu_rpc_msg {
+	/* Must be set to @ref NV_PMU_RPC_MSG_ID */
+	u8 msg_type;
+	/* RPC call flags (@see PMU_RPC_FLAGS)*/
+	u8 flags;
+	/*
+	 * Size of RPC structure allocated
+	 *  within NV managed DMEM heap.
+	 */
+	u16 rpc_dmem_size;
+	/*
+	 * DMEM pointer of RPC structure allocated
+	 * within NV managed DMEM heap.
+	 */
+	u32 rpc_dmem_ptr;
+};
+
+#define NV_PMU_RPC_MSG_ID 0x80U
 
 struct pmu_cmd {
 	struct pmu_hdr hdr;
@@ -43,6 +94,7 @@ struct pmu_cmd {
 		struct nv_pmu_clk_cmd clk;
 		struct nv_pmu_pmgr_cmd pmgr;
 		struct nv_pmu_therm_cmd therm;
+		struct nv_pmu_rpc_cmd rpc;
 	} cmd;
 };
 
@@ -60,30 +112,32 @@ struct pmu_msg {
 		struct nv_pmu_clk_msg clk;
 		struct nv_pmu_pmgr_msg pmgr;
 		struct nv_pmu_therm_msg therm;
+		struct nv_pmu_rpc_msg rpc;
 	} msg;
 };
 
-#define PMU_UNIT_REWIND		(0x00)
-#define PMU_UNIT_PG			(0x03)
-#define PMU_UNIT_INIT		(0x07)
-#define PMU_UNIT_ACR		(0x0A)
-#define PMU_UNIT_PERFMON_T18X	(0x11)
-#define PMU_UNIT_PERFMON	(0x12)
-#define PMU_UNIT_PERF		(0x13)
-#define PMU_UNIT_RC			(0x1F)
-#define PMU_UNIT_FECS_MEM_OVERRIDE	(0x1E)
-#define PMU_UNIT_CLK	(0x0D)
-#define PMU_UNIT_THERM	(0x14)
-#define PMU_UNIT_PMGR	(0x18)
-#define PMU_UNIT_VOLT	(0x0E)
+#define PMU_UNIT_REWIND			(0x00U)
+#define PMU_UNIT_PG			(0x03U)
+#define PMU_UNIT_INIT			(0x07U)
+#define PMU_UNIT_ACR			(0x0AU)
+#define PMU_UNIT_PERFMON_T18X		(0x11U)
+#define PMU_UNIT_PERFMON		(0x12U)
+#define PMU_UNIT_PERF			(0x13U)
+#define PMU_UNIT_RC			(0x1FU)
+#define PMU_UNIT_FECS_MEM_OVERRIDE	(0x1EU)
+#define PMU_UNIT_CLK			(0x0DU)
+#define PMU_UNIT_THERM			(0x14U)
+#define PMU_UNIT_PMGR			(0x18U)
+#define PMU_UNIT_VOLT			(0x0EU)
 
-#define PMU_UNIT_END		(0x23)
+#define PMU_UNIT_END			(0x23U)
+#define PMU_UNIT_INVALID		(0xFFU)
 
-#define PMU_UNIT_TEST_START	(0xFE)
-#define PMU_UNIT_END_SIM	(0xFF)
-#define PMU_UNIT_TEST_END	(0xFF)
+#define PMU_UNIT_TEST_START		(0xFEU)
+#define PMU_UNIT_END_SIM		(0xFFU)
+#define PMU_UNIT_TEST_END		(0xFFU)
 
 #define PMU_UNIT_ID_IS_VALID(id)		\
 		(((id) < PMU_UNIT_END) || ((id) >= PMU_UNIT_TEST_START))
 
-#endif /* _NVGPUGPMUCMDIF_H_*/
+#endif /* NVGPU_PMUIF_NVGPU_GPMU_CMDIF_H*/

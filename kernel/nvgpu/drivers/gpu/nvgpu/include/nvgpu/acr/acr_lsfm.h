@@ -1,31 +1,57 @@
 /*
- * Copyright (c) 2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2017-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
-#ifndef __ACR_LSFM_H__
-#define __ACR_LSFM_H__
+#ifndef NVGPU_ACR_LSFM_H
+#define NVGPU_ACR_LSFM_H
 
-#ifndef __NVGPU_ACR_H__
+#ifndef NVGPU_ACR_H
 #warning "acr_lsfm.h not included from nvgpu_acr.h!" \
 	"Include nvgpu_acr.h instead of acr_xxx.h to get access to ACR interfaces"
 #endif
+
+/*
+ * READ/WRITE masks for WPR region
+ */
+/* Readable only from level 2 and 3 client */
+#define LSF_WPR_REGION_RMASK	(0xC)
+/* Writable only from level 2 and 3 client */
+#define LSF_WPR_REGION_WMASK	(0xC)
+/* Readable only from level 3 client */
+#define LSF_WPR_REGION_RMASK_SUB_WPR_ENABLED	(0x8)
+/* Writable only from level 3 client */
+#define LSF_WPR_REGION_WMASK_SUB_WPR_ENABLED	(0x8)
+/* Disallow read mis-match for all clients */
+#define LSF_WPR_REGION_ALLOW_READ_MISMATCH_NO	(0x0)
+/* Disallow write mis-match for all clients */
+#define LSF_WPR_REGION_ALLOW_WRITE_MISMATCH_NO	(0x0)
 
 /*
  * Falcon Id Defines
  * Defines a common Light Secure Falcon identifier.
  */
 #define LSF_FALCON_ID_PMU       (0)
-#define LSF_FALCON_ID_RESERVED  (1)
+#define LSF_FALCON_ID_GSPLITE   (1)
 #define LSF_FALCON_ID_FECS      (2)
 #define LSF_FALCON_ID_GPCCS     (3)
+#define LSF_FALCON_ID_SEC2      (7)
 #define LSF_FALCON_ID_END       (11)
 #define LSF_FALCON_ID_INVALID   (0xFFFFFFFF)
 
@@ -74,6 +100,42 @@ struct lsf_wpr_header_v1 {
 	u32 bin_version;
 	u32 status;
 };
+
+
+/*
+ * LSF shared SubWpr Header
+ *
+ * use_case_id - Shared SubWpr use case ID (updated by nvgpu)
+ * start_addr  - start address of subWpr (updated by nvgpu)
+ * size_4K     - size of subWpr in 4K (updated by nvgpu)
+ */
+struct lsf_shared_sub_wpr_header {
+	u32 use_case_id;
+	u32 start_addr;
+	u32 size_4K;
+};
+
+/* shared sub_wpr use case IDs */
+enum {
+	LSF_SHARED_DATA_SUB_WPR_USE_CASE_ID_FRTS_VBIOS_TABLES	= 1,
+	LSF_SHARED_DATA_SUB_WPR_USE_CASE_ID_PLAYREADY_SHARED_DATA = 2
+};
+
+#define LSF_SHARED_DATA_SUB_WPR_USE_CASE_ID_MAX \
+	LSF_SHARED_DATA_SUB_WPR_USE_CASE_ID_PLAYREADY_SHARED_DATA
+
+#define LSF_SHARED_DATA_SUB_WPR_USE_CASE_ID_INVALID	(0xFFFFFFFF)
+
+#define MAX_SUPPORTED_SHARED_SUB_WPR_USE_CASES	\
+	LSF_SHARED_DATA_SUB_WPR_USE_CASE_ID_MAX
+
+/* Static sizes of shared subWPRs */
+/* Minimum granularity supported is 4K */
+/* 1MB in 4K */
+#define LSF_SHARED_DATA_SUB_WPR_FRTS_VBIOS_TABLES_SIZE_IN_4K	(0x100)
+/* 4K */
+#define LSF_SHARED_DATA_SUB_WPR_PLAYREADY_SHARED_DATA_SIZE_IN_4K	(0x1)
+
 /*
  * Bootstrap Owner Defines
  */
@@ -137,12 +199,39 @@ struct lsf_lsb_header_v1 {
 /*
  * Light Secure WPR Content Alignments
  */
-#define LSF_LSB_HEADER_ALIGNMENT    256
-#define LSF_BL_DATA_ALIGNMENT       256
-#define LSF_BL_DATA_SIZE_ALIGNMENT  256
-#define LSF_BL_CODE_SIZE_ALIGNMENT  256
+#define LSF_WPR_HEADER_ALIGNMENT        (256U)
+#define LSF_SUB_WPR_HEADER_ALIGNMENT    (256U)
+#define LSF_LSB_HEADER_ALIGNMENT        (256U)
+#define LSF_BL_DATA_ALIGNMENT           (256U)
+#define LSF_BL_DATA_SIZE_ALIGNMENT      (256U)
+#define LSF_BL_CODE_SIZE_ALIGNMENT      (256U)
+#define LSF_DATA_SIZE_ALIGNMENT         (256U)
+#define LSF_CODE_SIZE_ALIGNMENT         (256U)
+
+/* MMU excepts sub_wpr sizes in units of 4K */
+#define SUB_WPR_SIZE_ALIGNMENT	(4096U)
+
+/*
+ * Maximum WPR Header size
+ */
+#define LSF_WPR_HEADERS_TOTAL_SIZE_MAX	\
+	(ALIGN_UP((sizeof(struct lsf_wpr_header_v1) * LSF_FALCON_ID_END), \
+		LSF_WPR_HEADER_ALIGNMENT))
+#define LSF_LSB_HEADER_TOTAL_SIZE_MAX	(\
+	ALIGN_UP(sizeof(struct lsf_lsb_header_v1), LSF_LSB_HEADER_ALIGNMENT))
+
+/* Maximum SUB WPR header size */
+#define LSF_SUB_WPR_HEADERS_TOTAL_SIZE_MAX	(ALIGN_UP( \
+	(sizeof(struct lsf_shared_sub_wpr_header) * \
+	LSF_SHARED_DATA_SUB_WPR_USE_CASE_ID_MAX), \
+	LSF_SUB_WPR_HEADER_ALIGNMENT))
+
 
 #define LSF_UCODE_DATA_ALIGNMENT 4096
+
+/* Defined for 1MB alignment */
+#define SHIFT_1MB	(20)
+#define SHIFT_4KB	(12)
 
 /*
  * Supporting maximum of 2 regions.
@@ -236,4 +325,4 @@ struct flcn_acr_desc_v1 {
 };
 
 
-#endif /* __ACR_LSFM_H__ */
+#endif /* NVGPU_ACR_LSFM_H */

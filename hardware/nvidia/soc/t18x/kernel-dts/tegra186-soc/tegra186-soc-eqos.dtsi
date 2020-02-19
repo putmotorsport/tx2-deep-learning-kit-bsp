@@ -1,7 +1,7 @@
 /*
  * tegra186-soc-eqos.dtsi: Ethernet QOS DTSI file.
  *
- * Copyright (c) 2014-2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2014-2018, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
  *
  */
 
+#include <dt-bindings/pinctrl/pinctrl-tegra.h>
 
 #define MAKE_EQOS_TRIP(name, temp, hyst) \
 	eqos_##name: eqos-##name@temp { \
@@ -35,11 +36,30 @@
 
 
 / {
-        ether_qos@2490000 {
-                compatible = "nvidia,eqos";
-                reg = <0x0 0x02490000 0x0 0x10000        /* EQOS Base Register */
-		       0x0 0x02439000 0x0 0x00000074>;   /* PADS registers */
-		reg-names = "eqos_base", "eqos_pads";
+
+	pinmux@2430000 {
+		eqos_tx_tri_state_idle: eqos_idle {
+			eqos {
+				nvidia,pins = "eqos_td3_pe4","eqos_td2_pe3",
+						"eqos_td1_pe2","eqos_td0_pe1",
+						"eqos_txc_pe0","eqos_tx_ctl_pe5";
+				nvidia,tristate = <TEGRA_PIN_ENABLE>;
+			};
+		};
+		eqos_tx_tri_state_default: eqos_default {
+			eqos {
+				nvidia,pins = "eqos_td3_pe4","eqos_td2_pe3",
+						"eqos_td1_pe2","eqos_td0_pe1",
+						"eqos_txc_pe0","eqos_tx_ctl_pe5";
+				nvidia,tristate = <TEGRA_PIN_DISABLE>;
+			};
+		};
+	};
+
+	ether_qos@2490000 {
+		compatible = "nvidia,eqos";
+		reg = <0x0 0x02490000 0x0 0x10000>;    /* EQOS Base Register */
+		reg-names = "eqos_base";
 		interrupts = 	<0 194 0x4>,	/* common */
 				<0 195 0x4>,	/* power */
 				<0 190 0x4>,	/* rx0 */
@@ -52,6 +72,7 @@
 				<0 189 0x4>;	/* tx3 */
 		nvidia,csr_clock_speed = <0x19>; /* CSR clock speed 25MHz */
 		nvidia,iso_bw = <81920>; /* sum of read and write bw, 80Mb/s */
+		nvidia,rx_riwt = <124>; /* usec value for Rx watchdog interrupt */
 		/* bootloader should update MAC address */
 		nvidia,local-mac-address = <0x00 0x00 0x00 0x00 0x00 0x00>;
 		clocks = <&tegra_car TEGRA186_CLK_EQOS_AXI>,
@@ -62,9 +83,15 @@
 		clock-names = "eqos_axi", "eqos_rx", "eqos_ptp_ref", "eqos_tx", "axi_cbb";
 		resets = <&tegra_car TEGRA186_RESET_EQOS>;
 		reset-names = "eqos_rst";
-		#stream-id-cells = <1>;
+		iommus = <&smmu TEGRA_SID_EQOS>;
+		iommu-group-id = <TEGRA_IOMMU_GROUP_APE>;
+		iommu-resv-regions = <0x0 0x0 0x0 0x40000000 0x0 0x60000000 0xffffffff 0xffffffff>;
+		iommu_sodev_map;
 		phy-mode = "rgmii";
 		status = "disabled";
+		pinctrl-names = "idle", "default";
+		pinctrl-0 = <&eqos_tx_tri_state_idle>;
+		pinctrl-1 = <&eqos_tx_tri_state_default>;
 		eqos_cool_dev: eqos-cool-dev {
 			cooling-min-state = <0>;
 			cooling-max-state = <5>;

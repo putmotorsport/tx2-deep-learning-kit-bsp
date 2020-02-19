@@ -1,20 +1,34 @@
 /*
-* Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
+* Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
 *
-* This program is free software; you can redistribute it and/or modify it
-* under the terms and conditions of the GNU General Public License,
-* version 2, as published by the Free Software Foundation.
-*
-* This program is distributed in the hope it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-* more details.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef _CLKMCLK_H_
-#define _CLKMCLK_H_
+#ifndef NVGPU_CLK_MCLK_H
+#define NVGPU_CLK_MCLK_H
 
 #include <nvgpu/lock.h>
+
+#define GP106_MCLK_LOW_SPEED	0U
+#define GP106_MCLK_MID_SPEED	1U
+#define GP106_MCLK_HIGH_SPEED	2U
+#define GP106_MCLK_NUM_SPEED	3U
 
 enum gk20a_mclk_speed {
 	gk20a_mclk_low_speed,
@@ -23,7 +37,7 @@ enum gk20a_mclk_speed {
 };
 
 struct clk_mclk_state {
-	enum gk20a_mclk_speed speed;
+	u32 speed;
 	struct nvgpu_mutex mclk_lock;
 	struct nvgpu_mutex data_lock;
 
@@ -32,9 +46,6 @@ struct clk_mclk_state {
 
 	void *vreg_buf;
 	bool init;
-
-	/* function pointers */
-	int (*change)(struct gk20a *g, u16 val);
 
 #ifdef CONFIG_DEBUG_FS
 	s64 switch_max;
@@ -46,7 +57,4 @@ struct clk_mclk_state {
 #endif
 };
 
-int clk_mclkseq_init_mclk_gddr5(struct gk20a *g);
-int clk_mclkseq_change_mclk_gddr5(struct gk20a *g, u16 val);
-
-#endif
+#endif /* NVGPU_CLK_MCLK_H */

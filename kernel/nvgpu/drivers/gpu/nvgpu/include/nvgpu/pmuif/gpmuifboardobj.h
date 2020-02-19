@@ -1,20 +1,41 @@
 /*
-* Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
+* Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
 *
-* This program is free software; you can redistribute it and/or modify it
-* under the terms and conditions of the GNU General Public License,
-* version 2, as published by the Free Software Foundation.
-*
-* This program is distributed in the hope it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-* more details.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
 */
-#ifndef _GPMUIFBOARDOBJ_H_
-#define _GPMUIFBOARDOBJ_H_
+#ifndef NVGPU_PMUIF_GPMUIFBOARDOBJ_H
+#define NVGPU_PMUIF_GPMUIFBOARDOBJ_H
 
 #include <nvgpu/flcnif_cmn.h>
 #include "ctrl/ctrlboardobj.h"
+
+/* board object group command id's. */
+#define NV_PMU_BOARDOBJGRP_CMD_SET			0x00U
+#define NV_PMU_BOARDOBJGRP_CMD_GET_STATUS		0x01U
+
+#define NV_PMU_RPC_ID_CLK_BOARD_OBJ_GRP_CMD		0x00U
+#define NV_PMU_RPC_ID_FAN_BOARD_OBJ_GRP_CMD		0x00U
+#define NV_PMU_RPC_ID_PERF_BOARD_OBJ_GRP_CMD		0x00U
+#define NV_PMU_RPC_ID_PERF_CF_BOARD_OBJ_GRP_CMD		0x00U
+#define NV_PMU_RPC_ID_PMGR_BOARD_OBJ_GRP_CMD		0x00U
+#define NV_PMU_RPC_ID_THERM_BOARD_OBJ_GRP_CMD		0x00U
+#define NV_PMU_RPC_ID_VOLT_BOARD_OBJ_GRP_CMD		0x00U
 
 /*
  * Base structure describing a BOARDOBJ for communication between Kernel and
@@ -22,6 +43,7 @@
  */
 struct nv_pmu_boardobj {
 	u8 type;
+	u8 grp_idx;
 };
 
 /*
@@ -30,6 +52,7 @@ struct nv_pmu_boardobj {
  */
 struct nv_pmu_boardobj_query {
 	u8 type;
+	u8 grp_idx;
 };
 
 /*
@@ -40,7 +63,7 @@ struct nv_pmu_boardobjgrp_super {
 	u8 type;
 	u8 class_id;
 	u8 obj_slots;
-	u8 rsvd;
+	u8 flags;
 };
 
 struct nv_pmu_boardobjgrp {
@@ -191,5 +214,21 @@ struct nv_pmu_boardobj_msg {
 	NV_PMU_BOARDOBJ_GRP_GET_STATUS_MAKE(_eng, _class,                      \
 	CTRL_BOARDOBJGRP_E255_MAX_OBJECTS)
 
+/* RPC */
 
-#endif /*  _GPMUIFBOARDOBJ_H_ */
+/*
+ * structure that holds data used to
+ * execute BOARD_OBJ_GRP_CMD RPC.
+ */
+struct nv_pmu_rpc_struct_board_obj_grp_cmd
+{
+    /* [IN/OUT] Must be first field in RPC structure */
+	struct nv_pmu_rpc_header hdr;
+    /* [IN] BOARDOBJGRP class IDs. */
+    u8  class_id;
+    /* [IN] Requested command ID (@ref NV_PMU_BOARDOBJGRP_CMD_***)*/
+    u8  command_id;
+    u32  scratch[1];
+};
+
+#endif /*  NVGPU_PMUIF_GPMUIFBOARDOBJ_H */

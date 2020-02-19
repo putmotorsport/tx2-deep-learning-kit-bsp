@@ -1,17 +1,23 @@
 /*
- * Copyright (c) 2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 /*
  * Function naming determines intended use:
@@ -52,126 +58,126 @@
 
 static inline u32 therm_temp_sensor_tsense_r(void)
 {
-	return 0x00020460;
+	return 0x00020460U;
 }
 static inline u32 therm_temp_sensor_tsense_fixed_point_f(u32 v)
 {
-	return (v & 0x3fff) << 3;
+	return (v & 0x3fffU) << 3U;
 }
 static inline u32 therm_temp_sensor_tsense_fixed_point_m(void)
 {
-	return 0x3fff << 3;
+	return 0x3fffU << 3U;
 }
 static inline u32 therm_temp_sensor_tsense_fixed_point_v(u32 r)
 {
-	return (r >> 3) & 0x3fff;
+	return (r >> 3U) & 0x3fffU;
 }
 static inline u32 therm_temp_sensor_tsense_fixed_point_min_v(void)
 {
-	return 0x00003b00;
+	return 0x00003b00U;
 }
 static inline u32 therm_temp_sensor_tsense_fixed_point_max_v(void)
 {
-	return 0x000010e0;
+	return 0x000010e0U;
 }
 static inline u32 therm_temp_sensor_tsense_state_f(u32 v)
 {
-	return (v & 0x3) << 29;
+	return (v & 0x3U) << 29U;
 }
 static inline u32 therm_temp_sensor_tsense_state_m(void)
 {
-	return 0x3 << 29;
+	return 0x3U << 29U;
 }
 static inline u32 therm_temp_sensor_tsense_state_v(u32 r)
 {
-	return (r >> 29) & 0x3;
+	return (r >> 29U) & 0x3U;
 }
 static inline u32 therm_temp_sensor_tsense_state_valid_v(void)
 {
-	return 0x00000001;
+	return 0x00000001U;
 }
 static inline u32 therm_temp_sensor_tsense_state_shadow_v(void)
 {
-	return 0x00000002;
+	return 0x00000002U;
 }
 static inline u32 therm_gate_ctrl_r(u32 i)
 {
-	return 0x00020200 + i*4;
+	return 0x00020200U + i*4U;
 }
 static inline u32 therm_gate_ctrl_eng_clk_m(void)
 {
-	return 0x3 << 0;
+	return 0x3U << 0U;
 }
 static inline u32 therm_gate_ctrl_eng_clk_run_f(void)
 {
-	return 0x0;
+	return 0x0U;
 }
 static inline u32 therm_gate_ctrl_eng_clk_auto_f(void)
 {
-	return 0x1;
+	return 0x1U;
 }
 static inline u32 therm_gate_ctrl_eng_clk_stop_f(void)
 {
-	return 0x2;
+	return 0x2U;
 }
 static inline u32 therm_gate_ctrl_blk_clk_m(void)
 {
-	return 0x3 << 2;
+	return 0x3U << 2U;
 }
 static inline u32 therm_gate_ctrl_blk_clk_run_f(void)
 {
-	return 0x0;
+	return 0x0U;
 }
 static inline u32 therm_gate_ctrl_blk_clk_auto_f(void)
 {
-	return 0x4;
+	return 0x4U;
 }
 static inline u32 therm_gate_ctrl_eng_idle_filt_exp_f(u32 v)
 {
-	return (v & 0x1f) << 8;
+	return (v & 0x1fU) << 8U;
 }
 static inline u32 therm_gate_ctrl_eng_idle_filt_exp_m(void)
 {
-	return 0x1f << 8;
+	return 0x1fU << 8U;
 }
 static inline u32 therm_gate_ctrl_eng_idle_filt_mant_f(u32 v)
 {
-	return (v & 0x7) << 13;
+	return (v & 0x7U) << 13U;
 }
 static inline u32 therm_gate_ctrl_eng_idle_filt_mant_m(void)
 {
-	return 0x7 << 13;
+	return 0x7U << 13U;
 }
 static inline u32 therm_gate_ctrl_eng_delay_before_f(u32 v)
 {
-	return (v & 0xf) << 16;
+	return (v & 0xfU) << 16U;
 }
 static inline u32 therm_gate_ctrl_eng_delay_before_m(void)
 {
-	return 0xf << 16;
+	return 0xfU << 16U;
 }
 static inline u32 therm_gate_ctrl_eng_delay_after_f(u32 v)
 {
-	return (v & 0xf) << 20;
+	return (v & 0xfU) << 20U;
 }
 static inline u32 therm_gate_ctrl_eng_delay_after_m(void)
 {
-	return 0xf << 20;
+	return 0xfU << 20U;
 }
 static inline u32 therm_fecs_idle_filter_r(void)
 {
-	return 0x00020288;
+	return 0x00020288U;
 }
 static inline u32 therm_fecs_idle_filter_value_m(void)
 {
-	return 0xffffffff << 0;
+	return 0xffffffffU << 0U;
 }
 static inline u32 therm_hubmmu_idle_filter_r(void)
 {
-	return 0x0002028c;
+	return 0x0002028cU;
 }
 static inline u32 therm_hubmmu_idle_filter_value_m(void)
 {
-	return 0xffffffff << 0;
+	return 0xffffffffU << 0U;
 }
 #endif

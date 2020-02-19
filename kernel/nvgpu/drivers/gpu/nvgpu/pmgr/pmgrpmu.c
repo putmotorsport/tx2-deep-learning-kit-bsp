@@ -1,23 +1,36 @@
 /*
- * Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 
-#include "gk20a/gk20a.h"
-#include "pwrdev.h"
+#include <nvgpu/kmem.h>
+#include <nvgpu/pmuif/nvgpu_gpmu_cmdif.h>
+#include <nvgpu/pmu.h>
+#include <nvgpu/gk20a.h>
+
+#include "gp106/bios_gp106.h"
+
 #include "boardobj/boardobjgrp.h"
 #include "boardobj/boardobjgrp_e32.h"
-#include <nvgpu/pmuif/nvgpu_gpmu_cmdif.h>
-#include "gm206/bios_gm206.h"
-#include "gk20a/pmu_gk20a.h"
+
+#include "pwrdev.h"
 #include "pmgrpmu.h"
 
 struct pmgr_pmucmdhandler_params {
@@ -33,17 +46,14 @@ static void pmgr_pmucmdhandler(struct gk20a *g, struct pmu_msg *msg,
 	if ((msg->msg.pmgr.msg_type != NV_PMU_PMGR_MSG_ID_SET_OBJECT) &&
 		(msg->msg.pmgr.msg_type != NV_PMU_PMGR_MSG_ID_QUERY) &&
 		(msg->msg.pmgr.msg_type != NV_PMU_PMGR_MSG_ID_LOAD)) {
-		gk20a_err(dev_from_gk20a(g),
-			"unknow msg %x",
-			msg->msg.pmgr.msg_type);
+		nvgpu_err(g, "unknow msg %x", msg->msg.pmgr.msg_type);
 		return;
 	}
 
 	if (msg->msg.pmgr.msg_type == NV_PMU_PMGR_MSG_ID_SET_OBJECT) {
 		if ((msg->msg.pmgr.set_object.b_success != 1) ||
-			(msg->msg.pmgr.set_object.flcnstatus != 0) ) {
-			gk20a_err(dev_from_gk20a(g),
-				"pmgr msg failed %x %x %x %x",
+			(msg->msg.pmgr.set_object.flcnstatus != 0U)) {
+			nvgpu_err(g, "pmgr msg failed %x %x %x %x",
 				msg->msg.pmgr.set_object.msg_type,
 				msg->msg.pmgr.set_object.b_success,
 				msg->msg.pmgr.set_object.flcnstatus,
@@ -52,9 +62,8 @@ static void pmgr_pmucmdhandler(struct gk20a *g, struct pmu_msg *msg,
 		}
 	} else if (msg->msg.pmgr.msg_type == NV_PMU_PMGR_MSG_ID_QUERY) {
 		if ((msg->msg.pmgr.query.b_success != 1) ||
-			(msg->msg.pmgr.query.flcnstatus != 0) ) {
-			gk20a_err(dev_from_gk20a(g),
-				"pmgr msg failed %x %x %x %x",
+			(msg->msg.pmgr.query.flcnstatus != 0U)) {
+			nvgpu_err(g, "pmgr msg failed %x %x %x %x",
 				msg->msg.pmgr.query.msg_type,
 				msg->msg.pmgr.query.b_success,
 				msg->msg.pmgr.query.flcnstatus,
@@ -63,9 +72,8 @@ static void pmgr_pmucmdhandler(struct gk20a *g, struct pmu_msg *msg,
 		}
 	} else if (msg->msg.pmgr.msg_type == NV_PMU_PMGR_MSG_ID_LOAD) {
 		if ((msg->msg.pmgr.query.b_success != 1) ||
-			(msg->msg.pmgr.query.flcnstatus != 0) ) {
-			gk20a_err(dev_from_gk20a(g),
-				"pmgr msg failed %x %x %x",
+			(msg->msg.pmgr.query.flcnstatus != 0U)) {
+			nvgpu_err(g, "pmgr msg failed %x %x %x",
 				msg->msg.pmgr.load.msg_type,
 				msg->msg.pmgr.load.b_success,
 				msg->msg.pmgr.load.flcnstatus);
@@ -82,12 +90,16 @@ static u32 pmgr_pmu_set_object(struct gk20a *g,
 		u16 fb_size,
 		void *pobj)
 {
-	struct pmu_cmd cmd = { {0} };
-	struct pmu_payload payload = { {0} };
+	struct pmu_cmd cmd;
+	struct pmu_payload payload;
 	struct nv_pmu_pmgr_cmd_set_object *pcmd;
 	u32 status;
 	u32 seqdesc;
-	struct pmgr_pmucmdhandler_params handlerparams = {0};
+	struct pmgr_pmucmdhandler_params handlerparams;
+
+	memset(&payload, 0, sizeof(struct pmu_payload));
+	memset(&cmd, 0, sizeof(struct pmu_cmd));
+	memset(&handlerparams, 0, sizeof(struct pmgr_pmucmdhandler_params));
 
 	cmd.hdr.unit_id = PMU_UNIT_PMGR;
 	cmd.hdr.size = (u32)sizeof(struct nv_pmu_pmgr_cmd_set_object) +
@@ -105,13 +117,13 @@ static u32 pmgr_pmu_set_object(struct gk20a *g,
 	/* Setup the handler params to communicate back results.*/
 	handlerparams.success = 0;
 
-	status = gk20a_pmu_cmd_post(g, &cmd, NULL, &payload,
+	status = nvgpu_pmu_cmd_post(g, &cmd, NULL, &payload,
 				PMU_COMMAND_QUEUE_LPQ,
 				pmgr_pmucmdhandler,
 				(void *)&handlerparams,
 				&seqdesc, ~0);
 	if (status) {
-		gk20a_err(dev_from_gk20a(g),
+		nvgpu_err(g,
 			"unable to post pmgr cmd for unit %x cmd id %x obj type %x",
 			cmd.hdr.unit_id, pcmd->cmd_type, pcmd->object_type);
 		goto exit;
@@ -121,8 +133,8 @@ static u32 pmgr_pmu_set_object(struct gk20a *g,
 			gk20a_get_gr_idle_timeout(g),
 			&handlerparams.success, 1);
 
-	if (handlerparams.success == 0) {
-		gk20a_err(dev_from_gk20a(g), "could not process cmd\n");
+	if (handlerparams.success == 0U) {
+		nvgpu_err(g, "could not process cmd");
 		status = -ETIMEDOUT;
 		goto exit;
 	}
@@ -134,18 +146,19 @@ exit:
 static u32 pmgr_send_i2c_device_topology_to_pmu(struct gk20a *g)
 {
 	struct nv_pmu_pmgr_i2c_device_desc_table i2c_desc_table;
+	u32 idx = g->ina3221_dcb_index;
 	u32 status = 0;
 
 	/* INA3221 I2C device info */
-	i2c_desc_table.dev_mask = 0x01;
+	i2c_desc_table.dev_mask = (1UL << idx);
 
 	/* INA3221 */
-	i2c_desc_table.devices[0].super.type = 0x4E;
+	i2c_desc_table.devices[idx].super.type = 0x4E;
 
-	i2c_desc_table.devices[0].dcb_index = 0;
-	i2c_desc_table.devices[0].i2c_address = 0x84;
-	i2c_desc_table.devices[0].i2c_flags = 0xC2F;
-	i2c_desc_table.devices[0].i2c_port = 0x2;
+	i2c_desc_table.devices[idx].dcb_index = idx;
+	i2c_desc_table.devices[idx].i2c_address = g->ina3221_i2c_address;
+	i2c_desc_table.devices[idx].i2c_flags = 0xC2F;
+	i2c_desc_table.devices[idx].i2c_port = g->ina3221_i2c_port;
 
 	/* Pass the table down the PMU as an object */
 	status = pmgr_pmu_set_object(
@@ -155,22 +168,27 @@ static u32 pmgr_send_i2c_device_topology_to_pmu(struct gk20a *g)
 				PMU_CMD_SUBMIT_PAYLOAD_PARAMS_FB_SIZE_UNUSED,
 				&i2c_desc_table);
 
-	if (status)
-		gk20a_err(dev_from_gk20a(g),
-			"pmgr_pmu_set_object failed %x",
+	if (status) {
+		nvgpu_err(g, "pmgr_pmu_set_object failed %x",
 			status);
+	}
 
 	return status;
 }
 
-static u32 pmgr_send_pwr_device_topology_to_pmu(struct gk20a *g)
+static int pmgr_send_pwr_device_topology_to_pmu(struct gk20a *g)
 {
-	struct nv_pmu_pmgr_pwr_device_desc_table pwr_desc_table;
+	struct nv_pmu_pmgr_pwr_device_desc_table *pwr_desc_table;
 	struct nv_pmu_pmgr_pwr_device_desc_table_header *ppwr_desc_header;
-	u32 status = 0;
+	int status = 0;
 
 	/* Set the BA-device-independent HW information */
-	ppwr_desc_header = &(pwr_desc_table.hdr.data);
+	pwr_desc_table = nvgpu_kzalloc(g, sizeof(*pwr_desc_table));
+	if (!pwr_desc_table) {
+		return -ENOMEM;
+	}
+
+	ppwr_desc_header = &(pwr_desc_table->hdr.data);
 	ppwr_desc_header->ba_info.b_initialized_and_used = false;
 
 	/* populate the table */
@@ -179,11 +197,10 @@ static u32 pmgr_send_pwr_device_topology_to_pmu(struct gk20a *g)
 
 	status = boardobjgrp_pmudatainit_legacy(g,
 			&g->pmgr_pmu.pmgr_deviceobjs.super.super,
-			(struct nv_pmu_boardobjgrp_super *)&pwr_desc_table);
+			(struct nv_pmu_boardobjgrp_super *)pwr_desc_table);
 
 	if (status) {
-		gk20a_err(dev_from_gk20a(g),
-			"boardobjgrp_pmudatainit_legacy failed %x",
+		nvgpu_err(g, "boardobjgrp_pmudatainit_legacy failed %x",
 			status);
 		goto exit;
 	}
@@ -195,28 +212,34 @@ static u32 pmgr_send_pwr_device_topology_to_pmu(struct gk20a *g)
 				(u16)sizeof(
 				union nv_pmu_pmgr_pwr_device_dmem_size),
 				(u16)sizeof(struct nv_pmu_pmgr_pwr_device_desc_table),
-				&pwr_desc_table);
+				pwr_desc_table);
 
-	if (status)
-		gk20a_err(dev_from_gk20a(g),
-			"pmgr_pmu_set_object failed %x",
+	if (status) {
+		nvgpu_err(g, "pmgr_pmu_set_object failed %x",
 			status);
+	}
 
 exit:
+	nvgpu_kfree(g, pwr_desc_table);
 	return status;
 }
 
-static u32 pmgr_send_pwr_mointer_to_pmu(struct gk20a *g)
+static int pmgr_send_pwr_mointer_to_pmu(struct gk20a *g)
 {
-	struct nv_pmu_pmgr_pwr_monitor_pack pwr_monitor_pack;
+	struct nv_pmu_pmgr_pwr_monitor_pack *pwr_monitor_pack = NULL;
 	struct nv_pmu_pmgr_pwr_channel_header *pwr_channel_hdr;
 	struct nv_pmu_pmgr_pwr_chrelationship_header *pwr_chrelationship_header;
 	u32 max_dmem_size;
-	u32 status = 0;
+	int status = 0;
+
+	pwr_monitor_pack = nvgpu_kzalloc(g, sizeof(*pwr_monitor_pack));
+	if (!pwr_monitor_pack) {
+		return -ENOMEM;
+	}
 
 	/* Copy all the global settings from the RM copy */
-	pwr_channel_hdr = &(pwr_monitor_pack.channels.hdr.data);
-	pwr_monitor_pack = g->pmgr_pmu.pmgr_monitorobjs.pmu_data;
+	pwr_channel_hdr = &(pwr_monitor_pack->channels.hdr.data);
+	*pwr_monitor_pack = g->pmgr_pmu.pmgr_monitorobjs.pmu_data;
 
 	boardobjgrpe32hdrset((struct nv_pmu_boardobjgrp *)&pwr_channel_hdr->super,
 			g->pmgr_pmu.pmgr_monitorobjs.pwr_channels.super.objmask);
@@ -224,17 +247,16 @@ static u32 pmgr_send_pwr_mointer_to_pmu(struct gk20a *g)
 	/* Copy in each channel */
 	status = boardobjgrp_pmudatainit_legacy(g,
 			&g->pmgr_pmu.pmgr_monitorobjs.pwr_channels.super,
-			(struct nv_pmu_boardobjgrp_super *)&(pwr_monitor_pack.channels));
+			(struct nv_pmu_boardobjgrp_super *)&(pwr_monitor_pack->channels));
 
 	if (status) {
-		gk20a_err(dev_from_gk20a(g),
-			"boardobjgrp_pmudatainit_legacy failed %x",
+		nvgpu_err(g, "boardobjgrp_pmudatainit_legacy failed %x",
 			status);
 		goto exit;
 	}
 
 	/* Copy in each channel relationship */
-	pwr_chrelationship_header =  &(pwr_monitor_pack.ch_rels.hdr.data);
+	pwr_chrelationship_header =  &(pwr_monitor_pack->ch_rels.hdr.data);
 
 	boardobjgrpe32hdrset((struct nv_pmu_boardobjgrp *)&pwr_chrelationship_header->super,
 			g->pmgr_pmu.pmgr_monitorobjs.pwr_ch_rels.super.objmask);
@@ -244,11 +266,10 @@ static u32 pmgr_send_pwr_mointer_to_pmu(struct gk20a *g)
 
 	status = boardobjgrp_pmudatainit_legacy(g,
 		&g->pmgr_pmu.pmgr_monitorobjs.pwr_ch_rels.super,
-		(struct nv_pmu_boardobjgrp_super *)&(pwr_monitor_pack.ch_rels));
+		(struct nv_pmu_boardobjgrp_super *)&(pwr_monitor_pack->ch_rels));
 
 	if (status) {
-		gk20a_err(dev_from_gk20a(g),
-			"boardobjgrp_pmudatainit_legacy failed %x",
+		nvgpu_err(g, "boardobjgrp_pmudatainit_legacy failed %x",
 			status);
 		goto exit;
 	}
@@ -262,29 +283,29 @@ static u32 pmgr_send_pwr_mointer_to_pmu(struct gk20a *g)
 				NV_PMU_PMGR_OBJECT_PWR_MONITOR,
 				(u16)max_dmem_size,
 				(u16)sizeof(struct nv_pmu_pmgr_pwr_monitor_pack),
-				&pwr_monitor_pack);
+				pwr_monitor_pack);
 
-	if (status)
-		gk20a_err(dev_from_gk20a(g),
-			"pmgr_pmu_set_object failed %x",
+	if (status) {
+		nvgpu_err(g, "pmgr_pmu_set_object failed %x",
 			status);
+	}
 
 exit:
+	nvgpu_kfree(g, pwr_monitor_pack);
 	return status;
 }
 
-u32 pmgr_send_pwr_policy_to_pmu(struct gk20a *g)
+static int pmgr_send_pwr_policy_to_pmu(struct gk20a *g)
 {
 	struct nv_pmu_pmgr_pwr_policy_pack *ppwrpack = NULL;
 	struct pwr_policy *ppolicy = NULL;
-	u32 status = 0;
+	int status = 0;
 	u8 indx;
 	u32 max_dmem_size;
 
-	ppwrpack = kzalloc(sizeof(struct nv_pmu_pmgr_pwr_policy_pack), GFP_KERNEL);
+	ppwrpack = nvgpu_kzalloc(g, sizeof(struct nv_pmu_pmgr_pwr_policy_pack));
 	if (!ppwrpack) {
-		gk20a_err(dev_from_gk20a(g),
-			"pwr policy alloc failed %x",
+		nvgpu_err(g, "pwr policy alloc failed %x",
 			status);
 		status = -ENOMEM;
 		goto exit;
@@ -323,8 +344,7 @@ u32 pmgr_send_pwr_policy_to_pmu(struct gk20a *g)
 		status = ((struct boardobj *)ppolicy)->pmudatainit(g, (struct boardobj *)ppolicy,
 				(struct nv_pmu_boardobj *)&(ppwrpack->policies.policies[indx].data));
 		if (status) {
-			gk20a_err(dev_from_gk20a(g),
-				"pmudatainit failed %x indx %x",
+			nvgpu_err(g, "pmudatainit failed %x indx %x",
 				status, indx);
 			status = -ENOMEM;
 			goto exit;
@@ -350,14 +370,14 @@ u32 pmgr_send_pwr_policy_to_pmu(struct gk20a *g)
 				(u16)sizeof(struct nv_pmu_pmgr_pwr_policy_pack),
 				ppwrpack);
 
-	if (status)
-		gk20a_err(dev_from_gk20a(g),
-			"pmgr_pmu_set_object failed %x",
+	if (status) {
+		nvgpu_err(g, "pmgr_pmu_set_object failed %x",
 			status);
+	}
 
 exit:
 	if (ppwrpack) {
-		kfree(ppwrpack);
+		nvgpu_kfree(g, ppwrpack);
 	}
 
 	return status;
@@ -368,12 +388,16 @@ u32 pmgr_pmu_pwr_devices_query_blocking(
 		u32 pwr_dev_mask,
 		struct nv_pmu_pmgr_pwr_devices_query_payload *ppayload)
 {
-	struct pmu_cmd cmd = { {0} };
-	struct pmu_payload payload = { {0} };
+	struct pmu_cmd cmd;
+	struct pmu_payload payload;
 	struct nv_pmu_pmgr_cmd_pwr_devices_query *pcmd;
 	u32 status;
 	u32 seqdesc;
-	struct pmgr_pmucmdhandler_params handlerparams = {0};
+	struct pmgr_pmucmdhandler_params handlerparams;
+
+	memset(&payload, 0, sizeof(struct pmu_payload));
+	memset(&cmd, 0, sizeof(struct pmu_cmd));
+	memset(&handlerparams, 0, sizeof(struct pmgr_pmucmdhandler_params));
 
 	cmd.hdr.unit_id = PMU_UNIT_PMGR;
 	cmd.hdr.size = (u32)sizeof(struct nv_pmu_pmgr_cmd_pwr_devices_query) +
@@ -391,13 +415,13 @@ u32 pmgr_pmu_pwr_devices_query_blocking(
 	/* Setup the handler params to communicate back results.*/
 	handlerparams.success = 0;
 
-	status = gk20a_pmu_cmd_post(g, &cmd, NULL, &payload,
+	status = nvgpu_pmu_cmd_post(g, &cmd, NULL, &payload,
 				PMU_COMMAND_QUEUE_LPQ,
 				pmgr_pmucmdhandler,
 				(void *)&handlerparams,
 				&seqdesc, ~0);
 	if (status) {
-		gk20a_err(dev_from_gk20a(g),
+		nvgpu_err(g,
 			"unable to post pmgr query cmd for unit %x cmd id %x dev mask %x",
 			cmd.hdr.unit_id, pcmd->cmd_type, pcmd->dev_mask);
 		goto exit;
@@ -407,8 +431,8 @@ u32 pmgr_pmu_pwr_devices_query_blocking(
 			gk20a_get_gr_idle_timeout(g),
 			&handlerparams.success, 1);
 
-	if (handlerparams.success == 0) {
-		gk20a_err(dev_from_gk20a(g), "could not process cmd\n");
+	if (handlerparams.success == 0U) {
+		nvgpu_err(g, "could not process cmd");
 		status = -ETIMEDOUT;
 		goto exit;
 	}
@@ -435,13 +459,13 @@ static u32 pmgr_pmu_load_blocking(struct gk20a *g)
 	/* Setup the handler params to communicate back results.*/
 	handlerparams.success = 0;
 
-	status = gk20a_pmu_cmd_post(g, &cmd, NULL, NULL,
+	status = nvgpu_pmu_cmd_post(g, &cmd, NULL, NULL,
 				PMU_COMMAND_QUEUE_LPQ,
 				pmgr_pmucmdhandler,
 				(void *)&handlerparams,
 				&seqdesc, ~0);
 	if (status) {
-		gk20a_err(dev_from_gk20a(g),
+		nvgpu_err(g,
 			"unable to post pmgr load cmd for unit %x cmd id %x",
 			cmd.hdr.unit_id, pcmd->cmd_type);
 		goto exit;
@@ -451,8 +475,8 @@ static u32 pmgr_pmu_load_blocking(struct gk20a *g)
 			gk20a_get_gr_idle_timeout(g),
 			&handlerparams.success, 1);
 
-	if (handlerparams.success == 0) {
-		gk20a_err(dev_from_gk20a(g), "could not process cmd\n");
+	if (handlerparams.success == 0U) {
+		nvgpu_err(g, "could not process cmd");
 		status = -ETIMEDOUT;
 		goto exit;
 	}
@@ -461,14 +485,14 @@ exit:
 	return status;
 }
 
-u32 pmgr_send_pmgr_tables_to_pmu(struct gk20a *g)
+int pmgr_send_pmgr_tables_to_pmu(struct gk20a *g)
 {
-	u32 status = 0;
+	int status = 0;
 
 	status = pmgr_send_i2c_device_topology_to_pmu(g);
 
 	if (status) {
-		gk20a_err(dev_from_gk20a(g),
+		nvgpu_err(g,
 			"pmgr_send_i2c_device_topology_to_pmu failed %x",
 			status);
 		goto exit;
@@ -477,7 +501,7 @@ u32 pmgr_send_pmgr_tables_to_pmu(struct gk20a *g)
 	if (!BOARDOBJGRP_IS_EMPTY(&g->pmgr_pmu.pmgr_deviceobjs.super.super)) {
 		status = pmgr_send_pwr_device_topology_to_pmu(g);
 		if (status) {
-			gk20a_err(dev_from_gk20a(g),
+			nvgpu_err(g,
 				"pmgr_send_pwr_device_topology_to_pmu failed %x",
 				status);
 			goto exit;
@@ -490,7 +514,7 @@ u32 pmgr_send_pmgr_tables_to_pmu(struct gk20a *g)
 			&g->pmgr_pmu.pmgr_monitorobjs.pwr_ch_rels.super))) {
 		status = pmgr_send_pwr_mointer_to_pmu(g);
 		if (status) {
-			gk20a_err(dev_from_gk20a(g),
+			nvgpu_err(g,
 				"pmgr_send_pwr_mointer_to_pmu failed %x", status);
 			goto exit;
 		}
@@ -504,7 +528,7 @@ u32 pmgr_send_pmgr_tables_to_pmu(struct gk20a *g)
 			&g->pmgr_pmu.pmgr_policyobjs.pwr_violations.super))) {
 		status = pmgr_send_pwr_policy_to_pmu(g);
 		if (status) {
-			gk20a_err(dev_from_gk20a(g),
+			nvgpu_err(g,
 				"pmgr_send_pwr_policy_to_pmu failed %x", status);
 			goto exit;
 		}
@@ -512,7 +536,7 @@ u32 pmgr_send_pmgr_tables_to_pmu(struct gk20a *g)
 
 		status = pmgr_pmu_load_blocking(g);
 		if (status) {
-			gk20a_err(dev_from_gk20a(g),
+			nvgpu_err(g,
 				"pmgr_send_pwr_mointer_to_pmu failed %x", status);
 			goto exit;
 		}

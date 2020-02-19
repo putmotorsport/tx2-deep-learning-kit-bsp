@@ -1,33 +1,38 @@
 /*
- * Copyright (c) 2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2017-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
-#ifndef _GPMUIFCMN_H_
-#define _GPMUIFCMN_H_
+#ifndef NVGPU_PMUIF_GPMUIF_CMN_H
+#define NVGPU_PMUIF_GPMUIF_CMN_H
 
 /*
  * Defines the logical queue IDs that must be used when submitting
  * commands to the PMU
  */
 /* write by sw, read by pmu, protected by sw mutex lock */
-#define PMU_COMMAND_QUEUE_HPQ		0
+#define PMU_COMMAND_QUEUE_HPQ		0U
 /* write by sw, read by pmu, protected by sw mutex lock */
-#define PMU_COMMAND_QUEUE_LPQ		1
-/* read/write by sw/hw, protected by hw pmu mutex, id = 2 */
-#define PMU_COMMAND_QUEUE_BIOS		2
-/* read/write by sw/hw, protected by hw pmu mutex, id = 3 */
-#define PMU_COMMAND_QUEUE_SMI		3
+#define PMU_COMMAND_QUEUE_LPQ		1U
 /* write by pmu, read by sw, accessed by interrupt handler, no lock */
-#define PMU_MESSAGE_QUEUE		4
-#define PMU_QUEUE_COUNT			5
+#define PMU_MESSAGE_QUEUE		4U
+#define PMU_QUEUE_COUNT			5U
 
 #define PMU_IS_COMMAND_QUEUE(id)	\
 		((id)  < PMU_MESSAGE_QUEUE)
@@ -39,15 +44,13 @@
 #define  PMU_IS_MESSAGE_QUEUE(id)	\
 		((id) == PMU_MESSAGE_QUEUE)
 
-enum {
-	OFLAG_READ = 0,
-	OFLAG_WRITE
-};
+#define OFLAG_READ 	0U
+#define OFLAG_WRITE	1U
 
 #define QUEUE_SET		(true)
 #define QUEUE_GET		(false)
 
-#define QUEUE_ALIGNMENT		(4)
+#define QUEUE_ALIGNMENT		(4U)
 
 /* An enumeration containing all valid logical mutex identifiers */
 enum {
@@ -118,4 +121,22 @@ union name##_aligned {		                         \
 		(PMU_FB_COPY_RW_ALIGNMENT))];            \
 }
 
-#endif /* _GPMUIFCMN_H_*/
+/* RPC (Remote Procedure Call) header structure */
+#define NV_PMU_RPC_FLAGS_TYPE_SYNC 0x00000000
+
+struct nv_pmu_rpc_header {
+	/* Identifies the unit servicing requested RPC*/
+	u8  unit_id;
+	/* Identifies the requested RPC (within the unit)*/
+	u8  function;
+	/* RPC call flags (@see PMU_RPC_FLAGS) */
+	u8  flags;
+	/* Falcon's status code to describe failures*/
+	u8  flcn_status;
+	/* RPC's total exec. time (measured on nvgpu driver side)*/
+	u32  exec_time_nv_ns;
+	/* RPC's actual exec. time (measured on PMU side)*/
+	u32  exec_time_pmu_ns;
+};
+
+#endif /* NVGPU_PMUIF_GPMUIF_CMN_H*/

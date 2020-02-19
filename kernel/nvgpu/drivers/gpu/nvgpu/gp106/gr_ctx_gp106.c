@@ -1,24 +1,34 @@
 /*
  * GP106 Graphics Context
  *
- * Copyright (c) 2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 
-#include "gk20a/gk20a.h"
+#include <nvgpu/gk20a.h>
+
 #include "gr_ctx_gp106.h"
 
-static int gr_gp106_get_netlist_name(struct gk20a *g, int index, char *name)
+int gr_gp106_get_netlist_name(struct gk20a *g, int index, char *name)
 {
-	u32 ver = g->gpu_characteristics.arch + g->gpu_characteristics.impl;
+	u32 ver = g->params.gpu_arch + g->params.gpu_impl;
 
 	switch (ver) {
 		case NVGPU_GPUID_GP104:
@@ -30,20 +40,13 @@ static int gr_gp106_get_netlist_name(struct gk20a *g, int index, char *name)
 					GP106_NETLIST_IMAGE_FW_NAME);
 			break;
 		default:
-			gk20a_err(g->dev, "no support for GPUID %x", ver);
+			nvgpu_err(g, "no support for GPUID %x", ver);
 	}
 
 	return 0;
 }
 
-static bool gr_gp106_is_firmware_defined(void)
+bool gr_gp106_is_firmware_defined(void)
 {
 	return true;
-}
-
-void gp106_init_gr_ctx(struct gpu_ops *gops)
-{
-	gops->gr_ctx.get_netlist_name = gr_gp106_get_netlist_name;
-	gops->gr_ctx.is_fw_defined = gr_gp106_is_firmware_defined;
-	gops->gr_ctx.use_dma_for_fw_bootstrap = false;
 }

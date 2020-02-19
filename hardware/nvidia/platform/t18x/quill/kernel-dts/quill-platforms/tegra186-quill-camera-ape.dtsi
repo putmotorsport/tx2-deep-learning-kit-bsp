@@ -1,7 +1,7 @@
 /*
  * tegra186-quill-camera-ape.dtsi: Quill APE for camera dtsi.
  *
- * Copyright (c) 2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,15 +22,23 @@
 		status = "disabled";
 	};
 
-	tegra-hsp@29a0000 {
-		status = "okay";
-	};
-
 	rtcpu@b000000 {	/* Do not use SCE as camera-rtcpu */
 		status = "disabled";
 	};
 
+#if TEGRA_AUDIO_BUS_DT_VERSION >= DT_VERSION_2
+	aconnect@2a41000 {
+#endif
+
+	tegra-hsp@29a0000 {
+		status = "okay";
+	};
+
 	rtcpu@2993000 {	/* use APE as camera-rtcpu */
+		status = "okay";
+	};
+
+	agic-controller@2a41000 {
 		status = "okay";
 	};
 
@@ -39,7 +47,7 @@
 	};
 
 	ahub {
-		status = "disabled";
+		status = "okay";
 	};
 
 	spdif_dit {
@@ -47,10 +55,26 @@
 	};
 
 	adma@2930000 {
-		status = "disabled";
+		status = "okay";
 	};
 
         adsp_audio {
 		status = "disabled";
 	};
+
+#if TEGRA_AUDIO_BUS_DT_VERSION >= DT_VERSION_2
+	};
+#endif
+
+	sound {
+		adsp_disabled;
+	};
+
+	sound_ref {
+		adsp_disabled;
+	};
+
+	i2c@3180000 {
+ 		compatible = "nvidia,tegra186-i2c";
+        };
 };

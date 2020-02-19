@@ -1,37 +1,46 @@
 /*
- * Copyright (c) 2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef _ctrlboardobj_h_
-#define _ctrlboardobj_h_
+#ifndef NVGPU_CTRLBOARDOBJ_H
+#define NVGPU_CTRLBOARDOBJ_H
 
 struct ctrl_boardobj {
 	u8    type;
 };
 
-#define CTRL_BOARDOBJGRP_TYPE_INVALID 0x00
-#define CTRL_BOARDOBJGRP_TYPE_E32 0x01
-#define CTRL_BOARDOBJGRP_TYPE_E255 0x02
+#define CTRL_BOARDOBJGRP_TYPE_INVALID			0x00U
+#define CTRL_BOARDOBJGRP_TYPE_E32			0x01U
+#define CTRL_BOARDOBJGRP_TYPE_E255			0x02U
 
-#define CTRL_BOARDOBJGRP_E32_MAX_OBJECTS  32
+#define CTRL_BOARDOBJGRP_E32_MAX_OBJECTS		32U
 
-#define CTRL_BOARDOBJGRP_E255_MAX_OBJECTS 255
+#define CTRL_BOARDOBJGRP_E255_MAX_OBJECTS		255U
 
 #define CTRL_BOARDOBJ_MAX_BOARD_OBJECTS                                 \
 	CTRL_BOARDOBJGRP_E32_MAX_OBJECTS
 
-#define CTRL_BOARDOBJ_IDX_INVALID 255
+#define CTRL_BOARDOBJ_IDX_INVALID			255U
 
-#define CTRL_BOARDOBJGRP_MASK_MASK_ELEMENT_BIT_SIZE  32
+#define CTRL_BOARDOBJGRP_MASK_MASK_ELEMENT_BIT_SIZE	32U
 
 #define CTRL_BOARDOBJGRP_MASK_MASK_ELEMENT_INDEX(_bit)                  \
 	((_bit) / CTRL_BOARDOBJGRP_MASK_MASK_ELEMENT_BIT_SIZE)
@@ -40,10 +49,10 @@ struct ctrl_boardobj {
 	((_bit) % CTRL_BOARDOBJGRP_MASK_MASK_ELEMENT_BIT_SIZE)
 
 #define CTRL_BOARDOBJGRP_MASK_DATA_SIZE(_bits)                          \
-	(CTRL_BOARDOBJGRP_MASK_MASK_ELEMENT_INDEX((_bits) - 1) + 1)
+	(CTRL_BOARDOBJGRP_MASK_MASK_ELEMENT_INDEX((_bits) - 1U) + 1U)
 
 
-#define CTRL_BOARDOBJGRP_MASK_ARRAY_START_SIZE  1
+#define CTRL_BOARDOBJGRP_MASK_ARRAY_START_SIZE		1U
 #define CTRL_BOARDOBJGRP_MASK_ARRAY_EXTENSION_SIZE(_bits)          \
 	(CTRL_BOARDOBJGRP_MASK_DATA_SIZE(_bits) -                           \
 	 CTRL_BOARDOBJGRP_MASK_ARRAY_START_SIZE)
@@ -77,5 +86,4 @@ struct ctrl_boardobjgrp {
 	u32    obj_mask;
 };
 
-#endif
-
+#endif /* NVGPU_CTRLBOARDOBJ_H */

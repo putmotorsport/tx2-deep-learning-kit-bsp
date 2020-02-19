@@ -1,7 +1,7 @@
 /*
  * arch/arm/boot/dts/panel-s-4kuhd-5-46.dtsi
  *
- * Copyright (c) 2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 / {
 	host1x {
 		dsi {
-			panel-s-4kuhd-5-46 {
+			panel_s_4kuhd_5_46: panel-s-4kuhd-5-46 {
 				compatible = "s,4kuhd-5-46";
 				nvidia,dsi-instance = <DSI_INSTANCE_0>;
 				nvidia,dsi-n-data-lanes = <8>;
@@ -99,13 +99,13 @@
 				};
 				display-timings {
 					2160x3840-32-60Hz {
-						clock-frequency = <594283200>;
+						clock-frequency = <600156480>;
 						hactive = <2160>;
 						vactive = <3840>;
 						hfront-porch = <400>;
 						hback-porch = <8>;
 						hsync-len = <8>;
-						vfront-porch = <2>;
+						vfront-porch = <40>;
 						vback-porch = <2>;
 						vsync-len = <1>;
 						nvidia,h-ref-to-sync = <4>;

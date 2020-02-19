@@ -1,26 +1,35 @@
 /*
  * general power channel structures & definitions
  *
- * Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
-#ifndef _PWRPOLICY_H_
-#define _PWRPOLICY_H_
+#ifndef NVGPU_PMGR_PWRPOLICY_H
+#define NVGPU_PMGR_PWRPOLICY_H
 
 #include <nvgpu/pmuif/nvgpu_gpmu_cmdif.h>
 #include "boardobj/boardobjgrp.h"
 #include "boardobj/boardobj.h"
 #include "ctrl/ctrlpmgr.h"
 
-#define PWR_POLICY_EXT_POWER_STATE_ID_COUNT 0x4
+#define PWR_POLICY_EXT_POWER_STATE_ID_COUNT 0x4U
 
 enum pwr_policy_limit_id {
 	PWR_POLICY_LIMIT_ID_MIN    = 0x00000000,
@@ -122,6 +131,6 @@ union pwr_policy_data_union {
 #define PMGR_PWR_POLICY_INCREMENT_LIMIT_INPUT_COUNT(ppolicy)                 \
 	((ppolicy)->num_limit_inputs++)
 
-u32 pmgr_policy_sw_setup(struct gk20a *g);
+int pmgr_policy_sw_setup(struct gk20a *g);
 
-#endif
+#endif /* NVGPU_PMGR_PWRPOLICY_H */

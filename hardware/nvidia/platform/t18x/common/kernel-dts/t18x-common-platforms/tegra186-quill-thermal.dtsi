@@ -56,7 +56,7 @@
 	thermal-zones {
 		status = "okay";
 
-		Tboard_tegra {
+		Tboard_tegra: Tboard_tegra {
 			status = "okay";
 			polling-delay = <0>;
 			polling-delay-passive = <1000>;
@@ -75,7 +75,7 @@
 			};
 		};
 
-		Tdiode_tegra {
+		Tdiode_tegra: Tdiode_tegra {
 			status = "okay";
 			polling-delay = <0>;
 			polling-delay-passive = <1000>;
@@ -106,7 +106,7 @@
 
 			trips {
 				trip_critical {
-					temperature = <101000>;
+					temperature = <100500>;
 					type = "critical";
 					hysteresis = <0>;
 					writable;
@@ -137,7 +137,7 @@
 
 			trips {
 				trip_critical {
-					temperature = <101000>;
+					temperature = <100500>;
 					type = "critical";
 					hysteresis = <0>;
 					writable;
@@ -158,19 +158,12 @@
 			};
 		};
 
-		GPU-therm {
-			status = "okay";
-
-			thermal-zone-params {
-				governor-name = "step_wise";
-			};
-		};
-
 		PLL-therm {
 			status = "okay";
 		};
 
-		AO-therm {
+		GPU-therm {
+			thermal-sensors = <&{/bpmp/bpmpthermal} THERMAL_ZONE_AO>;
 			status = "okay";
 			polling-delay-passive = <250>;
 
@@ -179,7 +172,7 @@
 			};
 			trips {
 				trip_critical {
-					temperature = <101000>;
+					temperature = <100500>;
 					type = "critical";
 					hysteresis = <0>;
 					writable;
@@ -194,7 +187,7 @@
 
 			cooling-maps {
 				map0 {
-					trip = <&{/thermal-zones/AO-therm/trips/trip_bthrot}>;
+					trip = <&{/thermal-zones/GPU-therm/trips/trip_bthrot}>;
 					cdev-type = "gpu-balanced";
 					cooling-device = <&{/bthrot_cdev/gpu_balanced} THERMAL_NO_LIMIT THERMAL_NO_LIMIT>;
 				};

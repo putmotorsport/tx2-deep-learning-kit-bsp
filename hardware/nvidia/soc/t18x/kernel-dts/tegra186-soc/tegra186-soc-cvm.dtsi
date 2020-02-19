@@ -1,7 +1,7 @@
 /*
  * tegra186-soc-cvm.dtsi: Mobile family SoC specific DTSI file with required node enabled.
  *
- * Copyright (c) 2015-2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2015-2017, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 		spi0 = &spi0;
 		spi2 = &spi2;
 		spi3 = &spi3;
+		spi6 = &qspi6;
 		serial0 = &uarta;
 		serial1 = &uartb;
 		serial2 = &uartc;
@@ -36,7 +37,6 @@
 		serial4 = &uarte;
 		serial5 = &uartf;
 		serial6 = &uartg;
-		qspi6 = &qspi6;
 		rtc1 = "/rtc@c2a0000";
 		rtc0 = "/bpmp_i2c/spmic@3c";
 	};
@@ -74,10 +74,6 @@
 	};
 
 	aon@c160000 {
-		status = "okay";
-	};
-
-	tegra-aon-ivc-echo {
 		status = "okay";
 	};
 
@@ -200,6 +196,18 @@
 		};
 	};
 
+#if TEGRA_AUDIO_BUS_DT_VERSION >= DT_VERSION_2
+	aconnect@2a41000 {
+#endif
+
+	adsp@2993000 {
+		status = "okay";
+	};
+
+	agic-controller@2a41000 {
+		status = "okay";
+	};
+
 	ahub {
 		status = "okay";
 
@@ -211,6 +219,9 @@
 			status = "okay";
 		};
 	};
+#if TEGRA_AUDIO_BUS_DT_VERSION >= DT_VERSION_2
+	};
+#endif
 
 	hsp_top {
 		status = "okay";
@@ -229,10 +240,6 @@
 	};
 
 	interrupt-controller@3881000 {
-		status = "okay";
-	};
-
-	agic-controller@2a41000 {
 		status = "okay";
 	};
 
@@ -261,14 +268,6 @@
 	};
 
 	dma@2600000 {
-		status = "okay";
-	};
-
-	adsp@2993000 {
-		status = "okay";
-	};
-
-	serial@3100000 {
 		status = "okay";
 	};
 
@@ -327,14 +326,6 @@
 		};
 
 		pci@2,0 {
-			status = "okay";
-		};
-	};
-
-	clocks {
-		status = "okay";
-
-		clk32k_in@0 {
 			status = "okay";
 		};
 	};

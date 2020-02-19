@@ -1,17 +1,26 @@
 /*
- * Copyright (c) 2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2017-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
-#ifndef _GPMUIFPG_H_
-#define _GPMUIFPG_H_
+#ifndef NVGPU_PMUIF_GPMUIF_PG_H
+#define NVGPU_PMUIF_GPMUIF_PG_H
 
 #include "gpmuif_ap.h"
 #include "gpmuif_pg_rppg.h"
@@ -19,9 +28,9 @@
 /*PG defines*/
 
 /* Identifier for each PG */
-#define PMU_PG_ELPG_ENGINE_ID_GRAPHICS (0x00000000)
-#define PMU_PG_ELPG_ENGINE_ID_MS       (0x00000004)
-#define PMU_PG_ELPG_ENGINE_ID_INVALID_ENGINE (0x00000005)
+#define PMU_PG_ELPG_ENGINE_ID_GRAPHICS 		(0x00000000U)
+#define PMU_PG_ELPG_ENGINE_ID_MS       		(0x00000004U)
+#define PMU_PG_ELPG_ENGINE_ID_INVALID_ENGINE 	(0x00000005U)
 #define PMU_PG_ELPG_ENGINE_MAX    PMU_PG_ELPG_ENGINE_ID_INVALID_ENGINE
 
 /* PG message */
@@ -113,25 +122,94 @@ enum {
 	PMU_PG_STAT_CMD_ALLOC_DMEM = 0,
 };
 
-#define PMU_PG_PARAM_CMD_GR_INIT_PARAM  0x0
-#define PMU_PG_PARAM_CMD_MS_INIT_PARAM  0x01
-#define PMU_PG_PARAM_CMD_MCLK_CHANGE  0x04
-#define PMU_PG_PARAM_CMD_POST_INIT  0x06
+enum {
+	SLOWDOWN_FACTOR_FPDIV_BY1 = 0,
+	SLOWDOWN_FACTOR_FPDIV_BY1P5,
+	SLOWDOWN_FACTOR_FPDIV_BY2,
+	SLOWDOWN_FACTOR_FPDIV_BY2P5,
+	SLOWDOWN_FACTOR_FPDIV_BY3,
+	SLOWDOWN_FACTOR_FPDIV_BY3P5,
+	SLOWDOWN_FACTOR_FPDIV_BY4,
+	SLOWDOWN_FACTOR_FPDIV_BY4P5,
+	SLOWDOWN_FACTOR_FPDIV_BY5,
+	SLOWDOWN_FACTOR_FPDIV_BY5P5,
+	SLOWDOWN_FACTOR_FPDIV_BY6,
+	SLOWDOWN_FACTOR_FPDIV_BY6P5,
+	SLOWDOWN_FACTOR_FPDIV_BY7,
+	SLOWDOWN_FACTOR_FPDIV_BY7P5,
+	SLOWDOWN_FACTOR_FPDIV_BY8,
+	SLOWDOWN_FACTOR_FPDIV_BY8P5,
+	SLOWDOWN_FACTOR_FPDIV_BY9,
+	SLOWDOWN_FACTOR_FPDIV_BY9P5,
+	SLOWDOWN_FACTOR_FPDIV_BY10,
+	SLOWDOWN_FACTOR_FPDIV_BY10P5,
+	SLOWDOWN_FACTOR_FPDIV_BY11,
+	SLOWDOWN_FACTOR_FPDIV_BY11P5,
+	SLOWDOWN_FACTOR_FPDIV_BY12,
+	SLOWDOWN_FACTOR_FPDIV_BY12P5,
+	SLOWDOWN_FACTOR_FPDIV_BY13,
+	SLOWDOWN_FACTOR_FPDIV_BY13P5,
+	SLOWDOWN_FACTOR_FPDIV_BY14,
+	SLOWDOWN_FACTOR_FPDIV_BY14P5,
+	SLOWDOWN_FACTOR_FPDIV_BY15,
+	SLOWDOWN_FACTOR_FPDIV_BY15P5,
+	SLOWDOWN_FACTOR_FPDIV_BY16,
+	SLOWDOWN_FACTOR_FPDIV_BY16P5,
+	SLOWDOWN_FACTOR_FPDIV_BY17 = 0x20,
+	SLOWDOWN_FACTOR_FPDIV_BY18 = 0x22,
+	SLOWDOWN_FACTOR_FPDIV_BY19 = 0x24,
+	SLOWDOWN_FACTOR_FPDIV_BY20 = 0x26,
+	SLOWDOWN_FACTOR_FPDIV_BY21 = 0x28,
+	SLOWDOWN_FACTOR_FPDIV_BY22 = 0x2a,
+	SLOWDOWN_FACTOR_FPDIV_BY23 = 0x2c,
+	SLOWDOWN_FACTOR_FPDIV_BY24 = 0x2e,
+	SLOWDOWN_FACTOR_FPDIV_BY25 = 0x30,
+	SLOWDOWN_FACTOR_FPDIV_BY26 = 0x32,
+	SLOWDOWN_FACTOR_FPDIV_BY27 = 0x34,
+	SLOWDOWN_FACTOR_FPDIV_BY28 = 0x36,
+	SLOWDOWN_FACTOR_FPDIV_BY29 = 0x38,
+	SLOWDOWN_FACTOR_FPDIV_BY30 = 0x3a,
+	SLOWDOWN_FACTOR_FPDIV_BY31 = 0x3c,
+	SLOWDOWN_FACTOR_FPDIV_BYMAX,
+};
 
-#define PMU_PG_FEATURE_GR_SDIV_SLOWDOWN_ENABLED	(1 << 0)
-#define PMU_PG_FEATURE_GR_POWER_GATING_ENABLED	(1 << 2)
-#define PMU_PG_FEATURE_GR_RPPG_ENABLED		(1 << 3)
+#define PMU_PG_PARAM_CMD_GR_INIT_PARAM  		0x0U
+#define PMU_PG_PARAM_CMD_MS_INIT_PARAM  		0x01U
+#define PMU_PG_PARAM_CMD_MCLK_CHANGE  			0x04U
+#define PMU_PG_PARAM_CMD_POST_INIT  			0x06U
+#define PMU_PG_PARAM_CMD_SUB_FEATURE_MASK_UPDATE  	0x07U
 
-#define NVGPU_PMU_GR_FEATURE_MASK_RPPG	(1 << 3)
+#define NVGPU_PMU_GR_FEATURE_MASK_SDIV_SLOWDOWN     BIT32(0)
+#define NVGPU_PMU_GR_FEATURE_MASK_POWER_GATING      BIT32(2)
+#define NVGPU_PMU_GR_FEATURE_MASK_RPPG              BIT32(3)
+#define NVGPU_PMU_GR_FEATURE_MASK_PRIV_RING         BIT32(5)
+#define NVGPU_PMU_GR_FEATURE_MASK_UNBIND            BIT32(6)
+#define NVGPU_PMU_GR_FEATURE_MASK_SAVE_GLOBAL_STATE BIT32(7)
+#define NVGPU_PMU_GR_FEATURE_MASK_RESET_ENTRY       BIT32(8)
+#define NVGPU_PMU_GR_FEATURE_MASK_HW_SEQUENCE       BIT32(9)
+#define NVGPU_PMU_GR_FEATURE_MASK_ELPG_SRAM         BIT32(10)
+#define NVGPU_PMU_GR_FEATURE_MASK_ELPG_LOGIC        BIT32(11)
+#define NVGPU_PMU_GR_FEATURE_MASK_ELPG_L2RPPG       BIT32(12)
+
 #define NVGPU_PMU_GR_FEATURE_MASK_ALL	\
 	(	\
-		NVGPU_PMU_GR_FEATURE_MASK_RPPG   \
+		NVGPU_PMU_GR_FEATURE_MASK_SDIV_SLOWDOWN         |\
+		NVGPU_PMU_GR_FEATURE_MASK_POWER_GATING          |\
+		NVGPU_PMU_GR_FEATURE_MASK_RPPG                  |\
+		NVGPU_PMU_GR_FEATURE_MASK_PRIV_RING             |\
+		NVGPU_PMU_GR_FEATURE_MASK_UNBIND                |\
+		NVGPU_PMU_GR_FEATURE_MASK_SAVE_GLOBAL_STATE     |\
+		NVGPU_PMU_GR_FEATURE_MASK_RESET_ENTRY           |\
+		NVGPU_PMU_GR_FEATURE_MASK_HW_SEQUENCE           |\
+		NVGPU_PMU_GR_FEATURE_MASK_ELPG_SRAM             |\
+		NVGPU_PMU_GR_FEATURE_MASK_ELPG_LOGIC            |\
+		NVGPU_PMU_GR_FEATURE_MASK_ELPG_L2RPPG           \
 	)
 
-#define NVGPU_PMU_MS_FEATURE_MASK_CLOCK_GATING  (1 << 0)
-#define NVGPU_PMU_MS_FEATURE_MASK_SW_ASR        (1 << 1)
-#define NVGPU_PMU_MS_FEATURE_MASK_RPPG          (1 << 8)
-#define NVGPU_PMU_MS_FEATURE_MASK_FB_TRAINING   (1 << 5)
+#define NVGPU_PMU_MS_FEATURE_MASK_CLOCK_GATING  BIT32(0)
+#define NVGPU_PMU_MS_FEATURE_MASK_SW_ASR        BIT32(1)
+#define NVGPU_PMU_MS_FEATURE_MASK_RPPG          BIT32(8)
+#define NVGPU_PMU_MS_FEATURE_MASK_FB_TRAINING   BIT32(5)
 
 #define NVGPU_PMU_MS_FEATURE_MASK_ALL	\
 	(	\
@@ -185,6 +263,26 @@ struct pmu_pg_cmd_gr_init_param {
 	u8 featuremask;
 };
 
+struct pmu_pg_cmd_gr_init_param_v2 {
+	u8 cmd_type;
+	u16 sub_cmd_id;
+	u8 featuremask;
+	u8 ldiv_slowdown_factor;
+};
+
+struct pmu_pg_cmd_gr_init_param_v1 {
+	u8 cmd_type;
+	u16 sub_cmd_id;
+	u32 featuremask;
+};
+
+struct pmu_pg_cmd_sub_feature_mask_update {
+	u8 cmd_type;
+	u16 sub_cmd_id;
+	u8 ctrl_id;
+	u32 enabled_mask;
+};
+
 struct pmu_pg_cmd_ms_init_param {
 	u8 cmd_type;
 	u16 cmd_id;
@@ -236,12 +334,15 @@ struct pmu_pg_cmd {
 		struct pmu_pg_cmd_eng_buf_load_v2 eng_buf_load_v2;
 		struct pmu_pg_cmd_stat stat;
 		struct pmu_pg_cmd_gr_init_param gr_init_param;
+		struct pmu_pg_cmd_gr_init_param_v1 gr_init_param_v1;
+		struct pmu_pg_cmd_gr_init_param_v2 gr_init_param_v2;
 		struct pmu_pg_cmd_ms_init_param ms_init_param;
 		struct pmu_pg_cmd_mclk_change mclk_change;
 		struct pmu_pg_cmd_post_init_param post_init;
 		/* TBD: other pg commands */
 		union pmu_ap_cmd ap_cmd;
 		struct nv_pmu_rppg_cmd rppg_cmd;
+		struct pmu_pg_cmd_sub_feature_mask_update sf_mask_update;
 	};
 };
 
@@ -308,4 +409,4 @@ struct pmu_pg_stats {
 	u32 pg_gating_deny_cnt;
 };
 
-#endif /* _GPMUIFPG_H_*/
+#endif /* NVGPU_PMUIF_GPMUIF_PG_H*/

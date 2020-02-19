@@ -1,42 +1,44 @@
 /*
  * GP10B PMU
  *
- * Copyright (c) 2015-2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2015-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 
-#include <linux/delay.h>	/* for udelay */
-#include <soc/tegra/fuse.h>
+#include <nvgpu/pmu.h>
+#include <nvgpu/log.h>
+#include <nvgpu/fuse.h>
+#include <nvgpu/enabled.h>
+#include <nvgpu/io.h>
+#include <nvgpu/gk20a.h>
 
-#include "gk20a/gk20a.h"
 #include "gk20a/pmu_gk20a.h"
 #include "gm20b/acr_gm20b.h"
 #include "gm20b/pmu_gm20b.h"
 
 #include "pmu_gp10b.h"
-#include "gp10b_sysfs.h"
 
 #include <nvgpu/hw/gp10b/hw_pwr_gp10b.h>
-#include <nvgpu/hw/gp10b/hw_fuse_gp10b.h>
 
-#define gp10b_dbg_pmu(fmt, arg...) \
-	gk20a_dbg(gpu_dbg_pmu, fmt, ##arg)
-/*!
- * Structure/object which single register write need to be done during PG init
- * sequence to set PROD values.
- */
-struct pg_init_sequence_list {
-	u32 regaddr;
-	u32 writeval;
-};
+#define gp10b_dbg_pmu(g, fmt, arg...) \
+	nvgpu_log(g, gpu_dbg_pmu, fmt, ##arg)
 
 /* PROD settings for ELPG sequencing registers*/
 static struct pg_init_sequence_list _pginitseq_gp10b[] = {
@@ -141,14 +143,14 @@ static struct pg_init_sequence_list _pginitseq_gp10b[] = {
 static void gp10b_pmu_load_multiple_falcons(struct gk20a *g, u32 falconidmask,
 					 u32 flags)
 {
-	struct pmu_gk20a *pmu = &g->pmu;
+	struct nvgpu_pmu *pmu = &g->pmu;
 	struct pmu_cmd cmd;
 	u32 seq;
 
-	gk20a_dbg_fn("");
+	nvgpu_log_fn(g, " ");
 
-	gp10b_dbg_pmu("wprinit status = %x\n", g->ops.pmu.lspmuwprinitdone);
-	if (g->ops.pmu.lspmuwprinitdone) {
+	gp10b_dbg_pmu(g, "wprinit status = %x\n", g->pmu_lsf_pmu_wpr_init_done);
+	if (g->pmu_lsf_pmu_wpr_init_done) {
 		/* send message to load FECS falcon */
 		memset(&cmd, 0, sizeof(struct pmu_cmd));
 		cmd.hdr.unit_id = PMU_UNIT_ACR;
@@ -160,17 +162,15 @@ static void gp10b_pmu_load_multiple_falcons(struct gk20a *g, u32 falconidmask,
 		cmd.cmd.acr.boot_falcons.falconidmask =
 				falconidmask;
 		cmd.cmd.acr.boot_falcons.usevamask = 0;
-		cmd.cmd.acr.boot_falcons.wprvirtualbase.lo =
-				u64_lo32(g->pmu.wpr_buf.gpu_va);
-		cmd.cmd.acr.boot_falcons.wprvirtualbase.hi =
-				u64_hi32(g->pmu.wpr_buf.gpu_va);
-		gp10b_dbg_pmu("PMU_ACR_CMD_ID_BOOTSTRAP_MULTIPLE_FALCONS:%x\n",
+		cmd.cmd.acr.boot_falcons.wprvirtualbase.lo = 0x0;
+		cmd.cmd.acr.boot_falcons.wprvirtualbase.hi = 0x0;
+		gp10b_dbg_pmu(g, "PMU_ACR_CMD_ID_BOOTSTRAP_MULTIPLE_FALCONS:%x\n",
 				falconidmask);
-		gk20a_pmu_cmd_post(g, &cmd, NULL, NULL, PMU_COMMAND_QUEUE_HPQ,
+		nvgpu_pmu_cmd_post(g, &cmd, NULL, NULL, PMU_COMMAND_QUEUE_HPQ,
 				pmu_handle_fecs_boot_acr_msg, pmu, &seq, ~0);
 	}
 
-	gk20a_dbg_fn("done");
+	nvgpu_log_fn(g, "done");
 	return;
 }
 
@@ -179,21 +179,22 @@ int gp10b_load_falcon_ucode(struct gk20a *g, u32 falconidmask)
 	u32 flags = PMU_ACR_CMD_BOOTSTRAP_FALCON_FLAGS_RESET_YES;
 
 	/* GM20B PMU supports loading FECS and GPCCS only */
-	if (falconidmask == 0)
+	if (falconidmask == 0) {
 		return -EINVAL;
+	}
 	if (falconidmask & ~((1 << LSF_FALCON_ID_FECS) |
-				(1 << LSF_FALCON_ID_GPCCS)))
-				return -EINVAL;
-	g->ops.pmu.lsfloadedfalconid = 0;
+				(1 << LSF_FALCON_ID_GPCCS))) {
+		return -EINVAL;
+	}
+	g->pmu_lsf_loaded_falcon_id = 0;
 	/* check whether pmu is ready to bootstrap lsf if not wait for it */
-	if (!g->ops.pmu.lspmuwprinitdone) {
+	if (!g->pmu_lsf_pmu_wpr_init_done) {
 		pmu_wait_message_cond(&g->pmu,
 				gk20a_get_gr_idle_timeout(g),
-				&g->ops.pmu.lspmuwprinitdone, 1);
+				&g->pmu_lsf_pmu_wpr_init_done, 1);
 		/* check again if it still not ready indicate an error */
-		if (!g->ops.pmu.lspmuwprinitdone) {
-			gk20a_err(dev_from_gk20a(g),
-				"PMU not ready to load LSF");
+		if (!g->pmu_lsf_pmu_wpr_init_done) {
+			nvgpu_err(g, "PMU not ready to load LSF");
 			return -ETIMEDOUT;
 		}
 	}
@@ -201,24 +202,25 @@ int gp10b_load_falcon_ucode(struct gk20a *g, u32 falconidmask)
 	gp10b_pmu_load_multiple_falcons(g, falconidmask, flags);
 	pmu_wait_message_cond(&g->pmu,
 			gk20a_get_gr_idle_timeout(g),
-			&g->ops.pmu.lsfloadedfalconid, falconidmask);
-	if (g->ops.pmu.lsfloadedfalconid != falconidmask)
+			&g->pmu_lsf_loaded_falcon_id, falconidmask);
+	if (g->pmu_lsf_loaded_falcon_id != falconidmask) {
 		return -ETIMEDOUT;
+	}
 	return 0;
 }
 
 static void pmu_handle_gr_param_msg(struct gk20a *g, struct pmu_msg *msg,
 			void *param, u32 handle, u32 status)
 {
-	gk20a_dbg_fn("");
+	nvgpu_log_fn(g, " ");
 
 	if (status != 0) {
-		gk20a_err(dev_from_gk20a(g), "GR PARAM cmd aborted");
+		nvgpu_err(g, "GR PARAM cmd aborted");
 		/* TBD: disable ELPG */
 		return;
 	}
 
-	gp10b_dbg_pmu("GR PARAM is acknowledged from PMU %x \n",
+	gp10b_dbg_pmu(g, "GR PARAM is acknowledged from PMU %x \n",
 			msg->msg.pg.msg_type);
 
 	return;
@@ -226,7 +228,7 @@ static void pmu_handle_gr_param_msg(struct gk20a *g, struct pmu_msg *msg,
 
 int gp10b_pg_gr_init(struct gk20a *g, u32 pg_engine_id)
 {
-	struct pmu_gk20a *pmu = &g->pmu;
+	struct nvgpu_pmu *pmu = &g->pmu;
 	struct pmu_cmd cmd;
 	u32 seq;
 
@@ -234,31 +236,34 @@ int gp10b_pg_gr_init(struct gk20a *g, u32 pg_engine_id)
 		memset(&cmd, 0, sizeof(struct pmu_cmd));
 		cmd.hdr.unit_id = PMU_UNIT_PG;
 		cmd.hdr.size = PMU_CMD_HDR_SIZE +
-				sizeof(struct pmu_pg_cmd_gr_init_param);
-		cmd.cmd.pg.gr_init_param.cmd_type =
+				sizeof(struct pmu_pg_cmd_gr_init_param_v2);
+		cmd.cmd.pg.gr_init_param_v2.cmd_type =
 				PMU_PG_CMD_ID_PG_PARAM;
-		cmd.cmd.pg.gr_init_param.sub_cmd_id =
+		cmd.cmd.pg.gr_init_param_v2.sub_cmd_id =
 				PMU_PG_PARAM_CMD_GR_INIT_PARAM;
-		cmd.cmd.pg.gr_init_param.featuremask =
-				PMU_PG_FEATURE_GR_POWER_GATING_ENABLED;
+		cmd.cmd.pg.gr_init_param_v2.featuremask =
+				NVGPU_PMU_GR_FEATURE_MASK_POWER_GATING;
+		cmd.cmd.pg.gr_init_param_v2.ldiv_slowdown_factor =
+				g->ldiv_slowdown_factor;
 
-		gp10b_dbg_pmu("cmd post PMU_PG_CMD_ID_PG_PARAM ");
-		gk20a_pmu_cmd_post(g, &cmd, NULL, NULL, PMU_COMMAND_QUEUE_HPQ,
+		gp10b_dbg_pmu(g, "cmd post PMU_PG_CMD_ID_PG_PARAM ");
+		nvgpu_pmu_cmd_post(g, &cmd, NULL, NULL, PMU_COMMAND_QUEUE_HPQ,
 				pmu_handle_gr_param_msg, pmu, &seq, ~0);
 
-	} else
+	} else {
 		return -EINVAL;
+	}
 
 	return 0;
 }
 
-static void gp10b_pmu_elpg_statistics(struct gk20a *g, u32 pg_engine_id,
+void gp10b_pmu_elpg_statistics(struct gk20a *g, u32 pg_engine_id,
 		struct pmu_pg_stats_data *pg_stat_data)
 {
-	struct pmu_gk20a *pmu = &g->pmu;
+	struct nvgpu_pmu *pmu = &g->pmu;
 	struct pmu_pg_stats_v1 stats;
 
-	pmu_copy_from_dmem(pmu,
+	nvgpu_flcn_copy_from_dmem(pmu->flcn,
 		pmu->stat_dmem_offset[pg_engine_id],
 		(u8 *)&stats, sizeof(struct pmu_pg_stats_v1), 0);
 
@@ -269,15 +274,15 @@ static void gp10b_pmu_elpg_statistics(struct gk20a *g, u32 pg_engine_id,
 	pg_stat_data->avg_exit_latency_us = stats.exitlatency_avgus;
 }
 
-static int gp10b_pmu_setup_elpg(struct gk20a *g)
+int gp10b_pmu_setup_elpg(struct gk20a *g)
 {
 	int ret = 0;
 	u32 reg_writes;
 	u32 index;
 
-	gk20a_dbg_fn("");
+	nvgpu_log_fn(g, " ");
 
-	if (g->elpg_enabled) {
+	if (g->can_elpg && g->elpg_enabled) {
 		reg_writes = ((sizeof(_pginitseq_gp10b) /
 				sizeof((_pginitseq_gp10b)[0])));
 		/* Initialize registers with production values*/
@@ -287,7 +292,7 @@ static int gp10b_pmu_setup_elpg(struct gk20a *g)
 		}
 	}
 
-	gk20a_dbg_fn("done");
+	nvgpu_log_fn(g, "done");
 	return ret;
 }
 
@@ -299,45 +304,7 @@ void gp10b_write_dmatrfbase(struct gk20a *g, u32 addr)
 				0x0);
 }
 
-static int gp10b_init_pmu_setup_hw1(struct gk20a *g)
-{
-	struct pmu_gk20a *pmu = &g->pmu;
-	int err;
-
-	gk20a_dbg_fn("");
-
-	nvgpu_mutex_acquire(&pmu->isr_mutex);
-	g->ops.pmu.reset(g);
-	pmu->isr_enabled = true;
-	nvgpu_mutex_release(&pmu->isr_mutex);
-
-	/* setup apertures - virtual */
-	gk20a_writel(g, pwr_fbif_transcfg_r(GK20A_PMU_DMAIDX_UCODE),
-		pwr_fbif_transcfg_mem_type_virtual_f());
-	gk20a_writel(g, pwr_fbif_transcfg_r(GK20A_PMU_DMAIDX_VIRT),
-		pwr_fbif_transcfg_mem_type_virtual_f());
-
-	/* setup apertures - physical */
-	gk20a_writel(g, pwr_fbif_transcfg_r(GK20A_PMU_DMAIDX_PHYS_VID),
-		pwr_fbif_transcfg_mem_type_physical_f() |
-		pwr_fbif_transcfg_target_local_fb_f());
-	gk20a_writel(g, pwr_fbif_transcfg_r(GK20A_PMU_DMAIDX_PHYS_SYS_COH),
-		pwr_fbif_transcfg_mem_type_physical_f() |
-		pwr_fbif_transcfg_target_coherent_sysmem_f());
-	gk20a_writel(g, pwr_fbif_transcfg_r(GK20A_PMU_DMAIDX_PHYS_SYS_NCOH),
-		pwr_fbif_transcfg_mem_type_physical_f() |
-		pwr_fbif_transcfg_target_noncoherent_sysmem_f());
-
-	err = g->ops.pmu.pmu_nsbootstrap(pmu);
-	if (err)
-		return err;
-
-	gk20a_dbg_fn("done");
-	return 0;
-
-}
-
-static bool gp10b_is_lazy_bootstrap(u32 falcon_id)
+bool gp10b_is_lazy_bootstrap(u32 falcon_id)
 {
 	bool enable_status = false;
 
@@ -355,7 +322,7 @@ static bool gp10b_is_lazy_bootstrap(u32 falcon_id)
 	return enable_status;
 }
 
-static bool gp10b_is_priv_load(u32 falcon_id)
+bool gp10b_is_priv_load(u32 falcon_id)
 {
 	bool enable_status = false;
 
@@ -373,57 +340,7 @@ static bool gp10b_is_priv_load(u32 falcon_id)
 	return enable_status;
 }
 
-/*Dump Security related fuses*/
-static void pmu_dump_security_fuses_gp10b(struct gk20a *g)
-{
-	u32 val;
-
-	gk20a_err(dev_from_gk20a(g), "FUSE_OPT_SEC_DEBUG_EN_0 : 0x%x",
-			gk20a_readl(g, fuse_opt_sec_debug_en_r()));
-	gk20a_err(dev_from_gk20a(g), "FUSE_OPT_PRIV_SEC_EN_0 : 0x%x",
-			gk20a_readl(g, fuse_opt_priv_sec_en_r()));
-	tegra_fuse_readl(FUSE_GCPLEX_CONFIG_FUSE_0, &val);
-	gk20a_err(dev_from_gk20a(g), "FUSE_GCPLEX_CONFIG_FUSE_0 : 0x%x",
-			val);
-}
-
-static bool gp10b_is_pmu_supported(struct gk20a *g)
+bool gp10b_is_pmu_supported(struct gk20a *g)
 {
 	return true;
-}
-
-void gp10b_init_pmu_ops(struct gpu_ops *gops)
-{
-	gops->pmu.is_pmu_supported = gp10b_is_pmu_supported;
-	if (gops->privsecurity) {
-		gm20b_init_secure_pmu(gops);
-		gops->pmu.init_wpr_region = gm20b_pmu_init_acr;
-		gops->pmu.load_lsfalcon_ucode = gp10b_load_falcon_ucode;
-		gops->pmu.is_lazy_bootstrap = gp10b_is_lazy_bootstrap;
-		gops->pmu.is_priv_load = gp10b_is_priv_load;
-	} else {
-		gk20a_init_pmu_ops(gops);
-		gops->pmu.load_lsfalcon_ucode = NULL;
-		gops->pmu.init_wpr_region = NULL;
-		gops->pmu.pmu_setup_hw_and_bootstrap = gp10b_init_pmu_setup_hw1;
-	}
-	gops->pmu.pmu_setup_elpg = gp10b_pmu_setup_elpg;
-	gops->pmu.pmu_get_queue_head = pwr_pmu_queue_head_r;
-	gops->pmu.pmu_get_queue_head_size = pwr_pmu_queue_head__size_1_v;
-	gops->pmu.pmu_get_queue_tail = pwr_pmu_queue_tail_r;
-	gops->pmu.pmu_get_queue_tail_size = pwr_pmu_queue_tail__size_1_v;
-	gops->pmu.lspmuwprinitdone = false;
-	gops->pmu.fecsbootstrapdone = false;
-	gops->pmu.write_dmatrfbase = gp10b_write_dmatrfbase;
-	gops->pmu.pmu_elpg_statistics = gp10b_pmu_elpg_statistics;
-	gops->pmu.pmu_pg_init_param = gp10b_pg_gr_init;
-	gops->pmu.pmu_pg_supported_engines_list = gk20a_pmu_pg_engines_list;
-	gops->pmu.pmu_pg_engines_feature_list = gk20a_pmu_pg_feature_list;
-	gops->pmu.pmu_is_lpwr_feature_supported = NULL;
-	gops->pmu.pmu_lpwr_enable_pg = NULL;
-	gops->pmu.pmu_lpwr_disable_pg = NULL;
-	gops->pmu.pmu_pg_param_post_init = NULL;
-	gops->pmu.send_lrf_tex_ltc_dram_overide_en_dis_cmd = NULL;
-	gops->pmu.reset = gk20a_pmu_reset;
-	gops->pmu.dump_secure_fuses = pmu_dump_security_fuses_gp10b;
 }

@@ -1,7 +1,7 @@
 /*
  * tegra186-soc-ufshc.dtsi: Tegra186 soc dtsi file for UFS host controller
  *
- * Copyright (c) 2015-2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2015-2019, NVIDIA CORPORATION.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,12 +14,26 @@
  */
 
 / {
+	pmc@c360000 {
+		ufs_dpd_enable: dpd-enable {
+			ufs {
+				pins = "ufs";
+				low-power-enable;
+			};
+		};
+		ufs_dpd_disable: dpd-disable {
+			ufs {
+				pins = "ufs";
+				low-power-disable;
+			};
+		};
+	};
 
 	tegra_ufs: ufshci@2450000 {
 		compatible = "tegra,ufs_variant";
 		reg = <0x0 0x02450000 0x0 0x4000>;
 		interrupts = < 0 TEGRA186_IRQ_UFSHC 0x04 >;
-		#stream-id-cells = <1>;
+		iommus = <&smmu TEGRA_SID_UFSHC>;
 		clocks = <&tegra_car TEGRA186_CLK_MPHY_CORE_PLL_FIXED>,
 				<&tegra_car TEGRA186_CLK_MPHY_L0_TX_SYMB>,
 				<&tegra_car TEGRA186_CLK_MPHY_TX_1MHZ_REF> ,
@@ -53,14 +67,17 @@
 		nvidia,enable-x2-config;
 		nvidia,enable-rx-calib;
 		nvidia,enable-hs-mode;
+		nvidia,enable-wlu-scsi-device-add;
 		nvidia,mask-fast-auto-mode;
+		nvidia,enable-hibern8-war;
 		nvidia,max-hs-gear = <3>;
 		nvidia,max-pwm-gear = <4>;
 		vcc-max-microamp = <0>;
 		vccq-max-microamp = <0>;
 		vccq2-max-microamp = <0>;
-		pad-controllers = <&tegra_pmc TEGRA_IO_PAD_GROUP_UFS>;
-		pad-names = "ufs";
+		pinctrl-names = "ufs_dpd_enable", "ufs_dpd_disable";
+		pinctrl-0 = <&ufs_dpd_enable>;
+		pinctrl-1 = <&ufs_dpd_disable>;
 		status = "disabled";
 
 		ufs_variant {

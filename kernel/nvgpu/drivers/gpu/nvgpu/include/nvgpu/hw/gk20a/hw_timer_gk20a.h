@@ -1,17 +1,23 @@
 /*
- * Copyright (c) 2013-2016, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2013-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 /*
  * Function naming determines intended use:
@@ -52,58 +58,70 @@
 
 static inline u32 timer_pri_timeout_r(void)
 {
-	return 0x00009080;
+	return 0x00009080U;
 }
 static inline u32 timer_pri_timeout_period_f(u32 v)
 {
-	return (v & 0xffffff) << 0;
+	return (v & 0xffffffU) << 0U;
 }
 static inline u32 timer_pri_timeout_period_m(void)
 {
-	return 0xffffff << 0;
+	return 0xffffffU << 0U;
 }
 static inline u32 timer_pri_timeout_period_v(u32 r)
 {
-	return (r >> 0) & 0xffffff;
+	return (r >> 0U) & 0xffffffU;
 }
 static inline u32 timer_pri_timeout_en_f(u32 v)
 {
-	return (v & 0x1) << 31;
+	return (v & 0x1U) << 31U;
 }
 static inline u32 timer_pri_timeout_en_m(void)
 {
-	return 0x1 << 31;
+	return 0x1U << 31U;
 }
 static inline u32 timer_pri_timeout_en_v(u32 r)
 {
-	return (r >> 31) & 0x1;
+	return (r >> 31U) & 0x1U;
 }
 static inline u32 timer_pri_timeout_en_en_enabled_f(void)
 {
-	return 0x80000000;
+	return 0x80000000U;
 }
 static inline u32 timer_pri_timeout_en_en_disabled_f(void)
 {
-	return 0x0;
+	return 0x0U;
 }
 static inline u32 timer_pri_timeout_save_0_r(void)
 {
-	return 0x00009084;
+	return 0x00009084U;
+}
+static inline u32 timer_pri_timeout_save_0_fecs_tgt_v(u32 r)
+{
+	return (r >> 31U) & 0x1U;
+}
+static inline u32 timer_pri_timeout_save_0_addr_v(u32 r)
+{
+	return (r >> 2U) & 0x3fffffU;
+}
+static inline u32 timer_pri_timeout_save_0_write_v(u32 r)
+{
+	return (r >> 1U) & 0x1U;
 }
 static inline u32 timer_pri_timeout_save_1_r(void)
 {
-	return 0x00009088;
+	return 0x00009088U;
 }
 static inline u32 timer_pri_timeout_fecs_errcode_r(void)
 {
-	return 0x0000908c;
+	return 0x0000908cU;
 }
 static inline u32 timer_time_0_r(void)
 {
-	return 0x00009400;
+	return 0x00009400U;
 }
 static inline u32 timer_time_1_r(void)
 {
-	return 0x00009410;
+	return 0x00009410U;
 }
 #endif

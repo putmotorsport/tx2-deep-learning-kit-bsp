@@ -1,17 +1,23 @@
 /*
- * Copyright (c) 2014-2015, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2014-2017, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 /*
  * Function naming determines intended use:
@@ -52,130 +58,130 @@
 
 static inline u32 flush_l2_system_invalidate_r(void)
 {
-	return 0x00070004;
+	return 0x00070004U;
 }
 static inline u32 flush_l2_system_invalidate_pending_v(u32 r)
 {
-	return (r >> 0) & 0x1;
+	return (r >> 0U) & 0x1U;
 }
 static inline u32 flush_l2_system_invalidate_pending_busy_v(void)
 {
-	return 0x00000001;
+	return 0x00000001U;
 }
 static inline u32 flush_l2_system_invalidate_pending_busy_f(void)
 {
-	return 0x1;
+	return 0x1U;
 }
 static inline u32 flush_l2_system_invalidate_outstanding_v(u32 r)
 {
-	return (r >> 1) & 0x1;
+	return (r >> 1U) & 0x1U;
 }
 static inline u32 flush_l2_system_invalidate_outstanding_true_v(void)
 {
-	return 0x00000001;
+	return 0x00000001U;
 }
 static inline u32 flush_l2_flush_dirty_r(void)
 {
-	return 0x00070010;
+	return 0x00070010U;
 }
 static inline u32 flush_l2_flush_dirty_pending_v(u32 r)
 {
-	return (r >> 0) & 0x1;
+	return (r >> 0U) & 0x1U;
 }
 static inline u32 flush_l2_flush_dirty_pending_empty_v(void)
 {
-	return 0x00000000;
+	return 0x00000000U;
 }
 static inline u32 flush_l2_flush_dirty_pending_empty_f(void)
 {
-	return 0x0;
+	return 0x0U;
 }
 static inline u32 flush_l2_flush_dirty_pending_busy_v(void)
 {
-	return 0x00000001;
+	return 0x00000001U;
 }
 static inline u32 flush_l2_flush_dirty_pending_busy_f(void)
 {
-	return 0x1;
+	return 0x1U;
 }
 static inline u32 flush_l2_flush_dirty_outstanding_v(u32 r)
 {
-	return (r >> 1) & 0x1;
+	return (r >> 1U) & 0x1U;
 }
 static inline u32 flush_l2_flush_dirty_outstanding_false_v(void)
 {
-	return 0x00000000;
+	return 0x00000000U;
 }
 static inline u32 flush_l2_flush_dirty_outstanding_false_f(void)
 {
-	return 0x0;
+	return 0x0U;
 }
 static inline u32 flush_l2_flush_dirty_outstanding_true_v(void)
 {
-	return 0x00000001;
+	return 0x00000001U;
 }
 static inline u32 flush_l2_clean_comptags_r(void)
 {
-	return 0x0007000c;
+	return 0x0007000cU;
 }
 static inline u32 flush_l2_clean_comptags_pending_v(u32 r)
 {
-	return (r >> 0) & 0x1;
+	return (r >> 0U) & 0x1U;
 }
 static inline u32 flush_l2_clean_comptags_pending_empty_v(void)
 {
-	return 0x00000000;
+	return 0x00000000U;
 }
 static inline u32 flush_l2_clean_comptags_pending_empty_f(void)
 {
-	return 0x0;
+	return 0x0U;
 }
 static inline u32 flush_l2_clean_comptags_pending_busy_v(void)
 {
-	return 0x00000001;
+	return 0x00000001U;
 }
 static inline u32 flush_l2_clean_comptags_pending_busy_f(void)
 {
-	return 0x1;
+	return 0x1U;
 }
 static inline u32 flush_l2_clean_comptags_outstanding_v(u32 r)
 {
-	return (r >> 1) & 0x1;
+	return (r >> 1U) & 0x1U;
 }
 static inline u32 flush_l2_clean_comptags_outstanding_false_v(void)
 {
-	return 0x00000000;
+	return 0x00000000U;
 }
 static inline u32 flush_l2_clean_comptags_outstanding_false_f(void)
 {
-	return 0x0;
+	return 0x0U;
 }
 static inline u32 flush_l2_clean_comptags_outstanding_true_v(void)
 {
-	return 0x00000001;
+	return 0x00000001U;
 }
 static inline u32 flush_fb_flush_r(void)
 {
-	return 0x00070000;
+	return 0x00070000U;
 }
 static inline u32 flush_fb_flush_pending_v(u32 r)
 {
-	return (r >> 0) & 0x1;
+	return (r >> 0U) & 0x1U;
 }
 static inline u32 flush_fb_flush_pending_busy_v(void)
 {
-	return 0x00000001;
+	return 0x00000001U;
 }
 static inline u32 flush_fb_flush_pending_busy_f(void)
 {
-	return 0x1;
+	return 0x1U;
 }
 static inline u32 flush_fb_flush_outstanding_v(u32 r)
 {
-	return (r >> 1) & 0x1;
+	return (r >> 1U) & 0x1U;
 }
 static inline u32 flush_fb_flush_outstanding_true_v(void)
 {
-	return 0x00000001;
+	return 0x00000001U;
 }
 #endif

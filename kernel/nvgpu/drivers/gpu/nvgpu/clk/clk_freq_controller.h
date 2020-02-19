@@ -1,19 +1,29 @@
 /*
-* Copyright (c) 2016, NVIDIA CORPORATION.  All rights reserved.
+* Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
 *
-* This program is free software; you can redistribute it and/or modify it
-* under the terms and conditions of the GNU General Public License,
-* version 2, as published by the Free Software Foundation.
-*
-* This program is distributed in the hope it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-* more details.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef _CLK_FREQ_CONTROLLER_H_
-#define _CLK_FREQ_CONTROLLER_H_
+#ifndef NVGPU_CLK_FREQ_CONTROLLER_H
+#define NVGPU_CLK_FREQ_CONTROLLER_H
 
+#define CTRL_CLK_CLK_FREQ_CONTROLLER_ID_ALL  0xFF
 #define CTRL_CLK_CLK_FREQ_CONTROLLER_ID_SYS  0x00
 #define CTRL_CLK_CLK_FREQ_CONTROLLER_ID_LTC  0x01
 #define CTRL_CLK_CLK_FREQ_CONTROLLER_ID_XBAR 0x02
@@ -68,7 +78,7 @@ struct clk_freq_controllers {
 	void *pprereq_load;
 };
 
-u32 clk_freq_controller_sw_setup(struct gk20a *g);
-u32 clk_freq_controller_pmu_setup(struct gk20a *g);
+int clk_freq_controller_sw_setup(struct gk20a *g);
+int clk_freq_controller_pmu_setup(struct gk20a *g);
 
-#endif
+#endif /* NVGPU_CLK_FREQ_CONTROLLER_H */

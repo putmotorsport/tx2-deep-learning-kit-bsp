@@ -16,6 +16,7 @@
 #include "tegra186-quill-common.dtsi"
 #include "tegra186-quill-p3310-1000-a00-powermon.dtsi"
 #include "tegra186-quill-thermal.dtsi"
+#include "tegra186-quill-tskin-feature.dtsi"
 
 #define EXTCON_NONE		0
 #define EXTCON_USB             1
@@ -30,10 +31,7 @@
 
 	pmc@c360000 {
 		nvidia,restrict-voltage-switch;
-		pinctrl-names = "default";
-		pinctrl-0 = <&iopad_default>;
-
-		iopad_default: iopad-defaults {
+		iopad-defaults {
 			sdmmc-io-pads {
 				pins = "sdmmc1-hv", "sdmmc2-hv", "sdmmc3-hv";
 				nvidia,enable-voltage-switching;
@@ -47,6 +45,14 @@
 
 	spi@3240000 {
 		status = "okay";
+		spi@0 {
+			compatible = "spidev";
+			reg = <0x0>;
+			spi-max-frequency = <33000000>;
+			nvidia,enable-hw-based-cs;
+			nvidia,rx-clk-tap-delay = <0x8>;
+			nvidia,tx-clk-tap-delay = <0x16>;
+		};
 	};
 
 	gpio@2200000 {
@@ -95,7 +101,6 @@
 						    0x1 0x2
 						    0x2 0x1>;
 			gpios = <&tegra_main_gpio TEGRA_MAIN_GPIO(X, 7) 0 &spmic 0 0>;
-			extcon-gpio,out-cable-name-strings = "USB", "USB-Host";
 			extcon-gpio,out-cable-names = <EXTCON_USB EXTCON_USB_Host EXTCON_NONE>;
 			wakeup-source;
 			#extcon-cells = <1>;
@@ -103,11 +108,12 @@
 	};
 
 	sdhci@3440000 {
+		/delete-property/ iommus;
 		status = "okay";
 	};
 
 	nvdumper {
-		status = "okay";
+		status = "disabled";
 	};
 };
 

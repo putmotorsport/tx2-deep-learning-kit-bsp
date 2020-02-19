@@ -1,18 +1,27 @@
 /*
-* Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
+* Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
 *
-* This program is free software; you can redistribute it and/or modify it
-* under the terms and conditions of the GNU General Public License,
-* version 2, as published by the Free Software Foundation.
-*
-* This program is distributed in the hope it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-* more details.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef _CLKVIN_H_
-#define _CLKVIN_H_
+#ifndef NVGPU_CLK_VIN_H
+#define NVGPU_CLK_VIN_H
 
 #include "boardobj/boardobj.h"
 #include "boardobj/boardobjgrp.h"
@@ -35,11 +44,19 @@ struct vin_device {
 	u8 id;
 	u8 volt_domain;
 	u8 volt_domain_vbios;
-	u32 slope;
-	u32 intercept;
 	u32 flls_shared_mask;
 
 	vin_device_state_load  *state_load;
+};
+
+struct vin_device_v10 {
+	struct vin_device super;
+	struct ctrl_clk_vin_device_info_data_v10 data;
+};
+
+struct vin_device_v20 {
+	struct vin_device super;
+	struct ctrl_clk_vin_device_info_data_v20 data;
 };
 
 /* get vin device object from descriptor table index*/
@@ -50,7 +67,13 @@ struct vin_device {
 boardobj_construct construct_vindevice;
 boardobj_pmudatainit vindeviceinit_pmudata_super;
 
-u32 clk_vin_sw_setup(struct gk20a *g);
-u32 clk_vin_pmu_setup(struct gk20a *g);
+int clk_vin_sw_setup(struct gk20a *g);
+int clk_vin_pmu_setup(struct gk20a *g);
+u32 clk_avfs_get_vin_cal_fuse_v10(struct gk20a *g,
+					struct avfsvinobjs *pvinobjs,
+					struct vin_device_v20 *pvindev);
+u32 clk_avfs_get_vin_cal_fuse_v20(struct gk20a *g,
+					struct avfsvinobjs *pvinobjs,
+					struct vin_device_v20 *pvindev);
 
-#endif
+#endif /* NVGPU_CLK_VIN_H */

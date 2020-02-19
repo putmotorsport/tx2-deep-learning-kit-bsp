@@ -1,26 +1,34 @@
 /*
- * Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 
 #include <nvgpu/bios.h>
+#include <nvgpu/gk20a.h>
 
-#include "gk20a/gk20a.h"
 #include "pwrdev.h"
 #include "boardobj/boardobjgrp.h"
 #include "boardobj/boardobjgrp_e32.h"
-#include "gm206/bios_gm206.h"
-#include "gk20a/pmu_gk20a.h"
+#include "gp106/bios_gp106.h"
 
-static u32 _pwr_channel_pmudata_instget(struct gk20a *g,
+static int _pwr_channel_pmudata_instget(struct gk20a *g,
 			struct nv_pmu_boardobjgrp *pmuboardobjgrp,
 			struct nv_pmu_boardobj **ppboardobjpmudata,
 			u8 idx)
@@ -28,12 +36,13 @@ static u32 _pwr_channel_pmudata_instget(struct gk20a *g,
 	struct nv_pmu_pmgr_pwr_channel_desc *ppmgrchannel =
 		(struct nv_pmu_pmgr_pwr_channel_desc *)pmuboardobjgrp;
 
-	gk20a_dbg_info("");
+	nvgpu_log_info(g, " ");
 
 	/*check whether pmuboardobjgrp has a valid boardobj in index*/
 	if (((u32)BIT(idx) &
-		ppmgrchannel->hdr.data.super.obj_mask.super.data[0]) == 0)
+		ppmgrchannel->hdr.data.super.obj_mask.super.data[0]) == 0U) {
 		return -EINVAL;
+	}
 
 	*ppboardobjpmudata = (struct nv_pmu_boardobj *)
 		&ppmgrchannel->channels[idx].data.board_obj;
@@ -41,12 +50,12 @@ static u32 _pwr_channel_pmudata_instget(struct gk20a *g,
 	/* handle Global/common data here as we need index */
 	ppmgrchannel->channels[idx].data.pwr_channel.ch_idx = idx;
 
-	gk20a_dbg_info(" Done");
+	nvgpu_log_info(g, " Done");
 
 	return 0;
 }
 
-static u32 _pwr_channel_rels_pmudata_instget(struct gk20a *g,
+static int _pwr_channel_rels_pmudata_instget(struct gk20a *g,
 			struct nv_pmu_boardobjgrp *pmuboardobjgrp,
 			struct nv_pmu_boardobj **ppboardobjpmudata,
 			u8 idx)
@@ -54,17 +63,18 @@ static u32 _pwr_channel_rels_pmudata_instget(struct gk20a *g,
 	struct nv_pmu_pmgr_pwr_chrelationship_desc *ppmgrchrels =
 		(struct nv_pmu_pmgr_pwr_chrelationship_desc *)pmuboardobjgrp;
 
-	gk20a_dbg_info("");
+	nvgpu_log_info(g, " ");
 
 	/*check whether pmuboardobjgrp has a valid boardobj in index*/
 	if (((u32)BIT(idx) &
-		ppmgrchrels->hdr.data.super.obj_mask.super.data[0]) == 0)
+		ppmgrchrels->hdr.data.super.obj_mask.super.data[0]) == 0U) {
 		return -EINVAL;
+	}
 
 	*ppboardobjpmudata = (struct nv_pmu_boardobj *)
 		&ppmgrchrels->ch_rels[idx].data.board_obj;
 
-	gk20a_dbg_info(" Done");
+	nvgpu_log_info(g, " Done");
 
 	return 0;
 }
@@ -80,7 +90,7 @@ static u32 _pwr_channel_state_init(struct gk20a *g)
 	BOARDOBJGRP_FOR_EACH_INDEX_IN_MASK(32, indx, objmask) {
 		pchannel = PMGR_PWR_MONITOR_GET_PWR_CHANNEL(g, indx);
 		if (pchannel == NULL) {
-			gk20a_err(dev_from_gk20a(g),
+			nvgpu_err(g,
 				"PMGR_PWR_MONITOR_GET_PWR_CHANNEL-failed %d", indx);
 			return -EINVAL;
 		}
@@ -97,17 +107,17 @@ static bool _pwr_channel_implements(struct pwr_channel *pchannel,
 	return (type == BOARDOBJ_GET_TYPE(pchannel));
 }
 
-static u32 _pwr_domains_pmudatainit_sensor(struct gk20a *g,
+static int _pwr_domains_pmudatainit_sensor(struct gk20a *g,
 					struct boardobj *board_obj_ptr,
 					struct nv_pmu_boardobj *ppmudata)
 {
 	struct nv_pmu_pmgr_pwr_channel_sensor *pmu_sensor_data;
 	struct pwr_channel_sensor *sensor;
-	u32 status = 0;
+	int status = 0;
 
 	status = boardobj_pmudatainit_super(g, board_obj_ptr, ppmudata);
 	if (status) {
-		gk20a_err(dev_from_gk20a(g),
+		nvgpu_err(g,
 			  "error updating pmu boardobjgrp for pwr sensor 0x%x",
 			  status);
 		goto done;
@@ -136,14 +146,15 @@ static struct boardobj *construct_pwr_topology(struct gk20a *g,
 				void *pargs, u16 pargs_size, u8 type)
 {
 	struct boardobj *board_obj_ptr = NULL;
-	u32 status;
+	int status;
 	struct pwr_channel_sensor *pwrchannel;
 	struct pwr_channel_sensor *sensor = (struct pwr_channel_sensor*)pargs;
 
 	status = boardobj_construct_super(g, &board_obj_ptr,
 		pargs_size, pargs);
-	if (status)
+	if (status) {
 		return NULL;
+	}
 
 	pwrchannel = (struct pwr_channel_sensor*)board_obj_ptr;
 
@@ -161,15 +172,15 @@ static struct boardobj *construct_pwr_topology(struct gk20a *g,
 	pwrchannel->pwr_dev_idx = sensor->pwr_dev_idx;
 	pwrchannel->pwr_dev_prov_idx = sensor->pwr_dev_prov_idx;
 
-	gk20a_dbg_info(" Done");
+	nvgpu_log_info(g, " Done");
 
 	return board_obj_ptr;
 }
 
-static u32 devinit_get_pwr_topology_table(struct gk20a *g,
+static int devinit_get_pwr_topology_table(struct gk20a *g,
 				struct pmgr_pwr_monitor *ppwrmonitorobjs)
 {
-	u32 status = 0;
+	int status = 0;
 	u8 *pwr_topology_table_ptr = NULL;
 	u8 *curr_pwr_topology_table_ptr = NULL;
 	struct boardobj *boardobj;
@@ -184,7 +195,7 @@ static u32 devinit_get_pwr_topology_table(struct gk20a *g,
 		struct pwr_channel_sensor sensor;
 	} pwr_topology_data;
 
-	gk20a_dbg_info("");
+	nvgpu_log_info(g, " ");
 
 	pwr_topology_table_ptr = (u8 *)nvgpu_bios_get_perf_table_ptrs(g,
 			g->bios.perf_token, POWER_TOPOLOGY_TABLE);
@@ -230,7 +241,7 @@ static u32 devinit_get_pwr_topology_table(struct gk20a *g,
 
 		memcpy(&pwr_topology_table_entry.param0,
 			(curr_pwr_topology_table_ptr + 2),
-			(VBIOS_POWER_TOPOLOGY_2X_ENTRY_SIZE_16 - 2));
+			(VBIOS_POWER_TOPOLOGY_2X_ENTRY_SIZE_16 - 2U));
 
 		class_type = (u8)BIOS_GET_FIELD(
 			pwr_topology_table_entry.flags0,
@@ -245,8 +256,9 @@ static u32 devinit_get_pwr_topology_table(struct gk20a *g,
 				NV_VBIOS_POWER_TOPOLOGY_2X_ENTRY_PARAM1_SENSOR_PROVIDER_INDEX);
 
 			pwr_topology_size = sizeof(struct pwr_channel_sensor);
-		} else
+		} else {
 			continue;
+		}
 
 		/* Initialize data for the parent class */
 		pwr_topology_data.boardobj.type = CTRL_PMGR_PWR_CHANNEL_TYPE_SENSOR;
@@ -263,7 +275,7 @@ static u32 devinit_get_pwr_topology_table(struct gk20a *g,
 					pwr_topology_size, pwr_topology_data.boardobj.type);
 
 		if (!boardobj) {
-			gk20a_err(dev_from_gk20a(g),
+			nvgpu_err(g,
 				"unable to create pwr topology for %d type %d",
 				index, pwr_topology_data.boardobj.type);
 			status = -EINVAL;
@@ -274,7 +286,7 @@ static u32 devinit_get_pwr_topology_table(struct gk20a *g,
 				boardobj, obj_index);
 
 		if (status) {
-			gk20a_err(dev_from_gk20a(g),
+			nvgpu_err(g,
 				"unable to insert pwr topology boardobj for %d", index);
 			status = -EINVAL;
 			goto done;
@@ -284,23 +296,23 @@ static u32 devinit_get_pwr_topology_table(struct gk20a *g,
 	}
 
 done:
-	gk20a_dbg_info(" done status %x", status);
+	nvgpu_log_info(g, " done status %x", status);
 	return status;
 }
 
-u32 pmgr_monitor_sw_setup(struct gk20a *g)
+int pmgr_monitor_sw_setup(struct gk20a *g)
 {
-	u32 status;
+	int status;
 	struct boardobjgrp *pboardobjgrp = NULL;
 	struct pwr_channel *pchannel;
 	struct pmgr_pwr_monitor *ppwrmonitorobjs;
 	u8 indx = 0;
 
 	/* Construct the Super Class and override the Interfaces */
-	status = boardobjgrpconstruct_e32(
-		&g->pmgr_pmu.pmgr_monitorobjs.pwr_channels);
+	status = boardobjgrpconstruct_e32(g,
+			&g->pmgr_pmu.pmgr_monitorobjs.pwr_channels);
 	if (status) {
-		gk20a_err(dev_from_gk20a(g),
+		nvgpu_err(g,
 			"error creating boardobjgrp for pmgr channel, status - 0x%x",
 			status);
 		goto done;
@@ -312,10 +324,10 @@ u32 pmgr_monitor_sw_setup(struct gk20a *g)
 	pboardobjgrp->pmudatainstget = _pwr_channel_pmudata_instget;
 
 	/* Construct the Super Class and override the Interfaces */
-	status = boardobjgrpconstruct_e32(
+	status = boardobjgrpconstruct_e32(g,
 			&g->pmgr_pmu.pmgr_monitorobjs.pwr_ch_rels);
 	if (status) {
-		gk20a_err(dev_from_gk20a(g),
+		nvgpu_err(g,
 			"error creating boardobjgrp for pmgr channel relationship, status - 0x%x",
 			status);
 		goto done;
@@ -337,12 +349,14 @@ u32 pmgr_monitor_sw_setup(struct gk20a *g)
 	ppwrmonitorobjs = &(g->pmgr_pmu.pmgr_monitorobjs);
 
 	status = devinit_get_pwr_topology_table(g, ppwrmonitorobjs);
-	if (status)
+	if (status) {
 		goto done;
+	}
 
 	status = _pwr_channel_state_init(g);
-	if (status)
+	if (status) {
 		goto done;
+	}
 
 	/* Initialise physicalChannelMask */
 	g->pmgr_pmu.pmgr_monitorobjs.physical_channel_mask = 0;
@@ -357,6 +371,6 @@ u32 pmgr_monitor_sw_setup(struct gk20a *g)
 	}
 
 done:
-	gk20a_dbg_info(" done status %x", status);
+	nvgpu_log_info(g, " done status %x", status);
 	return status;
 }

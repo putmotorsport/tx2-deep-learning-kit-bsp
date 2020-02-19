@@ -1,18 +1,27 @@
 /*
-* Copyright (c) 2016-2017, NVIDIA CORPORATION.  All rights reserved.
+* Copyright (c) 2016-2018, NVIDIA CORPORATION.  All rights reserved.
 *
-* This program is free software; you can redistribute it and/or modify it
-* under the terms and conditions of the GNU General Public License,
-* version 2, as published by the Free Software Foundation.
-*
-* This program is distributed in the hope it will be useful, but WITHOUT
-* ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-* FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-* more details.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
 */
 
-#ifndef _GPMUIFPMGR_H_
-#define _GPMUIFPMGR_H_
+#ifndef NVGPU_PMUIF_GPMUIFPMGR_H
+#define NVGPU_PMUIF_GPMUIFPMGR_H
 
 #include "ctrl/ctrlpmgr.h"
 #include "gpmuifboardobj.h"
@@ -26,7 +35,7 @@ struct nv_pmu_pmgr_i2c_device_desc {
 	u8 i2c_port;
 };
 
-#define NV_PMU_PMGR_I2C_DEVICE_DESC_TABLE_MAX_DEVICES                      (32)
+#define NV_PMU_PMGR_I2C_DEVICE_DESC_TABLE_MAX_DEVICES              (32U)
 
 struct nv_pmu_pmgr_i2c_device_desc_table {
 	u32 dev_mask;
@@ -39,7 +48,7 @@ struct nv_pmu_pmgr_pwr_device_desc {
 	u32 power_corr_factor;
 };
 
-#define NV_PMU_PMGR_PWR_DEVICE_INA3221_CH_NUM                              0x03
+#define NV_PMU_PMGR_PWR_DEVICE_INA3221_CH_NUM                      0x03U
 
 struct nv_pmu_pmgr_pwr_device_desc_ina3221 {
 	struct nv_pmu_pmgr_pwr_device_desc super;
@@ -96,9 +105,9 @@ struct nv_pmu_pmgr_pwr_channel {
 	u32 dependent_ch_mask;
 };
 
-#define NV_PMU_PMGR_PWR_CHANNEL_MAX_CHANNELS                                  16
+#define NV_PMU_PMGR_PWR_CHANNEL_MAX_CHANNELS                       16U
 
-#define NV_PMU_PMGR_PWR_CHANNEL_MAX_CHRELATIONSHIPS                           16
+#define NV_PMU_PMGR_PWR_CHANNEL_MAX_CHRELATIONSHIPS                16U
 
 struct nv_pmu_pmgr_pwr_channel_sensor {
 	struct nv_pmu_pmgr_pwr_channel super;
@@ -117,7 +126,7 @@ union nv_pmu_pmgr_pwr_channel_union {
 	struct nv_pmu_pmgr_pwr_channel_pmu_compactible pmu_pwr_channel;
 };
 
-#define NV_PMU_PMGR_PWR_MONITOR_TYPE_NO_POLLING                             0x02
+#define NV_PMU_PMGR_PWR_MONITOR_TYPE_NO_POLLING                    0x02U
 
 struct nv_pmu_pmgr_pwr_monitor_pstate {
 	u32 hw_channel_mask;
@@ -184,9 +193,9 @@ struct nv_pmu_pmgr_pwr_monitor_pack {
 	struct nv_pmu_pmgr_pwr_chrelationship_desc ch_rels;
 };
 
-#define NV_PMU_PMGR_PWR_POLICY_MAX_POLICIES                                   32
+#define NV_PMU_PMGR_PWR_POLICY_MAX_POLICIES                        32U
 
-#define NV_PMU_PMGR_PWR_POLICY_MAX_POLICY_RELATIONSHIPS                       32
+#define NV_PMU_PMGR_PWR_POLICY_MAX_POLICY_RELATIONSHIPS            32U
 
 struct nv_pmu_pmgr_pwr_policy {
 	struct nv_pmu_boardobj super;
@@ -249,21 +258,21 @@ union nv_pmu_pmgr_pwr_violation_union {
 	struct nv_pmu_pmgr_pwr_violation_pmu_compactible violation;
 };
 
-#define NV_PMU_PMGR_PWR_POLICY_DESC_TABLE_VERSION_3X                    0x30
+#define NV_PMU_PMGR_PWR_POLICY_DESC_TABLE_VERSION_3X               0x30U
 
 NV_PMU_MAKE_ALIGNED_UNION(nv_pmu_pmgr_pwr_policy_union,
 		sizeof(union nv_pmu_pmgr_pwr_policy_union));
 NV_PMU_MAKE_ALIGNED_UNION(nv_pmu_pmgr_pwr_policy_relationship_union,
 		sizeof(union nv_pmu_pmgr_pwr_policy_relationship_union));
 
-#define NV_PMU_PERF_DOMAIN_GROUP_MAX_GROUPS 2
+#define NV_PMU_PERF_DOMAIN_GROUP_MAX_GROUPS 2U
 
 struct nv_pmu_perf_domain_group_limits
 {
 	u32 values[NV_PMU_PERF_DOMAIN_GROUP_MAX_GROUPS];
 } ;
 
-#define NV_PMU_PMGR_RESERVED_PWR_POLICY_MASK_COUNT                    0x6
+#define NV_PMU_PMGR_RESERVED_PWR_POLICY_MASK_COUNT                 0x6U
 
 struct nv_pmu_pmgr_pwr_policy_desc_header {
 	struct nv_pmu_boardobjgrp_e32 super;
@@ -329,15 +338,15 @@ struct nv_pmu_pmgr_pwr_policy_pack {
 	struct nv_pmu_pmgr_pwr_violation_desc violations;
 };
 
-#define NV_PMU_PMGR_CMD_ID_SET_OBJECT                              (0x00000000)
+#define NV_PMU_PMGR_CMD_ID_SET_OBJECT                              (0x00000000U)
 
-#define NV_PMU_PMGR_MSG_ID_QUERY                                   (0x00000002)
+#define NV_PMU_PMGR_MSG_ID_QUERY                                   (0x00000002U)
 
-#define NV_PMU_PMGR_CMD_ID_PWR_DEVICES_QUERY                       (0x00000001)
+#define NV_PMU_PMGR_CMD_ID_PWR_DEVICES_QUERY                       (0x00000001U)
 
-#define NV_PMU_PMGR_CMD_ID_LOAD                                    (0x00000006)
+#define NV_PMU_PMGR_CMD_ID_LOAD                                    (0x00000006U)
 
-#define NV_PMU_PMGR_CMD_ID_UNLOAD                                  (0x00000007)
+#define NV_PMU_PMGR_CMD_ID_UNLOAD                                  (0x00000007U)
 
 struct nv_pmu_pmgr_cmd_set_object {
 	u8 cmd_type;
@@ -346,15 +355,15 @@ struct nv_pmu_pmgr_cmd_set_object {
 	struct nv_pmu_allocation object;
 };
 
-#define NV_PMU_PMGR_SET_OBJECT_ALLOC_OFFSET                              (0x04)
+#define NV_PMU_PMGR_SET_OBJECT_ALLOC_OFFSET                        (0x04U)
 
-#define NV_PMU_PMGR_OBJECT_I2C_DEVICE_DESC_TABLE                   (0x00000000)
+#define NV_PMU_PMGR_OBJECT_I2C_DEVICE_DESC_TABLE                   (0x00000000U)
 
-#define NV_PMU_PMGR_OBJECT_PWR_DEVICE_DESC_TABLE                   (0x00000001)
+#define NV_PMU_PMGR_OBJECT_PWR_DEVICE_DESC_TABLE                   (0x00000001U)
 
-#define NV_PMU_PMGR_OBJECT_PWR_MONITOR                             (0x00000002)
+#define NV_PMU_PMGR_OBJECT_PWR_MONITOR                             (0x00000002U)
 
-#define NV_PMU_PMGR_OBJECT_PWR_POLICY                              (0x00000005)
+#define NV_PMU_PMGR_OBJECT_PWR_POLICY                              (0x00000005U)
 
 struct nv_pmu_pmgr_pwr_devices_query_payload {
 	struct {
@@ -371,7 +380,7 @@ struct nv_pmu_pmgr_cmd_pwr_devices_query {
 	struct nv_pmu_allocation payload;
 };
 
-#define NV_PMU_PMGR_PWR_DEVICES_QUERY_ALLOC_OFFSET                        (0x08)
+#define NV_PMU_PMGR_PWR_DEVICES_QUERY_ALLOC_OFFSET                 (0x08U)
 
 struct nv_pmu_pmgr_cmd_load {
 	u8 cmd_type;
@@ -391,11 +400,11 @@ struct nv_pmu_pmgr_cmd {
 	};
 };
 
-#define NV_PMU_PMGR_MSG_ID_SET_OBJECT                              (0x00000000)
+#define NV_PMU_PMGR_MSG_ID_SET_OBJECT                              (0x00000000U)
 
-#define NV_PMU_PMGR_MSG_ID_LOAD                                    (0x00000004)
+#define NV_PMU_PMGR_MSG_ID_LOAD                                    (0x00000004U)
 
-#define NV_PMU_PMGR_MSG_ID_UNLOAD                                  (0x00000005)
+#define NV_PMU_PMGR_MSG_ID_UNLOAD                                  (0x00000005U)
 
 struct nv_pmu_pmgr_msg_set_object {
 	u8 msg_type;
@@ -431,4 +440,4 @@ struct nv_pmu_pmgr_msg {
 	};
 };
 
-#endif
+#endif /* NVGPU_PMUIF_GPMUIFPMGR_H */

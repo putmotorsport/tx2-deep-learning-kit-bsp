@@ -1,30 +1,44 @@
 /*
- * Copyright (c) 2017, NVIDIA CORPORATION.  All rights reserved.
+ * Copyright (c) 2017-2018, NVIDIA CORPORATION.  All rights reserved.
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
  *
- * This program is distributed in the hope it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
- * more details.
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef __NVGPU_KMEM_H__
-#define __NVGPU_KMEM_H__
+#ifndef NVGPU_KMEM_H
+#define NVGPU_KMEM_H
 
-/*
- * Incase this isn't defined already.
- */
-#ifndef _THIS_IP_
-#define _THIS_IP_  ({ __label__ __here; __here: (unsigned long)&&__here; })
-#endif
+#include <nvgpu/types.h>
+#include <nvgpu/utils.h>
 
 struct gk20a;
+
+/*
+ * When there's other implementations make sure they are included instead of
+ * Linux when not compiling on Linux!
+ */
+#ifdef __KERNEL__
+#include <nvgpu/linux/kmem.h>
+#elif defined(__NVGPU_POSIX__)
+#include <nvgpu/posix/kmem.h>
+#else
+#include <nvgpu_rmos/include/kmem.h>
+#endif
 
 /**
  * DOC: Kmem cache support
@@ -105,7 +119,7 @@ void nvgpu_kmem_cache_free(struct nvgpu_kmem_cache *cache, void *ptr);
  *
  * This function may sleep so cannot be used in IRQs.
  */
-#define nvgpu_kmalloc(g, size)		__nvgpu_kmalloc(g, size, _THIS_IP_)
+#define nvgpu_kmalloc(g, size)		__nvgpu_kmalloc(g, size, _NVGPU_GET_IP_)
 
 /**
  * nvgpu_kzalloc - Allocate from the kernel's allocator.
@@ -116,7 +130,7 @@ void nvgpu_kmem_cache_free(struct nvgpu_kmem_cache *cache, void *ptr);
  * Identical to nvgpu_kalloc() except the memory will be zeroed before being
  * returned.
  */
-#define nvgpu_kzalloc(g, size)		__nvgpu_kzalloc(g, size, _THIS_IP_)
+#define nvgpu_kzalloc(g, size)		__nvgpu_kzalloc(g, size, _NVGPU_GET_IP_)
 
 /**
  * nvgpu_kcalloc - Allocate from the kernel's allocator.
@@ -128,7 +142,8 @@ void nvgpu_kmem_cache_free(struct nvgpu_kmem_cache *cache, void *ptr);
  * Identical to nvgpu_kalloc() except the size of the memory chunk returned is
  * @n * @size.
  */
-#define nvgpu_kcalloc(g, n, size)	__nvgpu_kcalloc(g, n, size, _THIS_IP_)
+#define nvgpu_kcalloc(g, n, size)	\
+	__nvgpu_kcalloc(g, n, size, _NVGPU_GET_IP_)
 
 /**
  * nvgpu_vmalloc - Allocate memory and return a map to it.
@@ -144,7 +159,7 @@ void nvgpu_kmem_cache_free(struct nvgpu_kmem_cache *cache, void *ptr);
  *
  * This function may sleep.
  */
-#define nvgpu_vmalloc(g, size)		__nvgpu_vmalloc(g, size, _THIS_IP_)
+#define nvgpu_vmalloc(g, size)		__nvgpu_vmalloc(g, size, _NVGPU_GET_IP_)
 
 /**
  * nvgpu_vzalloc - Allocate memory and return a map to it.
@@ -154,7 +169,7 @@ void nvgpu_kmem_cache_free(struct nvgpu_kmem_cache *cache, void *ptr);
  *
  * Identical to nvgpu_vmalloc() except this will return zero'ed memory.
  */
-#define nvgpu_vzalloc(g, size)		__nvgpu_vzalloc(g, size, _THIS_IP_)
+#define nvgpu_vzalloc(g, size)		__nvgpu_vzalloc(g, size, _NVGPU_GET_IP_)
 
 /**
  * nvgpu_kfree - Frees an alloc from nvgpu_kmalloc, nvgpu_kzalloc,
@@ -173,8 +188,8 @@ void nvgpu_kmem_cache_free(struct nvgpu_kmem_cache *cache, void *ptr);
  */
 #define nvgpu_vfree(g, addr)		__nvgpu_vfree(g, addr)
 
-#define kmem_dbg(fmt, args...)			\
-	gk20a_dbg(gpu_dbg_kmem, fmt, ##args)
+#define kmem_dbg(g, fmt, args...)		\
+	nvgpu_log(g, gpu_dbg_kmem, fmt, ##args)
 
 /**
  * nvgpu_kmem_init - Initialize the kmem tracking stuff.
@@ -215,29 +230,9 @@ void nvgpu_kmem_fini(struct gk20a *g, int flags);
 #define NVGPU_KMEM_FINI_BUG			(1 << 3)
 
 /*
- * When there's other implementations make sure they are included instead of
- * Linux when not compiling on Linux!
+ * Implemented by the OS interface.
  */
-#include <nvgpu/kmem_linux.h>
-
-static inline void *__nvgpu_big_alloc(struct gk20a *g, size_t size, bool clear)
-{
-	void *p;
-
-	if (size > PAGE_SIZE) {
-		if (clear)
-			p = nvgpu_vzalloc(g, size);
-		else
-			p = nvgpu_vmalloc(g, size);
-	} else {
-		if (clear)
-			p = nvgpu_kzalloc(g, size);
-		else
-			p = nvgpu_kmalloc(g, size);
-	}
-
-	return p;
-}
+void *__nvgpu_big_alloc(struct gk20a *g, size_t size, bool clear);
 
 /**
  * nvgpu_big_malloc - Pick virtual or physical alloc based on @size
@@ -285,17 +280,6 @@ static inline void *nvgpu_big_zalloc(struct gk20a *g, size_t size)
  * @g - The GPU.
  * @p - A pointer allocated by nvgpu_big_zalloc() or nvgpu_big_malloc().
  */
-static inline void nvgpu_big_free(struct gk20a *g, void *p)
-{
-	/*
-	 * This will have to be fixed eventually. Allocs that use
-	 * nvgpu_big_[mz]alloc() will need to remember the size of the alloc
-	 * when freeing.
-	 */
-	if (virt_addr_valid(p))
-		nvgpu_kfree(g, p);
-	else
-		nvgpu_vfree(g, p);
-}
+void nvgpu_big_free(struct gk20a *g, void *p);
 
-#endif /* __NVGPU_KMEM_H__ */
+#endif /* NVGPU_KMEM_H */
