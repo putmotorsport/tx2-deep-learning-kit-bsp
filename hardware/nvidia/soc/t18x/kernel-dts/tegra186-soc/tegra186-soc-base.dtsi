@@ -516,10 +516,16 @@
 
 		ports {
 			usb2-0 {
-				status = "disabled";
+				status = "okay";
+				mode = "otg";
+				vbus-supply = <&vdd_5v_fixed>;
+				nvidia,oc-pin = <0>;
 			};
 			usb2-1 {
-				status = "disabled";
+				status = "okay";
+				mode = "host";
+				vbus-supply = <&vdd_5v_fixed>;
+				nvidia,oc-pin = <1>;
 			};
 			usb2-2 {
 				status = "disabled";
@@ -528,7 +534,8 @@
 				status = "disabled";
 			};
 			usb3-1 {
-				status = "disabled";
+				nvidia,usb2-companion = <1>;
+            	status = "okay";
 			};
 			usb3-2 {
 				status = "disabled";
