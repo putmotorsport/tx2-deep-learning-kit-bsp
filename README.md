@@ -1,7 +1,7 @@
 # Work notes
 
-## known bugs
-- [X] <s>USB not working</s>
+## Known issues
+- [X] <s>USB not working</s> - fixed 21.03.2020
 - [ ] GPU not working
 - [ ] no OV5640 camera driver
 
