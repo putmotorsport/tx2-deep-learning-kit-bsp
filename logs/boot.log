@@ -1,0 +1,428 @@
+Type [C-a] [C-h] to see available commands
+
+Terminal ready
+[0000.201] I> Welcome to MB2(TBoot-BPMP)(version: 01.00.160913-t186-M-00.00-mobile-7d3edb9d)
+[0000.209] I> bit @ 0xd480000
+[0000.212] I> Boot-device: eMMC
+[0000.220] I> sdmmc bdev is already initialized
+[0000.224] I> pmic: reset reason (nverc)	: 0x0
+[0000.256] I> Found 18 partitions in SDMMC_BOOT (instance 3)
+[0000.275] I> Found 33 partitions in SDMMC_USER (instance 3)
+[0000.281] W> No valid slot number is found in scratch register
+[0000.286] W> Return default slot: _a
+[0000.290] I> A/B: bin_type (16) slot 0
+[0000.293] I> Loading partition bpmp-fw at 0xd7800000
+[0000.298] I> Reading two headers - addr:0xd7800000 blocks:1
+[0000.304] I> Addr: 0xd7800000, start-block: 58777608, num_blocks: 1
+[0000.329] I> Binary(16) of size 533504 is loaded @ 0xd7800000
+[0000.334] W> No valid slot number is found in scratch register
+[0000.340] W> Return default slot: _a
+[0000.343] I> A/B: bin_type (17) slot 0
+[0000.347] I> Loading partition bpmp-fw-dtb at 0xd79f0000
+[0000.352] I> Reading two headers - addr:0xd79f0000 blocks:1
+[0000.358] I> Addr: 0xd79f0000, start-block: 58780024, num_blocks: 1
+[0000.381] I> Binary(17) of size 465840 is loaded @ 0xd798e200
+[0000.559] I> Loading SCE-FW ...
+[0000.562] W> No valid slot number is found in scratch register
+[0000.568] W> Return default slot: _a
+[0000.571] I> A/B: bin_type (12) slot 0
+[0000.575] I> Loading partition sce-fw at 0xd7300000
+[0000.580] I> Reading two headers - addr:0xd7300000 blocks:1
+[0000.585] I> Addr: 0xd7300000, start-block: 58784120, num_blocks: 1
+[0000.604] I> Binary(12) of size 125168 is loaded @ 0xd7300000
+[0000.610] I> Init SCE
+[0000.612] I> Loading APE-FW ...
+[0000.615] W> No valid slot number is found in scratch register
+[0000.621] W> Return default slot: _a
+[0000.625] I> A/B: bin_type (11) slot 0
+[0000.628] I> Loading partition adsp-fw at 0xd7400000
+[0000.633] I> Reading two headers - addr:0xd7400000 blocks:1
+[0000.638] I> Addr: 0xd7400000, start-block: 58761224, num_blocks: 1
+[0000.658] I> Binary(11) of size 107808 is loaded @ 0xd7400000
+[0000.664] I> Copy BTCM section
+[0000.666] W> No valid slot number is found in scratch register
+[0000.672] W> Return default slot: _a
+[0000.676] I> A/B: bin_type (13) slot 0
+[0000.679] I> Loading partition cpu-bootloader at 0x96000000
+[0000.685] I> Reading two headers - addr:0x96000000 blocks:1
+[0000.690] I> Addr: 0x96000000, start-block: 58740744, num_blocks: 1
+[0000.711] I> Binary(13) of size 283728 is loaded @ 0x96000000
+[0000.717] W> No valid slot number is found in scratch register
+[0000.723] W> Return default slot: _a
+[0000.726] I> A/B: bin_type (20) slot 0
+[0000.730] I> Loading partition bootloader-dtb at 0x8520f400
+[0000.735] I> Reading two headers - addr:0x8520f400 blocks:1
+[0000.741] I> Addr: 0x8520f400, start-block: 58742792, num_blocks: 1
+[0000.763] I> Binary(20) of size 372192 is loaded @ 0x8520f400
+[0000.769] W> No valid slot number is found in scratch register
+[0000.774] W> Return default slot: _a
+[0000.778] I> A/B: bin_type (14) slot 0
+[0000.781] I> Loading partition secure-os at 0x8530f600
+[0000.786] I> Reading two headers - addr:0x8530f600 blocks:1
+[0000.792] I> Addr: 0x8530f600, start-block: 58744840, num_blocks: 1
+[0000.813] I> Binary(14) of size 312752 is loaded @ 0x8530f600
+[0000.821] I> TOS boot-params @ 0x85000000
+[0000.825] I> TOS params prepared
+[0000.828] I> Loading EKS ...
+[0000.831] I> A/B: bin_type (15) slot 0
+[0000.834] I> Loading partition eks at 0x8590f800
+[0000.839] I> Reading two headers - addr:0x8590f800 blocks:1
+[0000.844] I> Addr: 0x8590f800, start-block: 58757128, num_blocks: 1
+[0000.863] I> Binary(15) of size 1040 is loaded @ 0x8590f800
+[0000.869] I> EKB detected (length: 0x400) @ 0x8590f800
+[0000.874] I> Copied encrypted keys
+[0000.877] I> boot profiler @ 0x275844000
+[0000.881] I> boot profiler for TOS @ 0x275844000
+[0000.886] I> Unhalting SCE
+[0000.889] I> Primary Memory Start:80000000 Size:70000000
+[0000.894] I> Extended Memory Start:f0110000 Size:1856f0000
+[0000.901] I> MB2(TBoot-BPMP) done
+
+NOTICE:  BL31: v1.3(release):23b153a63
+NOTICE:  BL31: Built : 22:43:09, Dec  9 2019
+ipc-unittest-main: 1519: Welcome to IPC unittest!!!
+ipc-unittest-main: 1531: waiting forever
+ipc-unittest-srv: 329: Init unittest services!!!
+keystore-demo: 141: Hello world from keystore-demo app
+keystore-demo: 207: main: EKB contents match expected value
+exit called, thread 0xffffffffea87ad58, name trusty_app_2_7d18fc60-e9fc-11e8
+platform_bootstrap_epilog: trusty bootstrap complete
+[0001.261] I> Welcome to Cboot
+[0001.264] I> Cboot Version: t186-c3c778fb
+[0001.268] I> CPU-BL Params @ 0x275800000
+[0001.272] I>  0) Base:0x00000000 Size:0x00000000
+[0001.276] I>  1) Base:0x277f00000 Size:0x00100000
+[0001.281] I>  2) Base:0x277e00000 Size:0x00100000
+[0001.285] I>  3) Base:0x277d00000 Size:0x00100000
+[0001.290] I>  4) Base:0x277c00000 Size:0x00100000
+[0001.294] I>  5) Base:0x277b00000 Size:0x00100000
+[0001.299] I>  6) Base:0x277800000 Size:0x00200000
+[0001.303] I>  7) Base:0x277400000 Size:0x00400000
+[0001.308] I>  8) Base:0x277a00000 Size:0x00100000
+[0001.312] I>  9) Base:0x277300000 Size:0x00100000
+[0001.317] I> 10) Base:0x276800000 Size:0x00800000
+[0001.321] I> 11) Base:0x30000000 Size:0x00040000
+[0001.326] I> 12) Base:0xf0000000 Size:0x00100000
+[0001.330] I> 13) Base:0x30040000 Size:0x00001000
+[0001.334] I> 14) Base:0x30048000 Size:0x00001000
+[0001.339] I> 15) Base:0x30049000 Size:0x00001000
+[0001.343] I> 16) Base:0x3004a000 Size:0x00001000
+[0001.348] I> 17) Base:0x3004b000 Size:0x00001000
+[0001.352] I> 18) Base:0x3004c000 Size:0x00001000
+[0001.357] I> 19) Base:0x3004d000 Size:0x00001000
+[0001.361] I> 20) Base:0x3004e000 Size:0x00001000
+[0001.365] I> 21) Base:0x3004f000 Size:0x00001000
+[0001.370] I> 22) Base:0x00000000 Size:0x00000000
+[0001.374] I> 23) Base:0xf0100000 Size:0x00010000
+[0001.379] I> 24) Base:0x00000000 Size:0x00000000
+[0001.383] I> 25) Base:0x00000000 Size:0x00000000
+[0001.388] I> 26) Base:0x00000000 Size:0x00000000
+[0001.392] I> 27) Base:0x00000000 Size:0x00000000
+[0001.396] I> 28) Base:0x84400000 Size:0x00400000
+[0001.401] I> 29) Base:0x30000000 Size:0x00010000
+[0001.405] I> 30) Base:0x278000000 Size:0x08000000
+[0001.410] I> 31) Base:0x00000000 Size:0x00000000
+[0001.414] I> 32) Base:0x276000000 Size:0x00600000
+[0001.419] I> 33) Base:0x80000000 Size:0x70000000
+[0001.423] I> 34) Base:0xf0110000 Size:0x1856f0000
+[0001.428] I> 35) Base:0x00000000 Size:0x00000000
+[0001.432] I> 36) Base:0x00000000 Size:0x00000000
+[0001.437] I> 37) Base:0x2772e0000 Size:0x00020000
+[0001.441] I> 38) Base:0x84000000 Size:0x00400000
+[0001.446] I> 39) Base:0x96000000 Size:0x02000000
+[0001.450] I> 40) Base:0x85000000 Size:0x01200000
+[0001.454] I> 41) Base:0x275800000 Size:0x00500000
+[0001.459] I> 42) Base:0x00000000 Size:0x00000000
+[0001.463] I> 43) Base:0x00000000 Size:0x00000000
+[0001.468] GIC-SPI Target CPU: 4
+
+[0001.471] Interrupts Init done
+
+[0001.474] calling constructors
+
+[0001.478] initializing heap
+[0001.480] initializing threads
+
+[0001.483] initializing timers
+
+[0001.486] creating bootstrap completion thread
+
+[0001.491] top of bootstrap2()
+
+[0001.494] CPU: ARM Cortex A57
+
+[0001.497] CPU: MIDR: 0x411FD073, MPIDR: 0x80000100
+
+[0001.502] initializing platform
+
+[0001.506] I> Bl_dtb @0x8520f400
+[0001.509] I> gpio framework initialized
+[0001.515] I> tegrabl_gpio_driver_register: register 'nvidia,tegra186-gpio' driver
+[0001.525] I> tegrabl_gpio_driver_register: register 'nvidia,tegra186-gpio-aon' driver
+[0001.533] I> GPIO framework and drivers are initialized.
+[0001.538] I> Boot-device: eMMC
+[0001.545] I> sdmmc bdev is already initialized
+[0001.576] I> Found 18 partitions in SDMMC_BOOT (instance 3)
+[0001.593] I> Found 33 partitions in SDMMC_USER (instance 3)
+[0001.599] W> opt-in fuse is not set, skip fuse_burning
+[0001.604] I> Reserved memory at 0xfbe00000 for U-Boot relocation
+[0001.609] W> No valid slot number is found in scratch register
+[0001.615] W> Return default slot: _a
+[0001.618] I> A/B: bin_type (21) slot 0
+[0001.622] I> Loading partition kernel-dtb at 0x80000000 from device(0x1)
+[0001.639] I> Kernel_dtb @0x80000000
+[0001.642] I> tegrabl_tca9539_init: i2c bus: 0, slave addr: 0xee
+[0001.650] E> I2C: slave not found in slaves.
+[0001.654] E> I2C: Could not write 0 bytes to slave: 0x00ee with repeat start false.
+[0001.662] E> I2C_DEV: Failed to send register address 0x00000004.
+[0001.668] E> I2C_DEV: Could not write 1 registers of size 1 to slave 0xee at 0x00000004 via instance 0.
+[0001.677] E> tca9539_device_init: failed to write polar reg
+[0001.683] E> tegrabl_tca9539_init: failed to init device!
+[0001.688] I> tegrabl_tca9539_init: i2c bus: 0, slave addr: 0xe8
+[0001.695] E> I2C: slave not found in slaves.
+[0001.699] E> I2C: Could not write 0 bytes to slave: 0x00e8 with repeat start false.
+[0001.707] E> I2C_DEV: Failed to send register address 0x00000004.
+[0001.712] E> I2C_DEV: Could not write 1 registers of size 1 to slave 0xe8 at 0x00000004 via instance 0.
+[0001.722] E> tca9539_device_init: failed to write polar reg
+[0001.727] E> tegrabl_tca9539_init: failed to init device!
+[0001.735] I> fixed regulator driver initialized
+[0001.773] I> register 'maxim' power off handle
+[0001.779] I> virtual i2c enabled
+[0001.782] I> registered 'maxim,max77620' pmic
+[0001.786] I> tegrabl_gpio_driver_register: register 'max77620-gpio' driver
+[0001.800] I> Find /i2c@c250000's alias i2c7
+[0001.804] I> Reading eeprom i2c=7 address=0x50
+[0001.833] I> Device at /i2c@c250000:0x50
+[0001.837] I> Reading eeprom i2c=7 address=0x57
+[0001.841] E> I2C: slave not found in slaves.
+[0001.845] E> I2C: Could not write 0 bytes to slave: 0x00ae with repeat start true.
+[0001.853] E> I2C_DEV: Failed to send register address 0x00000000.
+[0001.859] E> I2C_DEV: Could not read 256 registers of size 1 from slave 0xae at 0x00000000 via instance 7.
+[0001.868] E> eeprom: Failed to read I2C slave device
+[0001.873] I> Eeprom read failed 0x3526070d
+[0001.878] I> Find /i2c@c240000's alias i2c1
+[0001.882] I> Reading eeprom i2c=1 address=0x51
+[0001.887] E> I2C: slave not found in slaves.
+[0001.891] E> I2C: Could not write 0 bytes to slave: 0x00a2 with repeat start true.
+[0001.899] E> I2C_DEV: Failed to send register address 0x00000000.
+[0001.905] E> I2C_DEV: Could not read 256 registers of size 1 from slave 0xa2 at 0x00000000 via instance 1.
+[0001.914] E> eeprom: Retry to read I2C slave device.
+[0001.919] E> I2C: slave not found in slaves.
+[0001.923] E> I2C: Could not write 0 bytes to slave: 0x00a2 with repeat start true.
+[0001.931] E> I2C_DEV: Failed to send register address 0x00000000.
+[0001.937] E> I2C_DEV: Could not read 256 registers of size 1 from slave 0xa2 at 0x00000000 via instance 1.
+[0001.946] E> eeprom: Failed to read I2C slave device
+[0001.951] I> Eeprom read failed 0x3526070d
+[0001.955] I> Find /i2c@3160000's alias i2c0
+[0001.959] I> Reading eeprom i2c=0 address=0x50
+[0001.964] E> I2C: slave not found in slaves.
+[0001.968] E> I2C: Could not write 0 bytes to slave: 0x00a0 with repeat start true.
+[0001.976] E> I2C_DEV: Failed to send register address 0x00000000.
+[0001.981] E> I2C_DEV: Could not read 256 registers of size 1 from slave 0xa0 at 0x00000000 via instance 0.
+[0001.991] E> eeprom: Failed to read I2C slave device
+[0001.996] I> Eeprom read failed 0x3526070d
+[0002.000] I> Find /i2c@3180000's alias i2c2
+[0002.004] I> Reading eeprom i2c=2 address=0x54
+[0002.009] I> Enabling gpio chip_id = 2, gpio pin = 9
+[0002.013] C> GPIO driver for chip_id 0x2 could not be found
+[0002.019] E> cam_eeprom_read: Can't get gpio driver
+[0002.024] I> Eeprom read failed 0x4d4d000d
+[0002.027] I> Reading eeprom i2c=2 address=0x57
+[0002.032] I> Enabling gpio chip_id = 2, gpio pin = 9
+[0002.036] C> GPIO driver for chip_id 0x2 could not be found
+[0002.042] E> cam_eeprom_read: Can't get gpio driver
+[0002.047] I> Eeprom read failed 0x4d4d000d
+[0002.050] I> create_pm_ids: id: 3310-1000-B02-C, len: 15
+[0002.056] I> config: mem-type:00,power-config:00,misc-config:00,modem-config:00,touch-config:00,display-config:00,, len: 93
+[0002.090] I> enabling 'vdd-hdmi' regulator
+[0002.094] E> tegrabl_display_get_pdata, failed to parse dtb settings
+[0002.103] E> cannot find any other nvdisp nodes
+[0002.107] E> no valid display unit config found in dtb
+[0002.113] W> display init failed
+[0002.116] initializing target
+
+[0002.119] calling apps_init()
+
+[0002.123] starting app kernel_boot_app
+
+[0002.145] I> found decompressor handler: lz4-legacy
+[0002.150] I> decompressing BMP blob ...
+[0002.160] I> Kernel type = Normal
+[0002.163] I> Loading partition kernel-bootctrl at 0xa8000000 from device(0x1)
+[0002.177] W> tegrabl_get_kernel_bootctrl: magic number(0x00000000) is invalid
+[0002.184] W> tegrabl_get_kernel_bootctrl: use default dummy boot control data
+[0002.191] I> ########## Fixed storage boot ##########
+[0002.196] I> Loading kernel from partition ...
+[0002.200] W> No valid slot number is found in scratch register
+[0002.206] W> Return default slot: _a
+[0002.209] I> A/B: bin_type (24) slot 0
+[0002.225] I> Boot image size read from image header: f2f08
+[0002.230] I> Boot image load address: 0x0x80400000
+[0002.235] I> Loading partition kernel at 0x80400000 from device(0x1)
+[0003.195] I> Validate kernel ...
+[0003.198] I> T18x: Authenticate kernel (bin_type 24), max size 0x4000000
+[0003.205] I> kernel-dtb is already loaded
+[0003.209] I> Validate kernel-dtb ...
+[0003.213] I> T18x: Authenticate kernel-dtb (bin_type 21), max size 0x100000
+[0003.220] I> Checking boot.img header magic ... [0003.225] I> [OK]
+[0003.226] I> Kernel hdr @0x80400000
+[0003.230] I> Kernel dtb @0x80000000
+[0003.233] I> decompressor handler not found
+[0003.237] I> Copying kernel image (477882 bytes) from 0x80400800 to 0x80800000 ... [0003.244] I> Done
+[0003.246] I> Move ramdisk (len: 0) from 0x80475800 to 0x94830000
+[0003.254] I> Updated bpmp info to DTB
+[0003.259] I> Ramdisk: Base: 0x94830000; Size: 0x0
+[0003.264] I> Updated initrd info to DTB
+[0003.268] W> WARN: Fail to override "console=none" in commandline
+[0003.273] E> tegrabl_linuxboot_add_disp_param, du 0 failed to get display params
+[0003.281] E> tegrabl_linuxboot_add_disp_param, du 0 failed to get display params
+[0003.288] E> tegrabl_linuxboot_add_disp_param, du 0 failed to get display params
+[0003.295] I> disabled_core_mask: 0xffffff0c
+[0003.299] W> No valid slot number is found in scratch register
+[0003.305] W> Return default slot: _a
+[0003.308] I> Active slot suffix: 
+[0003.311] I> add_boot_slot_suffix: slot_suffix = 
+[0003.316] I> Linux Cmdline: root=/dev/mmcblk0p1 rw rootwait rootfstype=ext4 console=ttyS0,115200n8 console=tty0 fbcon=map:0 net.ifnames=0 video=tegrafb no_console_suspend=1 earlycon=uart8250,mmio32,0x3100000 nvdumper_reserved=0x2772e0000 gpt usbcore.old_scheme_first=1 tegraid=18.1.2.0.0 maxcpus=6 boot.slot_suffix= boot.ratchetvalues=0.2031647.1 bl_prof_dataptr=0x10000@0x275840000 sdhci_tegra.en_boot_part_access=1 
+[0003.352] I> Updated bootarg info to DTB
+[0003.356] I> eeprom_get_mac_addr: MAC (type: 0): 00:04:4b:a5:8f:75
+[0003.362] I> eeprom_get_mac_addr: MAC (type: 1): 00:04:4b:a5:8f:76
+[0003.368] I> eeprom_get_mac_addr: MAC (type: 2): 00:04:4b:a5:8f:77
+[0003.375] E> Found no plugin manager ids in source DT
+[0003.380] W> Add plugin manager ids from board info
+[0003.384] E> "plugin-manager" doesn't exist, creating
+[0003.389] E> "ids" doesn't exist, creating
+[0003.393] E> "connection" doesn't exist, creating
+[0003.398] E> "configs" doesn't exist, creating
+[0003.402] I> create_pm_ids: id: 3310-1000-B02-C, len: 15
+[0003.407] I> config: mem-type:00,power-config:00,misc-config:00,modem-config:00,touch-config:00,display-config:00,, len: 93
+[0003.418] I> Adding plugin-manager/ids/3310-1000-B02=/i2c@c250000:module@0x50
+[0003.425] E> "i2c@c250000" doesn't exist, creating
+[0003.430] E> "module@0x50" doesn't exist, creating
+[0003.437] I> Adding plugin-manager/ids/3310-1000-B02-C
+[0003.444] I> Adding plugin-manager/configs/3310-mem-type 00
+[0003.450] I> Adding plugin-manager/configs/3310-power-config 00
+[0003.456] I> Adding plugin-manager/configs/3310-misc-config 00
+[0003.461] I> Adding plugin-manager/configs/3310-modem-config 00
+[0003.467] I> Adding plugin-manager/configs/3310-touch-config 00
+[0003.473] I> Adding plugin-manager/configs/3310-display-config 00
+[0003.480] I> Adding plugin-manager/cvm
+[0003.483] E> "chip-id" doesn't exist, creating
+[0003.488] I> Adding plugin-manager/chip-id/A02P
+[0003.492] E> "odm-data" doesn't exist, creating
+[0003.497] I> Adding /chosen/plugin-manager/odm-data
+[0003.507] I> added [base:0x80000000, size:0x70000000] to /memory
+[0003.513] I> added [base:0xf0200000, size:0x185600000] to /memory
+[0003.518] I> added [base:0x275e00000, size:0x200000] to /memory
+[0003.524] I> added [base:0x276600000, size:0x200000] to /memory
+[0003.530] I> added [base:0x277000000, size:0x200000] to /memory
+[0003.536] I> Updated memory info to DTB
+[0003.540] E> add_disp_param: failed to get display params for du=0
+[0003.548] E> "reset" doesn't exist, creating
+[0003.552] E> "pmc-reset-reason" doesn't exist, creating
+[0003.558] E> "pmic-reset-reason" doesn't exist, creating
+[0003.564] I> Adding ecid(0000000164444889040000000f0601c0) to DT
+[0003.570] I> disabled_core_mask: 0xffffff0c
+[0003.583] I> Add serial number:0421818038486 as DT property
+[0003.592] I> Plugin-manager override starting
+[0003.597] I> node /plugin-manager/fragement@0 matches
+[0003.608] I> node /plugin-manager/fragement@4 matches
+[0003.620] I> node /plugin-manager/fragment-sdwake-p3310-1000-300 matches
+[0003.640] I> node /plugin-manager/fragement-pmon-p3310-1000-300 matches
+[0003.650] I> node /plugin-manager/fragement-pmon-p3310-1000-800 matches
+[0003.658] I> node /plugin-manager/fragment-devslp@0 matches
+[0003.671] I> node /plugin-manager/fragment-500-pcie-config matches
+[0003.685] I> node /plugin-manager/fragment-500-xusb-config matches
+[0003.708] I> node /plugin-manager/fragment-p3310-c00-comm matches
+[0003.722] I> node /plugin-manager/fragment-p3310-c00-pmic matches
+[0003.732] I> node /plugin-manager/fragment-p3310-c01 matches
+[0003.745] I> node /plugin-manager/fragment-p3310-c03 matches
+[0003.784] I> node /plugin-manager/fragment-p3310-c00-camera matches
+[0003.810] I> Disable plugin-manager status in FDT
+[0003.815] I> Plugin-manager override finished successfully
+[0003.820] I> tegrabl_load_kernel_and_dtb: Done
+[0003.824] E> tegrabl_display_clear: display is not initialized
+[0003.830] W> Boot logo display failed...
+[0003.834] I> Kernel EP: 0x80800000, DTB: 0x80000000
+
+
+U-Boot 2016.07-g0536cf2a27 (Dec 09 2019 - 22:43:10 -0800)
+
+TEGRA186
+Model: NVIDIA P2771-0000-500
+DRAM:  7.8 GiB
+MC:   Tegra SD/MMC: 0, Tegra SD/MMC: 1
+*** Warning - bad CRC, using default environment
+
+In:    serial
+Out:   serial
+Err:   serial
+Net:   eth0: ethernet@2490000
+Hit any key to stop autoboot:  2  1  0 
+MMC: no card present
+switch to partitions #0, OK
+mmc0(part 0) is current device
+Scanning mmc 0:1...
+Found /boot/extlinux/extlinux.conf
+Retrieving file: /boot/extlinux/extlinux.conf
+733 bytes read in 118 ms (5.9 KiB/s)
+1:	primary kernel
+Retrieving file: /boot/initrd
+5565140 bytes read in 238 ms (22.3 MiB/s)
+Retrieving file: /boot/Image
+34125832 bytes read in 856 ms (38 MiB/s)
+append: root=/dev/mmcblk0p1 rw rootwait rootfstype=ext4 console=ttyS0,115200n8 console=tty0 fbcon=map:0 net.ifnames=0 video=tegrafb no_console_suspend=1 earlycon=uart8250,mmio32,0x3100000 nvdumper_reserved=0x2772e0000 gpt usbcore.old_scheme_first=1 tegraid=18.1.2.0.0 maxcpus=6 boot.slot_suffix= boot.ratchetvalues=0.2031647.1 bl_prof_dataptr=0x10000@0x275840000 sdhci_tegra.en_boot_part_access=1 quiet
+## Flattened Device Tree blob at 80000000
+   Booting using the fdt blob at 0x80000000
+   reserving fdt memory region: addr=80000000 size=10000
+   Using Device Tree in place at 0000000080000000, end 000000008005fd76
+
+Starting kernel ...
+
+[    0.000000] Booting Linux on physical CPU 0x100
+[    0.000000] Linux version 4.9.140-antmicro (bartosz@bartosz-pc) (gcc version 7.3.1 20180425 [linaro-7.3-2018.05 revision d29120a424ecfbc167ef90065c0eeb7f91977701] (Linaro GCC 7.3-2018.05) ) #1 SMP PREEMPT Sun Apr 26 14:12:12 CEST 2020
+[    0.000000] Boot CPU: AArch64 Processor [411fd073]
+[    0.000000] OF: fdt:memory scan node memory@80000000, reg size 16416,
+[    0.000000] OF: fdt: - 80000000 ,  70000000
+[    0.000000] OF: fdt: - f0200000 ,  185600000
+[    0.000000] OF: fdt: - 275e00000 ,  200000
+[    0.000000] OF: fdt: - 276600000 ,  200000
+[    0.000000] OF: fdt: - 277000000 ,  200000
+[    0.000000] earlycon: uart8250 at MMIO32 0x0000000003100000 (options '')
+[    0.000000] bootconsole [uart8250] enabled
+<hit enter to activate fiq debugger>
+[    0.533659] pca953x 0-0074: failed reading register
+[    0.534330] pca953x 0-0077: failed reading register
+[    1.173669] tegradc 15210000.nvdisplay: dc_hdmi_hotplug_init: couldn't get regulator vdd_hdmi_5v0, -517
+[    1.593702] FAN: coudln't get the regulator
+[    1.641369] ina3221x 0-0042: ina3221 reset failure status: 0xffffff87
+[    1.648439] ina3221x 0-0043: ina3221 reset failure status: 0xffffff87
+[    2.250501] cgroup: cgroup2: unknown option "nsdelegate"
+[    4.162509] random: crng init done
+[    4.165939] random: 7 urandom warning(s) missed due to ratelimiting
+[    4.269984] using random self ethernet address
+[    4.274663] using random host ethernet address
+[    4.687495] using random self ethernet address
+[    4.692013] using random host ethernet address
+[   13.550676] CPU1: shutdown
+[   13.623508] CPU2: shutdown
+
+
+Ubuntu 18.04.3 LTS linux ttyS0
+
+linux login: nvidia
+
+Password: 
+Last login: Sun Apr 26 08:50:33 EDT 2020 on ttyS0
+Welcome to Ubuntu 18.04.3 LTS (GNU/Linux 4.9.140-antmicro aarch64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+This system has been minimized by removing packages and content that are
+not required on a system that users do not log into.
+
+To restore this content, you can run the 'unminimize' command.
+
+132 packages can be updated.
+69 updates are security updates.
