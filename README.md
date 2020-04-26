@@ -1,5 +1,12 @@
 # Work notes
 
+## known bugs
+- [X] <s>USB not working</s>
+- [ ] GPU not working
+- [ ] no OV5640 camera driver
+
+
+
 ## Getting resources
 * [Linux for Tegra 32.3.1](https://developer.nvidia.com/embedded/linux-tegra)
 
