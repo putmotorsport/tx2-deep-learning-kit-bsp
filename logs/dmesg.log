@@ -1,0 +1,1309 @@
+[    0.000000] Booting Linux on physical CPU 0x100
+[    0.000000] Linux version 4.9.140-antmicro (bartosz@bartosz-pc) (gcc version 7.3.1 20180425 [linaro-7.3-2018.05 revision d29120a424ecfbc167ef90065c0eeb7f91977701] (Linaro GCC 7.3-2018.05) ) #2 SMP PREEMPT Sun Apr 26 21:02:54 CEST 2020
+[    0.000000] Boot CPU: AArch64 Processor [411fd073]
+[    0.000000] OF: fdt:memory scan node memory@80000000, reg size 16416,
+[    0.000000] OF: fdt: - 80000000 ,  70000000
+[    0.000000] OF: fdt: - f0200000 ,  185600000
+[    0.000000] OF: fdt: - 275e00000 ,  200000
+[    0.000000] OF: fdt: - 276600000 ,  200000
+[    0.000000] OF: fdt: - 277000000 ,  200000
+[    0.000000] earlycon: uart8250 at MMIO32 0x0000000003100000 (options '')
+[    0.000000] bootconsole [uart8250] enabled
+[    0.000000] OF: fdt:Reserved memory: failed to reserve memory for node 'fb0_carveout': base 0x0000000000000000, size 0 MiB
+[    0.000000] OF: fdt:Reserved memory: failed to reserve memory for node 'fb0_carveout': base 0x0000000000000000, size 0 MiB
+[    0.000000] OF: fdt:Reserved memory: failed to reserve memory for node 'fb1_carveout': base 0x0000000000000000, size 0 MiB
+[    0.000000] OF: fdt:Reserved memory: failed to reserve memory for node 'fb1_carveout': base 0x0000000000000000, size 0 MiB
+[    0.000000] OF: fdt:Reserved memory: failed to reserve memory for node 'fb2_carveout': base 0x0000000000000000, size 0 MiB
+[    0.000000] OF: fdt:Reserved memory: failed to reserve memory for node 'fb2_carveout': base 0x0000000000000000, size 0 MiB
+[    0.000000] OF: reserved mem: initialized node ramoops_carveout, compatible id nvidia,ramoops
+[    0.000000] cma: Reserved 64 MiB at 0x00000000fc000000
+[    0.000000] On node 0 totalpages: 2055168
+[    0.000000]   DMA zone: 8192 pages used for memmap
+[    0.000000]   DMA zone: 0 pages reserved
+[    0.000000]   DMA zone: 523776 pages, LIFO batch:31
+[    0.000000]   Normal zone: 24008 pages used for memmap
+[    0.000000]   Normal zone: 1531392 pages, LIFO batch:31
+[    0.000000] psci: probing for conduit method from DT.
+[    0.000000] psci: PSCIv1.0 detected in firmware.
+[    0.000000] psci: Using standard PSCI v0.2 function IDs
+[    0.000000] psci: MIGRATE_INFO_TYPE not supported.
+[    0.000000] psci: SMC Calling Convention v1.1
+[    0.000000] percpu: Embedded 25 pages/cpu @ffffffc1f676a000 s61592 r8192 d32616 u102400
+[    0.000000] pcpu-alloc: s61592 r8192 d32616 u102400 alloc=25*4096
+[    0.000000] pcpu-alloc: [0] 0 [0] 1 [0] 2 [0] 3 [0] 4 [0] 5 
+[    0.000000] Speculative Store Bypass Disable mitigation not required
+[    0.000000] Built 1 zonelists in Zone order, mobility grouping on.  Total pages: 2022968
+[    0.000000] Kernel command line: root=/dev/mmcblk0p1 rw rootwait rootfstype=ext4 console=ttyS0,115200n8 console=tty0 fbcon=map:0 net.ifnames=0 video=tegrafb no_console_suspend=1 earlycon=uart8250,mmio32,0x3100000 nvdumper_reserved=0x2772e0000 gpt usbcore.old_scheme_first=1 tegraid=18.1.2.0.0 maxcpus=6 boot.slot_suffix= boot.ratchetvalues=0.2031647.1 bl_prof_dataptr=0x10000@0x275840000 sdhci_tegra.en_boot_part_access=1 quiet
+[    0.000000] log_buf_len individual max cpu contribution: 32768 bytes
+[    0.000000] log_buf_len total cpu_extra contributions: 163840 bytes
+[    0.000000] log_buf_len min size: 32768 bytes
+[    0.000000] log_buf_len: 262144 bytes
+[    0.000000] early log buf free: 29428(89%)
+[    0.000000] PID hash table entries: 4096 (order: 3, 32768 bytes)
+[    0.000000] Dentry cache hash table entries: 1048576 (order: 11, 8388608 bytes)
+[    0.000000] Inode-cache hash table entries: 524288 (order: 10, 4194304 bytes)
+[    0.000000] Memory: 7969076K/8220672K available (15230K kernel code, 2926K rwdata, 6552K rodata, 8576K init, 609K bss, 186060K reserved, 65536K cma-reserved)
+[    0.000000] Virtual kernel memory layout:
+[    0.000000]     modules : 0xffffff8000000000 - 0xffffff8008000000   (   128 MB)
+[    0.000000]     vmalloc : 0xffffff8008000000 - 0xffffffbebfff0000   (   250 GB)
+[    0.000000]       .text : 0xffffff8008080000 - 0xffffff8008f60000   ( 15232 KB)
+[    0.000000]     .rodata : 0xffffff8008f60000 - 0xffffff80095d0000   (  6592 KB)
+[    0.000000]       .init : 0xffffff80095d0000 - 0xffffff8009e30000   (  8576 KB)
+[    0.000000]       .data : 0xffffff8009e30000 - 0xffffff800a10b808   (  2927 KB)
+[    0.000000]        .bss : 0xffffff800a10b808 - 0xffffff800a1a3dbc   (   610 KB)
+[    0.000000]     fixed   : 0xffffffbefe7fd000 - 0xffffffbefec00000   (  4108 KB)
+[    0.000000]     PCI I/O : 0xffffffbefee00000 - 0xffffffbeffe00000   (    16 MB)
+[    0.000000]     vmemmap : 0xffffffbf00000000 - 0xffffffc000000000   (     4 GB maximum)
+[    0.000000]               0xffffffbf00000000 - 0xffffffbf07dc8000   (   125 MB actual)
+[    0.000000]     memory  : 0xffffffc000000000 - 0xffffffc1f7200000   (  8050 MB)
+[    0.000000] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=6, Nodes=1
+[    0.000000] Preemptible hierarchical RCU implementation.
+[    0.000000] 	Build-time adjustment of leaf fanout to 64.
+[    0.000000] 	RCU restricting CPUs from NR_CPUS=64 to nr_cpu_ids=6.
+[    0.000000] RCU: Adjusting geometry for rcu_fanout_leaf=64, nr_cpu_ids=6
+[    0.000000] NR_IRQS:64 nr_irqs:64 0
+[    0.000000] GIC: Using split EOI/Deactivate mode
+[    0.000000] arm_arch_timer: Architected cp15 timer(s) running at 31.25MHz (phys).
+[    0.000000] clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0xe6a171046, max_idle_ns: 881590405314 ns
+[    0.000003] sched_clock: 56 bits at 31MHz, resolution 32ns, wraps every 4398046511088ns
+[    0.001644] Console: colour dummy device 80x25
+[    0.001649] console [tty0] enabled
+[    0.001652] bootconsole [uart8250] disabled
+[    0.001660] kmemleak: Kernel memory leak detector disabled
+[    0.001669] Calibrating delay loop (skipped), value calculated using timer frequency.. 62.50 BogoMIPS (lpj=125000)
+[    0.001677] pid_max: default: 32768 minimum: 301
+[    0.001992] Security Framework initialized
+[    0.002150] Mount-cache hash table entries: 16384 (order: 5, 131072 bytes)
+[    0.002154] Mountpoint-cache hash table entries: 16384 (order: 5, 131072 bytes)
+[    0.002750] ftrace: allocating 47001 entries in 184 pages
+[    0.127841] sched-energy: Sched-energy-costs installed from DT
+[    0.127852] ASID allocator initialised with 65536 entries
+[    0.164263] tegra-id: chipid=21817.
+[    0.164269] tegra-id: opt_subrevision=1.
+[    0.164286] Tegra Revision: A02p SKU: 0xdc CPU Process: 0 SoC Process: 0
+[    0.164294] DTS File Name: arch/arm64/boot/dts/../../../../../../hardware/nvidia/platform/t18x/quill/kernel-dts/tegra186-quill-p3310-1000-c03-00-base.dts
+[    0.164300] DTB Build time: Apr 26 2020 21:04:44
+[    0.213673] CPU1: Booted secondary processor [4e0f0030]
+[    0.245311] CPU2: Booted secondary processor [4e0f0030]
+[    0.277099] CPU3: Booted secondary processor [411fd073]
+[    0.309086] CPU4: Booted secondary processor [411fd073]
+[    0.341079] CPU5: Booted secondary processor [411fd073]
+[    0.341130] Brought up 6 CPUs
+[    0.341133] SMP: Total of 6 processors activated.
+[    0.341138] CPU features: detected feature: 32-bit EL0 Support
+[    0.341887] CPU: All CPU(s) started at EL2
+[    0.341940] alternatives: patching kernel code
+[    0.351485] devtmpfs: initialized
+[    0.390600] Initilizing CustomIPI irq domain
+[    0.390802] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 7645041785100000 ns
+[    0.390811] futex hash table entries: 2048 (order: 5, 131072 bytes)
+[    0.391658] pinctrl core: initialized pinctrl subsystem
+[    0.391865] OS set in device tree is not L4T.
+[    0.392020] regulator-dummy: no parameters
+[    0.392163] Initializing plugin-manager
+[    0.392214] Plugin module not found
+[    0.392250] Plugin-manager status disabled
+[    0.394148] NET: Registered protocol family 16
+[    0.394811] pstore: using zlib compression
+[    0.394824] console [pstore-1] enabled
+[    0.394827] pstore: Registered ramoops as persistent store backend
+[    0.394831] ramoops: attached 0x200000@0x275880000, ecc: 0/0
+[    0.408687] cpuidle: using governor menu
+[    0.410187] bpmp: waiting for handshake
+[    0.410191] bpmp: handshake completed
+[    0.410204] bpmp: synchronizing channels
+[    0.410221] bpmp: channels synchronized
+[    0.410224] bpmp: mail init ok
+[    0.412351] arm-smmu 12000000.iommu: probing hardware configuration...
+[    0.412355] arm-smmu 12000000.iommu: SMMUv2 with:
+[    0.412359] arm-smmu 12000000.iommu: 	stage 1 translation
+[    0.412362] arm-smmu 12000000.iommu: 	stage 2 translation
+[    0.412365] arm-smmu 12000000.iommu: 	nested translation
+[    0.412371] arm-smmu 12000000.iommu: 	stream matching with 128 register groups, mask 0x7f80
+[    0.412377] arm-smmu 12000000.iommu: SMMU address space size (0x800000) differs from mapped region size (0x1000000)!
+[    0.412380] arm-smmu 12000000.iommu: 	64 context banks (0 stage-2 only)
+[    0.412385] arm-smmu 12000000.iommu: 	Stage-1: 39-bit VA -> 48-bit IPA
+[    0.412388] arm-smmu 12000000.iommu: 	Stage-2: 39-bit IPA -> 48-bit PA
+[    0.414531] vdso: 2 pages (1 code @ ffffff8008f67000, 1 data @ ffffff8009e34000)
+[    0.414544] hw-breakpoint: found 6 breakpoint and 4 watchpoint registers.
+[    0.416880] atomic_pool_init():622: DMA: preallocated 1024 KiB pool for atomic allocations
+[    0.418787] Registering BPMP clocks...
+[    0.418880] tegra_bpmp_clk_init: clock init ok (638 clks)
+[    0.421122] tegra_powergate_init: DONE
+[    0.421130] DTS File Name: arch/arm64/boot/dts/../../../../../../hardware/nvidia/platform/t18x/quill/kernel-dts/tegra186-quill-p3310-1000-c03-00-base.dts
+[    0.421135] DTB Build time: Apr 26 2020 21:04:44
+[    0.423229] Tegra reboot handler registered.
+[    0.426513] tegra-pmc c360000.pmc: scratch reg offset dts data not present
+[    0.426713] tegra-pmc: get_secure_pmc_setting: done secure_pmc=0
+[    0.426734] tegra-pmc: ### PMC reset source: TEGRA_SOFTWARE_RESET
+[    0.426740] tegra-pmc: ### PMC reset level: TEGRA_RESET_LEVEL_L1
+[    0.426746] tegra-pmc: ### PMC reset status reg: 0x2d
+[    0.427215] padctrl padctrl.0: Pad control driver tegra-pmc-padctrl registered
+[    0.427236] tegra-pmc c360000.pmc: IO padctrl driver initialized
+[    0.427854] iommu: Adding device 3460000.sdhci to group 0
+[    0.429321] iommu: Adding device 3400000.sdhci to group 1
+[    0.431609] iommu: Adding device 3507000.ahci-sata to group 2
+[    0.431634] arm-smmu: forcing sodev map for 3507000.ahci-sata
+[    0.432363] iommu: Adding device 3160000.i2c to group 3
+[    0.433024] iommu: Adding device c240000.i2c to group 4
+[    0.434169] iommu: Adding device 3180000.i2c to group 5
+[    0.434715] iommu: Adding device 3190000.i2c to group 6
+[    0.435365] iommu: Adding device 31b0000.i2c to group 7
+[    0.435892] iommu: Adding device 31c0000.i2c to group 8
+[    0.436354] iommu: Adding device c250000.i2c to group 9
+[    0.436855] iommu: Adding device 31e0000.i2c to group 10
+[    0.439396] iommu: Adding device 3210000.spi to group 11
+[    0.439869] iommu: Adding device c260000.spi to group 12
+[    0.440363] iommu: Adding device 3240000.spi to group 13
+[    0.441455] iommu: Adding device 3100000.serial to group 14
+[    0.441963] iommu: Adding device 3110000.serial to group 15
+[    0.442477] iommu: Adding device c280000.serial to group 16
+[    0.442934] iommu: Adding device 3130000.serial to group 17
+[    0.444801] iommu: Adding device 2490000.ether_qos to group 18
+[    0.444824] arm-smmu: forcing sodev map for 2490000.ether_qos
+[    0.446016] iommu: Adding device b000000.rtcpu to group 19
+[    0.448721] iommu: Adding device 13e10000.host1x to group 20
+[    0.449224] iommu: Adding device 13e10000.host1x:ctx0 to group 21
+[    0.449735] iommu: Adding device 13e10000.host1x:ctx1 to group 22
+[    0.450168] iommu: Adding device 13e10000.host1x:ctx2 to group 23
+[    0.450602] iommu: Adding device 13e10000.host1x:ctx3 to group 24
+[    0.451016] iommu: Adding device 13e10000.host1x:ctx4 to group 25
+[    0.451451] iommu: Adding device 13e10000.host1x:ctx5 to group 26
+[    0.451904] iommu: Adding device 13e10000.host1x:ctx6 to group 27
+[    0.452291] iommu: Adding device 13e10000.host1x:ctx7 to group 28
+[    0.452934] iommu: Adding device 150c0000.nvcsi to group 29
+[    0.453842] iommu: Adding device 15700000.vi to group 30
+[    0.454308] iommu: Adding device 15600000.isp to group 31
+[    0.455002] iommu: Adding device 15210000.nvdisplay to group 32
+[    0.455755] iommu: Adding device 15340000.vic to group 33
+[    0.456093] iommu: Adding device 154c0000.nvenc to group 34
+[    0.456410] iommu: Adding device 15480000.nvdec to group 35
+[    0.456915] iommu: Adding device 15380000.nvjpg to group 36
+[    0.457228] iommu: Adding device 15500000.tsec to group 37
+[    0.457518] iommu: Adding device 15100000.tsecb to group 38
+[    0.458510] iommu: Adding device 15810000.se to group 39
+[    0.458831] iommu: Adding device 15820000.se to group 40
+[    0.459227] iommu: Adding device 15830000.se to group 41
+[    0.459522] iommu: Adding device 15840000.se to group 42
+[    0.460757] iommu: Adding device smmu_test to group 43
+[    0.461573] mc: mapped MMIO address: 0xffffff800a690000 -> 0x2c10000
+[    0.461591] mc: mapped MMIO address: 0xffffff800a6b0000 -> 0x2c20000
+[    0.461607] mc: mapped MMIO address: 0xffffff800a6d0000 -> 0x2c30000
+[    0.461623] mc: mapped MMIO address: 0xffffff800a7b0000 -> 0x2c40000
+[    0.461655] mc: mapped MMIO address: 0xffffff800a7d0000 -> 0x2c50000
+[    0.461719] nv-tegra-mc 2c10000.mc: No mssnvlink node
+[    0.461736] mc-err: mcerr ops are set to t18x
+[    0.461998] dram-ecc: DRAM ECC disabled-MC_ECC_CONTROL:0x0000000c
+[    0.463589] iommu: Adding device 3530000.xhci to group 44
+[    0.463630] arm-smmu: forcing sodev map for 3530000.xhci
+[    0.464250] iommu: Adding device 3550000.xudc to group 45
+[    0.464279] arm-smmu: forcing sodev map for 3550000.xudc
+[    0.465687] tegra186-aowake c370000.pmc: WAKE_AOWAKE_CTRL_0 = 3
+[    0.465698] tegra186-aowake c370000.pmc: WAKE_AOWAKE_CNTRL_24(PMU_INT) = 256
+[    0.466538] iommu: Adding device 17000000.gp10b to group 46
+[    0.467961] tegra-reset 5000000.clock: registered 193 resets.
+[    0.471018] iommu: Adding device d000000.bpmp to group 47
+[    0.471388] bpmp: ping status is 0
+[    0.471525] bpmp d000000.bpmp: firmware tag is 4208eb5c85fe47a2235fbc0b8eb87dca
+[    0.475793] bpmp d000000.bpmp: probe ok
+[    0.479867] iommu: Adding device 2600000.dma to group 48
+[    0.481437] GPIO line 461 (camera-control-output-low) hogged as output/low
+[    0.481496] GPIO line 456 (camera-control-output-low) hogged as output/low
+[    0.481536] GPIO line 457 (camera-control-output-low) hogged as output/low
+[    0.481571] GPIO line 426 (camera-control-output-low) hogged as output/low
+[    0.481626] GPIO line 424 (wifi-enable) hogged as output/high
+[    0.481694] GPIO line 445 (sdmmc-wake-support-input) hogged as input
+[    0.481733] GPIO line 446 (sdmmc-wake-support-output) hogged as output/low
+[    0.482093] gpiochip_setup_dev: registered GPIOs 320 to 511 on device: gpiochip0 (tegra-gpio)
+[    0.487873] GPIO line 315 (wifi-wake-ap) hogged as input
+[    0.488182] gpiochip_setup_dev: registered GPIOs 256 to 319 on device: gpiochip1 (tegra-gpio-aon)
+[    0.490591] iommu: Adding device 10003000.pcie-controller to group 49
+[    0.490620] arm-smmu: forcing sodev map for 10003000.pcie-controller
+[    0.491023] iommu: Adding device sound to group 50
+[    0.491504] iommu: Adding device 3510000.hda to group 51
+[    0.501338] random: fast init done
+[    0.503076] iommu: Adding device c1a0000.aon to group 52
+[    0.503736] vdd-ac-bat: 5000 mV 
+[    0.506196] vdd-1v8-ap: 1800 mV 
+[    0.506473] vdd-1v8-fixed: 1800 mV 
+[    0.506780] ldo7-fixed: 1000 mV 
+[    0.507074] vdd-5v-fixed: 5000 mV 
+[    0.507343] ldo8-fixed: 1000 mV 
+[    0.542607] HugeTLB registered 2 MB page size, pre-allocated 0 pages
+[    0.548011] eventlib_kernel: keventlib is initialized, test id: 0
+[    0.548473] SCSI subsystem initialized
+[    0.548735] libata version 3.00 loaded.
+[    0.548979] usbcore: registered new interface driver usbfs
+[    0.549039] usbcore: registered new interface driver hub
+[    0.549163] usbcore: registered new device driver usb
+[    0.552077] tegra-i2c 3160000.i2c: no acknowledge from address 0x74
+[    0.552122] pca953x 0-0074: failed reading register
+[    0.552256] pca953x: probe of 0-0074 failed with error -121
+[    0.552680] tegra-i2c 3160000.i2c: no acknowledge from address 0x77
+[    0.552716] pca953x 0-0077: failed reading register
+[    0.552801] pca953x: probe of 0-0077 failed with error -121
+[    0.565277] max77620 4-003c: PMIC Version OTP:0x45 and ES:0x8
+[    0.569881] vddio-ddr: at 1125 mV 
+[    0.573701] avdd_dsi_csi: 1200 mV 
+[    0.577695] vdd-1v8: 1800 mV 
+[    0.581349] vdd-3v3-sys: 3300 mV 
+[    0.582369] spmic-ldo0: at 1800 mV 
+[    0.583198] spmic-ldo1: at 800 mV 
+[    0.585346] vddio-3v3: 3300 mV 
+[    0.586279] vddio-sdmmc1: 1800 <--> 3300 mV at 3300 mV 
+[    0.589344] vdd-rtc: at 800 mV 
+[    0.590084] avdd-ts-hv: 1800 <--> 3300 mV at 1800 mV 
+[    0.593342] spmic-ldo6: at 1500 mV 
+[    0.597346] vdd-pex-1v00: 1000 mV 
+[    0.598110] dvdd-pex: 1000 mV 
+[    0.600893] GPIO line 253 (spmic_gpio_input) hogged as input
+[    0.601065] GPIO line 254 (spmic_gpio_input) hogged as input
+[    0.601364] gpiochip_setup_dev: registered GPIOs 248 to 255 on device: gpiochip2 (max77620-gpio)
+[    0.601660] max77620 4-003c: max77620 probe successful
+[    0.602261] media: Linux media interface: v0.10
+[    0.602311] Linux video capture interface: v2.00
+[    0.606588] pps_core: LinuxPPS API ver. 1 registered
+[    0.606596] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+[    0.606625] PTP clock support registered
+[    0.607388] tegra_wdt_t18x 30c0000.watchdog: Tegra WDT init timeout = 120 sec
+[    0.607419] tegra_wdt_t18x 30c0000.watchdog: Registered successfully
+[    0.610965] tegra_fiq_debugger_init: found FIQ source (IRQ 386)
+[    0.616538] trusty trusty: trusty version: Built: 22:43:54 Dec  9 2019 
+[    0.616577] trusty trusty: selected api version: 3 (requested 3)
+[    0.617627] Advanced Linux Sound Architecture Driver Initialized.
+[    0.618252] Bluetooth: Core ver 2.22
+[    0.618294] NET: Registered protocol family 31
+[    0.618299] Bluetooth: HCI device and connection manager initialized
+[    0.618309] Bluetooth: HCI socket layer initialized
+[    0.618318] Bluetooth: L2CAP socket layer initialized
+[    0.618345] Bluetooth: SCO socket layer initialized
+[    0.619356] en-vdd-sd: 3300 mV 
+[    0.619928] vdd-usb0-5v: 5000 mV 
+[    0.620373] vdd-usb1-5v: 5000 mV 
+[    0.620990] vdd-3v3: 3300 mV 
+[    0.621282] en-vdd-vcm-2v8: 2800 mV 
+[    0.621622] vdd-sys-bl: 3300 mV 
+[    0.624922] camchar: rtcpu character device driver loaded
+[    0.625562] gpio tegra-gpio wake53 for gpio=159(X:7)
+[    0.627610] extcon-gpio-states external-connection:extcon@1: Cable state:1, cable id:1
+[    0.628957] clocksource: Switched to clocksource arch_sys_counter
+[    0.670335] VFS: Disk quotas dquot_6.6.0
+[    0.670554] VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+[    0.671149] nvmap_heap_init: nvmap_heap_init: created heap block cache
+[    0.672078] nvmap: nvmap_select_cache_ops() nvmap cache ops set to roc
+[    0.672087] nvmap_page_pool_init: Total RAM pages: 2008653
+[    0.672094] nvmap_page_pool_init: nvmap page pool size: 251081 pages (980 MB)
+[    0.672219] nvmap_background_zero_thread: PP zeroing thread starting.
+[    0.675964] tegra-gpcdma 2600000.dma: GPC DMA driver register 32 channels
+[    0.687153] thermal thermal_zone0: Registering thermal zone thermal_zone0 for type BCPU-therm
+[    0.687337] thermal thermal_zone1: Registering thermal zone thermal_zone1 for type MCPU-therm
+[    0.687757] thermal thermal_zone2: Registering thermal zone thermal_zone2 for type GPU-therm
+[    0.687843] thermal thermal_zone3: Registering thermal zone thermal_zone3 for type PLL-therm
+[    0.687960] thermal thermal_zone4: Registering thermal zone thermal_zone4 for type Tboard_tegra
+[    0.688078] thermal thermal_zone5: Registering thermal zone thermal_zone5 for type Tdiode_tegra
+[    0.688247] thermal thermal_zone6: Registering thermal zone thermal_zone6 for type PMIC-Die
+[    0.688483] la/ptsa driver initialized.
+[    0.688495] pre_t19x_iso_plat_init(): iso emc max clk=1866000KHz
+[    0.688505] pre_t19x_iso_plat_init(): max_iso_bw=26870400KB
+[    0.689787] NET: Registered protocol family 2
+[    0.691971] TCP established hash table entries: 65536 (order: 7, 524288 bytes)
+[    0.692799] TCP bind hash table entries: 65536 (order: 8, 1048576 bytes)
+[    0.693630] TCP: Hash tables configured (established 65536 bind 65536)
+[    0.693688] UDP hash table entries: 4096 (order: 5, 131072 bytes)
+[    0.693812] UDP-Lite hash table entries: 4096 (order: 5, 131072 bytes)
+[    0.694660] NET: Registered protocol family 1
+[    0.695830] RPC: Registered named UNIX socket transport module.
+[    0.695836] RPC: Registered udp transport module.
+[    0.695841] RPC: Registered tcp transport module.
+[    0.695846] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    0.695858] PCI: CLS 0 bytes, default 64
+[    0.696097] Trying to unpack rootfs image as initramfs...
+[    0.888483] Freeing initrd memory: 5432K
+[    0.908885] host1x 13e10000.host1x: initialized
+[    0.910332] hw perfevents: enabled with armv8_pmuv3 PMU driver, 7 counters available
+[    0.915089] audit: initializing netlink subsys (disabled)
+[    0.915128] audit: type=2000 audit(0.808:1): initialized
+[    0.915863] workingset: timestamp_bits=46 max_order=21 bucket_order=0
+[    0.927506] squashfs: version 4.0 (2009/01/31) Phillip Lougher
+[    0.930198] ntfs: driver 2.1.32 [Flags: R/W].
+[    0.931736] 9p: Installing v9fs 9p2000 file system support
+[    0.938439] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 240)
+[    0.938603] io scheduler noop registered
+[    0.939223] io scheduler cfq registered (default)
+[    0.944121] gic 2a41000.agic-controller: GIC IRQ controller registered
+[    1.045630] iommu: Adding device aconnect@2a41000:adsp_audio to group 53
+[    1.049846] iommu: Adding device 2993000.adsp to group 54
+[    1.049982] tegra-aconnect aconnect@2a41000: Tegra ACONNECT bus registered
+[    1.053680] tegra-xusb-padctl 3520000.xusb_padctl: VBUS over-current detection enabled
+[    1.057468] tegra-pwm 3280000.pwm: PWM clk can sleep in ops
+[    1.058849] tegra-pwm 3290000.pwm: PWM clk can sleep in ops
+[    1.060110] tegra-pwm 32a0000.pwm: PWM clk can sleep in ops
+[    1.061399] tegra-pwm c340000.pwm: PWM clk can sleep in ops
+[    1.064050] tegra-pcie 10003000.pcie-controller: 4x1, 1x1 configuration
+[    1.065268] tegra-pcie 10003000.pcie-controller: PCIE: Enable power rails
+[    1.065694] tegra-pcie 10003000.pcie-controller: probing port 0, using 4 lanes
+[    1.066032] tegra_camera_platform tegra-camera-platform: tegra_camera_probe:camera_platform_driver probe
+[    1.066184] misc tegra_camera_ctrl: tegra_camera_isomgr_register tpg_max_iso = 3916800KBs
+[    1.066194] misc tegra_camera_ctrl: tegra_camera_isomgr_register isp_iso_bw=4687500, vi_iso_bw=2000000, max_bw=4687500
+[    1.069223] tegra-pcie 10003000.pcie-controller: probing port 2, using 1 lanes
+[    1.070826] tsec 15500000.tsec: initialized
+[    1.072261] tsec 15100000.tsecb: initialized
+[    1.076733] nvdec 15480000.nvdec: initialized
+[    1.084656] falcon 15340000.vic: initialized
+[    1.086303] falcon 154c0000.nvenc: initialized
+[    1.087818] falcon 15380000.nvjpg: initialized
+[    1.092026] iommu_context_dev 13e10000.host1x:ctx0: initialized (streamid=56)
+[    1.093642] iommu_context_dev 13e10000.host1x:ctx1: initialized (streamid=57)
+[    1.095254] iommu_context_dev 13e10000.host1x:ctx2: initialized (streamid=58)
+[    1.096758] iommu_context_dev 13e10000.host1x:ctx3: initialized (streamid=59)
+[    1.098403] iommu_context_dev 13e10000.host1x:ctx4: initialized (streamid=60)
+[    1.099934] iommu_context_dev 13e10000.host1x:ctx5: initialized (streamid=61)
+[    1.101826] iommu_context_dev 13e10000.host1x:ctx6: initialized (streamid=62)
+[    1.103321] iommu_context_dev 13e10000.host1x:ctx7: initialized (streamid=63)
+[    1.107567] tegradccommon 15200000.dc_common: host1x channel mapped
+[    1.107581] tegradccommon 15200000.dc_common: dc_common syncpt # 1 allocated
+[    1.107617] tegradccommon 15200000.dc_common: dma mapping done
+[    1.108710] tegradc 15210000.nvdisplay: disp0 connected to head1->/host1x/sor1
+[    1.108764] generic_infoframe_type: 0x87
+[    1.108989] tegradc 15210000.nvdisplay: DT parsed successfully
+[    1.109014] tegradc 15210000.nvdisplay: Display dc.ffffff800b690000 registered with id=0
+[    1.109053] tegra_cec 3960000.tegra_cec: dt=1 start=0x03960000 end=0x03960FFF irq=390
+[    1.109760] tegra_cec 3960000.tegra_cec: Unpowergate DISP: 0.
+[    1.110665] tegra_cec 3960000.tegra_cec: Enable clock result: 0.
+[    1.110689] tegra_cec 3960000.tegra_cec: tegra_cec_init started
+[    1.111509] tegra_cec 3960000.tegra_cec: cec_add_sysfs ret=0
+[    1.111515] tegra_cec 3960000.tegra_cec: probed
+[    1.115063] tegra_nvdisp_bandwidth_register_max_config: max config iso bw = 16727000 KB/s
+[    1.115066] tegra_nvdisp_bandwidth_register_max_config: max config EMC floor = 665600000 Hz
+[    1.115069] tegra_nvdisp_bandwidth_register_max_config: max config hubclk = 357620000 Hz
+[    1.115244] tegradc 15210000.nvdisplay: vblank syncpt # 8 for dc 1
+[    1.115250] tegradc 15210000.nvdisplay: vpulse3 syncpt # 9 for dc 1
+[    1.116083] tegradc 15210000.nvdisplay: dc_hdmi_hotplug_init: couldn't get regulator vdd_hdmi_5v0, -517
+[    1.123939] tegradc 15210000.nvdisplay: hdmi: invalid prod list prod_list_hdmi_board
+[    1.123949] tegradc 15210000.nvdisplay: hdmi: tegra_hdmi_tmds_range_read(bd) failed
+[    1.127892] tegradc 15210000.nvdisplay: probed
+[    1.130190] tegra-adma 2930000.adma: Tegra210 ADMA driver registered 32 channels
+[    1.130406] Console: switching to colour frame buffer device 80x30
+[    1.130443] tegradc 15210000.nvdisplay: fb registered
+[    1.130658] gpio tegra-gpio wake21 for gpio=121(P:1)
+[    1.131370] tegra-fuse-burn 3820000.efuse:efuse-burn: Fuse burn driver initialized
+[    1.131883] kfuse 3830000.kfuse: initialized
+[    1.133523] tegra-pmc-iopower pmc-iopower: NO_IOPOWER setting 0x0
+[    1.138040] Serial: 8250/16550 driver, 4 ports, IRQ sharing disabled
+[    1.141389] console [ttyS0] disabled
+[    1.141461] 3100000.serial: ttyS0 at MMIO 0x3100000 (irq = 36, base_baud = 25500000) is a Tegra
+[    1.160824] console [ttyS0] enabled
+[    1.162870] 3110000.serial: ttyTHS1 at MMIO 0x3110000 (irq = 37, base_baud = 0) is a TEGRA_UART
+[    1.164053] c280000.serial: ttyTHS2 at MMIO 0xc280000 (irq = 38, base_baud = 0) is a TEGRA_UART
+[    1.164280] serial-tegra 3130000.serial: RX in PIO mode
+[    1.165239] 3130000.serial: ttyTHS3 at MMIO 0x3130000 (irq = 39, base_baud = 0) is a TEGRA_UART
+[    1.166421] [drm] Initialized
+[    1.218319] brd: module loaded
+[    1.226824] loop: module loaded
+[    1.226918] tegra_profiler: version: 1.139, samples/io: 47/27
+[    1.227037] tegra_profiler: auth: init
+[    1.227544] nct1008_nct72 7-004c: starting parse dt
+[    1.227709] nct1008_nct72 7-004c: !!!Found deprecated property!!!
+[    1.227721] nct1008_nct72 7-004c: success parsing dt
+[    1.227833] nct1008_nct72 7-004c: success in enabling tmp451 VDD rail
+[    1.228046] THERMAL EST: found 3 subdevs
+[    1.228087] THERMAL EST num_resources: 0
+[    1.228129] [THERMAL EST subdev 0]
+[    1.228136] [THERMAL EST subdev 1]
+[    1.228142] [THERMAL EST subdev 2]
+[    1.228469] thermal thermal_zone7: Registering thermal zone thermal_zone7 for type thermal-fan-est
+[    1.228474] THERMAL EST: thz register success.
+[    1.228660] THERMAL EST: end of probe, return err: 0
+[    1.229773] hisi_sas: driver version v1.6
+[    1.233881] tegra-ahci 3507000.ahci-sata: AHCI 0001.0301 32 slots 2 ports 3 Gbps 0x1 impl platform mode
+[    1.233895] tegra-ahci 3507000.ahci-sata: flags: 64bit ncq sntf pm led pmp pio slum part deso sadm apst 
+[    1.238845] scsi host0: tegra_ahci
+[    1.239802] scsi host1: tegra_ahci
+[    1.239949] ata1: SATA max UDMA/133 mmio [mem 0x03507000-0x03508fff] port 0x100 irq 24
+[    1.239955] ata2: DUMMY
+[    1.246173] libphy: Fixed MDIO Bus: probed
+[    1.246645] tun: Universal TUN/TAP device driver, 1.6
+[    1.246650] tun: (C) 1999-2004 Max Krasnyansky <maxk@qualcomm.com>
+[    1.247463] e1000e: Intel(R) PRO/1000 Network Driver - 3.2.6-k
+[    1.247468] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+[    1.247575] igb: Intel(R) Gigabit Ethernet Network Driver - version 5.4.0-k
+[    1.247580] igb: Copyright (c) 2007-2014 Intel Corporation.
+[    1.247673] igbvf: Intel(R) Gigabit Virtual Function Network Driver - version 2.4.0-k
+[    1.247677] igbvf: Copyright (c) 2009 - 2012 Intel Corporation.
+[    1.247758] Intel(R) 10GbE PCI Express Linux Network Driver - version 4.6.4
+[    1.247763] Copyright(c) 1999 - 2017 Intel Corporation.
+[    1.260398] nct1008_nct72 7-004c: LOC shutdown limit 107
+[    1.260894] nct1008_nct72 7-004c: EXT shutdown limit 107
+[    1.261106] eqos 2490000.ether_qos: can't get pllrefe_vcoout clk (-2)
+[    1.264738] eqos 2490000.ether_qos: Setting local MAC: 0 4 4b a5 8f 77
+[    1.264854] libphy: dwc_phy: probed
+[    1.265264] bcm54xx_low_power_mode(): put phy in iddq-lp mode
+[    1.267400] PPP generic driver version 2.4.2
+[    1.267561] PPP BSD Compression module registered
+[    1.267567] PPP Deflate Compression module registered
+[    1.267612] PPP MPPE Compression module registered
+[    1.267620] NET: Registered protocol family 24
+[    1.267670] usbcore: registered new interface driver r8152
+[    1.267707] usbcore: registered new interface driver asix
+[    1.267741] usbcore: registered new interface driver ax88179_178a
+[    1.267775] usbcore: registered new interface driver cdc_ether
+[    1.267807] usbcore: registered new interface driver net1080
+[    1.267862] usbcore: registered new interface driver cdc_subset
+[    1.267896] usbcore: registered new interface driver zaurus
+[    1.267999] usbcore: registered new interface driver cdc_ncm
+[    1.268234] VFIO - User Level meta-driver version: 0.3
+[    1.270104] ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+[    1.270126] ehci-pci: EHCI PCI platform driver
+[    1.270156] ohci_hcd: USB 1.1 'Open' Host Controller (OHCI) Driver
+[    1.270165] ohci-pci: OHCI PCI platform driver
+[    1.270192] ohci-platform: OHCI generic platform driver
+[    1.275865] tegra-xusb 3530000.xhci: USB2 port 0 has OTG_CAP
+[    1.277571] tegra-xusb 3530000.xhci: extcon 0: ffffffc1eb1c3400 id
+[    1.278370] usbcore: registered new interface driver uas
+[    1.278419] usbcore: registered new interface driver usb-storage
+[    1.278484] usbcore: registered new interface driver usbserial
+[    1.280092] tegra-xusb 3530000.xhci: Firmware timestamp: 2019-07-08 19:32:42 UTC, Version: 55.15 release
+[    1.283240] tegra-xudc-new 3550000.xudc: device count: 1
+[    1.284423] tegra-xudc-new 3550000.xudc: vbus state: 1
+[    1.293126] nct1008_nct72 7-004c: initial LOC temp: 23000 
+[    1.293432] nct1008_nct72 7-004c: initial EXT temp: 22250 
+[    1.294035] nct1008_nct72 7-004c: hi_b:-11, lo_b:0
+[    1.294326] gpio tegra-gpio-aon wake35 for gpio=16(V:0)
+[    1.294509] nct1008_nct72 7-004c: nct1008_probe: initialized
+[    1.305261] tegra-xusb 3530000.xhci: xHCI Host Controller
+[    1.305285] tegra-xusb 3530000.xhci: new USB bus registered, assigned bus number 1
+[    1.306151] tegra-xusb 3530000.xhci: hcc params 0x0184fd25 hci version 0x100 quirks 0x00050810
+[    1.306196] tegra-xusb 3530000.xhci: irq 70, io mem 0x03530000
+[    1.306430] usb usb1: New USB device found, idVendor=1d6b, idProduct=0002
+[    1.306438] usb usb1: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+[    1.306444] usb usb1: Product: xHCI Host Controller
+[    1.306452] usb usb1: Manufacturer: Linux 4.9.140-antmicro xhci-hcd
+[    1.306457] usb usb1: SerialNumber: 3530000.xhci
+[    1.306976] hub 1-0:1.0: USB hub found
+[    1.307066] hub 1-0:1.0: 4 ports detected
+[    1.307475] tegra-xusb 3530000.xhci: xHCI Host Controller
+[    1.307488] tegra-xusb 3530000.xhci: new USB bus registered, assigned bus number 2
+[    1.307717] usb usb2: New USB device found, idVendor=1d6b, idProduct=0003
+[    1.307724] usb usb2: New USB device strings: Mfr=3, Product=2, SerialNumber=1
+[    1.307729] usb usb2: Product: xHCI Host Controller
+[    1.307735] usb usb2: Manufacturer: Linux 4.9.140-antmicro xhci-hcd
+[    1.307740] usb usb2: SerialNumber: 3530000.xhci
+[    1.308213] hub 2-0:1.0: USB hub found
+[    1.308258] hub 2-0:1.0: 3 ports detected
+[    1.385279] tegra-usb-cd usb_cd: notification status (0x0, 0x1)
+[    1.385287] tegra-usb-cd usb_cd: connected to SDP
+[    1.385302] tegra-xudc-new 3550000.xudc: device mode on: 0
+[    1.385525] tegra-xudc-new 3550000.xudc: active: 0 => 1
+[    1.386246] mousedev: PS/2 mouse device common for all mice
+[    1.386312] usbcore: registered new interface driver xpad
+[    1.409229] usb usb1: usb_suspend_both: status 0
+[    1.471959] max77686-rtc max77620-rtc: rtc core: registered max77620-rtc as rtc0
+[    1.473250] Wake73 for irq=42
+[    1.474588] rtc rtc1: alarm rtc device
+[    1.474637] tegra_rtc c2a0000.rtc: rtc core: registered c2a0000.rtc as rtc1
+[    1.474661] tegra_rtc c2a0000.rtc: Tegra internal Real Time Clock
+[    1.474905] i2c /dev entries driver
+[    1.477242] max77620-power max77620-power: Event recorder REG_NVERC : 0x0
+[    1.483460] parse_throttle_dt_data: Num cap clks = 4
+[    1.483473] parse_throttle_dt_data: clk=mcpu type=1
+[    1.483478] parse_throttle_dt_data: clk=bcpu type=2
+[    1.483487] parse_throttle_dt_data: clk=gpu type=4
+[    1.483492] parse_throttle_dt_data: clk=emc type=3
+[    1.484738] tegra_throttle_probe: probe successful. #cdevs=4
+[    1.485327] FAN: coudln't get the regulator
+[    1.491557] device-mapper: uevent: version 1.0.3
+[    1.492404] device-mapper: ioctl: 4.35.0-ioctl (2016-06-23) initialised: dm-devel@redhat.com
+[    1.492745] CPU EMC frequency mapping table: default setting
+[    1.499831] cpufreq: platform driver Initialization: pass
+[    1.500502] cpuidle: Initializing cpuidle driver init for Denver cluster
+[    1.500618] cpuidle: Initializing cpuidle driver init for A57 cluster
+[    1.501534] sdhci: Secure Digital Host Controller Interface driver
+[    1.501539] sdhci: Copyright(c) Pierre Ossman
+[    1.501542] sdhci-pltfm: SDHCI platform and OF driver helper
+[    1.503248] sdhci-tegra 3460000.sdhci: Client registration for eMC Successful
+[    1.505206] CMDQ: cmdq_platfm_init successful
+[    1.506453] CQE: CMD_TIMING bit set for R1B DCMD
+[    1.506496] sdhci-tegra 3440000.sdhci: Client registration for eMC Successful
+[    1.508710] tegra-pcie 10003000.pcie-controller: link 0 down, retrying
+[    1.510520] sdhci-tegra 3400000.sdhci: Got CD GPIO
+[    1.510595] sdhci-tegra 3400000.sdhci: Got WP GPIO
+[    1.511437] sdhci-tegra 3400000.sdhci: Client registration for eMC Successful
+[    1.513395] sdhci-tegra 3400000.sdhci: wakeup init done, cdirq 257
+[    1.516790] tegra-se-elp 3ad0000.se_elp: tegra_se_elp_probe: complete
+[    1.517822] tegra-se-nvhost 15810000.se: initialized
+[    1.518936] tegra-se-nvhost 15810000.se: tegra_se_probe: complete
+[    1.519585] tegra-se-nvhost 15820000.se: initialized
+[    1.520505] tegra-se-nvhost 15820000.se: tegra_se_probe: complete
+[    1.521177] tegra-se-nvhost 15830000.se: initialized
+[    1.521937] tegra-se-nvhost 15830000.se: tegra_se_probe: complete
+[    1.522571] tegra-se-nvhost 15840000.se: initialized
+[    1.523433] tegra-se-nvhost 15840000.se: tegra_se_probe: complete
+[    1.523680] hidraw: raw HID events driver (C) Jiri Kosina
+[    1.524854] usbcore: registered new interface driver usbhid
+[    1.524856] usbhid: USB HID core driver
+[    1.527017] tegra-i2c 3160000.i2c: no acknowledge from address 0x42
+[    1.527076] ina3221x 0-0042: ina3221 reset failure status: 0xffffff87
+[    1.533987] ina3221x: probe of 0-0042 failed with error -121
+[    1.534383] tegra-i2c 3160000.i2c: no acknowledge from address 0x43
+[    1.534412] ina3221x 0-0043: ina3221 reset failure status: 0xffffff87
+[    1.541214] ina3221x: probe of 0-0043 failed with error -121
+[    1.544305] tegra186-cam-rtcpu b000000.rtcpu: Trace buffer configured at IOVA=0xbff00000
+[    1.546878] tegra-ivc ivc-b000000.rtcpu: region 0: iova=0xbfef0000-0xbfefdb7f size=56192
+[    1.547189] tegra-ivc ivc-b000000.rtcpu:echo@0: echo: ver=0 grp=1 RX[16x64]=0x1000-0x1480 TX[16x64]=0x1480-0x1900
+[    1.547343] tegra-ivc ivc-b000000.rtcpu:i2c@480: i2c: ver=0 grp=1 RX[8x128]=0x1900-0x1d80 TX[8x128]=0x1d80-0x2200
+[    1.547714] tegra-ivc ivc-b000000.rtcpu:vinotify@12c0: vinotify: ver=0 grp=1 RX[64x128]=0x2200-0x4280 TX[64x128]=0x4280-0x6300
+[    1.548680] tegra-ivc ivc-b000000.rtcpu:mods@32c0: mods: ver=0 grp=1 RX[1x64]=0x6300-0x63c0 TX[1x64]=0x63c0-0x6480
+[    1.548763] tegra-ivc ivc-b000000.rtcpu:ivccontrol@52c0: ivccontrol: ver=0 grp=1 RX[16x320]=0x6480-0x7900 TX[16x320]=0x7900-0x8d80
+[    1.548826] tegra-ivc ivc-b000000.rtcpu:ivccapture@72c0: ivccapture: ver=0 grp=1 RX[16x64]=0x8d80-0x9200 TX[16x64]=0x9200-0x9680
+[    1.548885] tegra-ivc ivc-b000000.rtcpu:dbg@7c00: dbg: ver=0 grp=1 RX[1x384]=0x9680-0x9880 TX[1x384]=0x9880-0x9a80
+[    1.549046] tegra-ivc ivc-b000000.rtcpu:dbg@7e00: dbg: ver=0 grp=1 RX[1x8192]=0x9a80-0xbb00 TX[1x8192]=0xbb00-0xdb80
+[    1.549052] mmc0: SDHCI controller on 3460000.sdhci [3460000.sdhci] using ADMA 64-bit with 64 bit addr
+[    1.549577] tegra186-cam-rtcpu b000000.rtcpu: using cam RTCPU IRQ (51)
+[    1.549583] tegra186-cam-rtcpu b000000.rtcpu: tegra_camrtc_mon_create is successful
+[    1.550532] tegra186-cam-rtcpu b000000.rtcpu: firmware version cpu=sce cmd=5 sha1=3ecb1dca25fa98771f988f238c025334776c9a96
+[    1.552003] tegra_aon c1a0000.aon: tegra aon driver probe OK
+[    1.552513] tegra186-aondbg aondbg: aondbg driver probe() OK
+[    1.552671] register_ari_mca_banks: Registered MCA ROC:IOB
+[    1.552747] register_ari_mca_banks: Registered MCA ROC:CCE
+[    1.553009] mmc1: SDHCI controller on 3440000.sdhci [3440000.sdhci] using ADMA 64-bit with 64 bit addr
+[    1.553216] tegra18-bridge 2390000.axi2apb: axi_cbb clk rate = 115 MHZ, timeout = 97000 useconds
+[    1.553222] tegra18-bridge 2390000.axi2apb: enabled timeout = 11155000
+[    1.553226] tegra18-bridge 2390000.axi2apb: bridge probed OK
+[    1.553296] tegra18-bridge 23a0000.axi2apb: axi_cbb clk rate = 115 MHZ, timeout = 97000 useconds
+[    1.553322] tegra18-bridge 23a0000.axi2apb: enabled timeout = 11155000
+[    1.553326] tegra18-bridge 23a0000.axi2apb: bridge probed OK
+[    1.553401] tegra18-bridge 23b0000.axi2apb: axi_cbb clk rate = 115 MHZ, timeout = 97000 useconds
+[    1.553421] tegra18-bridge 23b0000.axi2apb: enabled timeout = 11155000
+[    1.553426] tegra18-bridge 23b0000.axi2apb: bridge probed OK
+[    1.553533] tegra18-bridge 23c0000.axi2apb: axi_cbb clk rate = 115 MHZ, timeout = 97000 useconds
+[    1.553537] tegra18-bridge 23c0000.axi2apb: enabled timeout = 11155000
+[    1.553541] tegra18-bridge 23c0000.axi2apb: bridge probed OK
+[    1.553599] tegra18-bridge 23d0000.axi2apb: axi_cbb clk rate = 115 MHZ, timeout = 97000 useconds
+[    1.553602] tegra18-bridge 23d0000.axi2apb: enabled timeout = 11155000
+[    1.553606] tegra18-bridge 23d0000.axi2apb: bridge probed OK
+[    1.553663] tegra18-bridge 2100000.axip2p: axi_cbb clk rate = 115 MHZ, timeout = 97000 useconds
+[    1.553669] tegra18-bridge 2100000.axip2p: enabled timeout = 11155000
+[    1.553672] tegra18-bridge 2100000.axip2p: bridge probed OK
+[    1.553727] tegra18-bridge 2110000.axip2p: axi_cbb clk rate = 115 MHZ, timeout = 97000 useconds
+[    1.553733] tegra18-bridge 2110000.axip2p: enabled timeout = 11155000
+[    1.553736] tegra18-bridge 2110000.axip2p: bridge probed OK
+[    1.553791] tegra18-bridge 2120000.axip2p: axi_cbb clk rate = 115 MHZ, timeout = 97000 useconds
+[    1.553807] tegra18-bridge 2120000.axip2p: enabled timeout = 11155000
+[    1.553810] tegra18-bridge 2120000.axip2p: bridge probed OK
+[    1.554964] tegra18-bridge 2130000.axip2p: axi_cbb clk rate = 115 MHZ, timeout = 97000 useconds
+[    1.554971] tegra18-bridge 2130000.axip2p: enabled timeout = 11155000
+[    1.554974] tegra18-bridge 2130000.axip2p: bridge probed OK
+[    1.555041] tegra18-bridge 2140000.axip2p: axi_cbb clk rate = 115 MHZ, timeout = 97000 useconds
+[    1.555068] tegra18-bridge 2140000.axip2p: enabled timeout = 11155000
+[    1.555071] tegra18-bridge 2140000.axip2p: bridge probed OK
+[    1.555337] ata1: SATA link down (SStatus 0 SControl 300)
+[    1.557253] tegra18-bridge 2150000.axip2p: axi_cbb clk rate = 115 MHZ, timeout = 97000 useconds
+[    1.557261] tegra18-bridge 2150000.axip2p: enabled timeout = 11155000
+[    1.557265] tegra18-bridge 2150000.axip2p: bridge probed OK
+[    1.557356] tegra18-bridge 2160000.axip2p: axi_cbb clk rate = 115 MHZ, timeout = 97000 useconds
+[    1.557366] tegra18-bridge 2160000.axip2p: enabled timeout = 11155000
+[    1.557369] tegra18-bridge 2160000.axip2p: bridge probed OK
+[    1.557503] tegra18-bridge 2170000.axip2p: axi_cbb clk rate = 115 MHZ, timeout = 97000 useconds
+[    1.557511] tegra18-bridge 2170000.axip2p: enabled timeout = 11155000
+[    1.557515] tegra18-bridge 2170000.axip2p: bridge probed OK
+[    1.557641] tegra18-bridge 2180000.axip2p: axi_cbb clk rate = 115 MHZ, timeout = 97000 useconds
+[    1.557648] tegra18-bridge 2180000.axip2p: enabled timeout = 11155000
+[    1.557652] tegra18-bridge 2180000.axip2p: bridge probed OK
+[    1.557713] tegra18-bridge 2190000.axip2p: axi_cbb clk rate = 115 MHZ, timeout = 97000 useconds
+[    1.557719] tegra18-bridge 2190000.axip2p: enabled timeout = 11155000
+[    1.557723] tegra18-bridge 2190000.axip2p: bridge probed OK
+[    1.557807] tegra18_a57_serr_init: on CPU 2 a Denver Core
+[    1.557894] tegra18x_actmon d230000.actmon: in actmon_register()...
+[    1.558408] tegra18x_actmon d230000.actmon: initialization Completed for the device mc_all
+[    1.558954] hw perfevents: enabled with denver15_uncore_pmu PMU driver, 3 counters available
+[    1.559095] denver_knobs_init:MTS_VERSION:47926945
+[    1.560875] nvpmodel: initialized successfully
+[    1.561340] gpio tegra-gpio wake71 for gpio=125(P:5)
+[    1.561397] mmc2: SDHCI controller on 3400000.sdhci [3400000.sdhci] using ADMA 64-bit with 64 bit addr
+[    1.563080] trusty-virtio trusty:virtio: initializing
+[    1.563288] trusty_ipc virtio0: vring0: va(pa)  ffffffc1e7d2e000(0) qsz 32 notifyid 1
+[    1.563298] trusty_ipc virtio0: vring1: va(pa)  ffffffc1e7d38000(0) qsz 32 notifyid 2
+[    1.563420] trusty-virtio trusty:virtio: initializing done
+[    1.563545] trusty_ipc virtio0: is online
+[    1.566019] usbcore: registered new interface driver snd-usb-audio
+[    1.574979] input: tegra-hda HDMI/DP,pcm=3 as /devices/3510000.hda/sound/card0/input0
+[    1.575199] input: tegra-hda HDMI/DP,pcm=7 as /devices/3510000.hda/sound/card0/input1
+[    1.594624] mmc0: mmc_decode_ext_csd: CMDQ supported: depth: 31, cmdq_support: 1
+[    1.610543] mmc0: periodic cache flush enabled
+[    1.610558] mmc0: new HS400 Enhanced strobe MMC card at address 0001
+[    1.611129] mmcblk0: mmc0:0001 032G34 29.1 GiB 
+[    1.615384] mmcblk0boot0: mmc0:0001 032G34 partition 1 4.00 MiB
+[    1.615581] mmcblk0boot1: mmc0:0001 032G34 partition 2 4.00 MiB
+[    1.615753] mmcblk0rpmb: mmc0:0001 032G34 partition 3 4.00 MiB
+[    1.619330]  mmcblk0: p1 p2 p3 p4 p5 p6 p7 p8 p9 p10 p11 p12 p13 p14 p15 p16 p17 p18 p19 p20 p21 p22 p23 p24 p25 p26 p27 p28 p29 p30 p31 p32 p33
+[    1.622200] OPE platform probe
+[    1.622292] OPE platform probe successful
+[    1.694468] tegra-asoc: sound: ADMAIF1 <-> ADMAIF1 mapping ok
+[    1.694552] tegra-asoc: sound: ADMAIF2 <-> ADMAIF2 mapping ok
+[    1.694633] tegra-asoc: sound: ADMAIF3 <-> ADMAIF3 mapping ok
+[    1.694710] tegra-asoc: sound: ADMAIF4 <-> ADMAIF4 mapping ok
+[    1.694787] tegra-asoc: sound: ADMAIF5 <-> ADMAIF5 mapping ok
+[    1.694864] tegra-asoc: sound: ADMAIF6 <-> ADMAIF6 mapping ok
+[    1.694960] tegra-asoc: sound: ADMAIF7 <-> ADMAIF7 mapping ok
+[    1.695066] tegra-asoc: sound: ADMAIF8 <-> ADMAIF8 mapping ok
+[    1.695140] tegra-asoc: sound: ADMAIF9 <-> ADMAIF9 mapping ok
+[    1.695219] tegra-asoc: sound: ADMAIF10 <-> ADMAIF10 mapping ok
+[    1.695297] tegra-asoc: sound: ADMAIF11 <-> ADMAIF11 mapping ok
+[    1.695377] tegra-asoc: sound: ADMAIF12 <-> ADMAIF12 mapping ok
+[    1.695457] tegra-asoc: sound: ADMAIF13 <-> ADMAIF13 mapping ok
+[    1.695540] tegra-asoc: sound: ADMAIF14 <-> ADMAIF14 mapping ok
+[    1.695622] tegra-asoc: sound: ADMAIF15 <-> ADMAIF15 mapping ok
+[    1.695699] tegra-asoc: sound: ADMAIF16 <-> ADMAIF16 mapping ok
+[    1.695773] tegra-asoc: sound: ADMAIF17 <-> ADMAIF17 mapping ok
+[    1.695853] tegra-asoc: sound: ADMAIF18 <-> ADMAIF18 mapping ok
+[    1.695933] tegra-asoc: sound: ADMAIF19 <-> ADMAIF19 mapping ok
+[    1.696035] tegra-asoc: sound: ADMAIF20 <-> ADMAIF20 mapping ok
+[    1.735339] u32 classifier
+[    1.735345]     Actions configured
+[    1.735439] Initializing XFRM netlink socket
+[    1.737307] NET: Registered protocol family 10
+[    1.738645] NET: Registered protocol family 17
+[    1.738660] NET: Registered protocol family 15
+[    1.738866] bridge: filtering via arp/ip/ip6tables is no longer available by default. Update your scripts to load br_netfilter if you need this.
+[    1.738946] Bluetooth: RFCOMM socket layer initialized
+[    1.738961] Bluetooth: RFCOMM ver 1.11
+[    1.738967] Bluetooth: HIDP (Human Interface Emulation) ver 1.2
+[    1.738972] Bluetooth: HIDP socket layer initialized
+[    1.739012] 9pnet: Installing 9P2000 support
+[    1.739057] Key type dns_resolver registered
+[    1.739415] Registered cp15_barrier emulation handler
+[    1.740432] Registered setend emulation handler
+[    1.748907] registered taskstats version 1
+[    1.753398] isp 15600000.isp: initialized
+[    1.758570] nvcsi 150c0000.nvcsi: initialized
+[    1.767082] gpio tegra-gpio-aon wake29 for gpio=56(FF:0)
+[    1.767167] gpio tegra-gpio-aon wake67 for gpio=57(FF:1)
+[    1.767258] gpio tegra-gpio-aon wake68 for gpio=58(FF:2)
+[    1.767432] input: gpio-keys as /devices/gpio-keys/input/input2
+[    1.767861] tegra-vi4 15700000.vi: initialized
+[    1.768690] tegra-vi4 15700000.vi: ep of_device is not enabled /host1x/vi@15700000/ports/port@0/endpoint.
+[    1.768695] tegra-vi4 15700000.vi: ep of_device is not enabled /host1x/vi@15700000/ports/port@1/endpoint.
+[    1.802611] tegra_rtc c2a0000.rtc: setting system clock to 2020-05-07 14:11:12 UTC (1588860672)
+[    1.804254] mmcblk mmc0:0001: Card claimed for testing.
+[    1.805877] mmc1: hw tuning done ...
+[    1.813052] mmc1: new ultra high speed SDR104 SDIO card at address 0001
+[    1.842043] bpmp: mounted debugfs mirror
+[    1.844160] bwmgr: missing cdev-type property
+[    1.850950] spmic-ldo0: disabling
+[    1.851146] spmic-ldo1: disabling
+[    1.851315] en-vdd-sd: disabling
+[    1.851319] vdd-usb0-5v: disabling
+[    1.851323] vdd-usb1-5v: disabling
+[    1.851326] vdd-3v3: disabling
+[    1.851329] en-vdd-vcm-2v8: disabling
+[    1.851353] vdd-sys-bl: disabling
+[    1.851357] ALSA device list:
+[    1.851362]   #0: tegra-hda at 0x3518000 irq 383
+[    1.851365]   #1: tegra-snd-t186ref-mobile-rt565x
+[    1.853239] Freeing unused kernel memory: 8576K
+[    1.884030] Root device found: mmcblk0p1
+[    1.885758] Found dev node: /dev/mmcblk0p1
+[    1.911997] EXT4-fs (mmcblk0p1): mounted filesystem with ordered data mode. Opts: (null)
+[    1.913223] Rootfs mounted over mmcblk0p1
+[    1.919355] tegra-pcie 10003000.pcie-controller: link 0 down, retrying
+[    1.941297] Switching from initrd to actual rootfs
+[    2.116987] tegra_cec 3960000.tegra_cec: Can't find physical addresse.
+[    2.116994] tegra_cec 3960000.tegra_cec: tegra_cec_init Done.
+[    2.136414] cgroup: cgroup2: unknown option "nsdelegate"
+[    2.165299] systemd[1]: systemd 237 running in system mode. (+PAM +AUDIT +SELINUX +IMA +APPARMOR +SMACK +SYSVINIT +UTMP +LIBCRYPTSETUP +GCRYPT +GNUTLS +ACL +XZ +LZ4 +SECCOMP +BLKID +ELFUTILS +KMOD -IDN2 +IDN -PCRE2 default-hierarchy=hybrid)
+[    2.168554] systemd[1]: Detected architecture arm64.
+[    2.258620] systemd[1]: Set hostname to <linux>.
+[    2.337993] tegra-pcie 10003000.pcie-controller: link 0 down, retrying
+[    2.340030] tegra-pcie 10003000.pcie-controller: link 0 down, ignoring
+[    2.346119] systemd[1]: File /lib/systemd/system/systemd-journald.service:36 configures an IP firewall (IPAddressDeny=any), but the local system does not support BPF/cgroup based firewalling.
+[    2.346143] systemd[1]: Proceeding WITHOUT firewalling in effect! (This warning is only shown for the first loaded unit using IP firewalling.)
+[    2.545250] random: systemd: uninitialized urandom read (16 bytes read)
+[    2.545752] systemd[1]: Started Forward Password Requests to Wall Directory Watch.
+[    2.546244] random: systemd: uninitialized urandom read (16 bytes read)
+[    2.553080] systemd[1]: Set up automount Arbitrary Executable File Formats File System Automount Point.
+[    2.553135] random: systemd: uninitialized urandom read (16 bytes read)
+[    2.556362] systemd[1]: Created slice User and Session Slice.
+[    2.556478] systemd[1]: Reached target Swap.
+[    2.558628] systemd[1]: Created slice System Slice.
+[    2.596706] EXT4-fs (mmcblk0p1): re-mounted. Opts: (null)
+[    2.744081] tegra-pcie 10003000.pcie-controller: link 2 down, retrying
+[    2.839143] systemd-journald[2269]: Received request to flush runtime journal from PID 1
+[    3.147019] tegra-pcie 10003000.pcie-controller: link 2 down, retrying
+[    3.541740] using random self ethernet address
+[    3.546613] using random host ethernet address
+[    3.567038] tegra-pcie 10003000.pcie-controller: link 2 down, retrying
+[    3.569074] tegra-pcie 10003000.pcie-controller: link 2 down, ignoring
+[    3.630089] random: crng init done
+[    3.633496] random: 7 urandom warning(s) missed due to ratelimiting
+[    3.773149] tegra-pcie 10003000.pcie-controller: PCIE: no end points detected
+[    3.773450] tegra-pcie 10003000.pcie-controller: PCIE: Disable power rails
+[    3.956151] Mass Storage Function, version: 2009/09/11
+[    3.956158] LUN: removable file: (no medium)
+[    3.966734] using random self ethernet address
+[    3.971252] using random host ethernet address
+[    4.052930] rndis0: HOST MAC 96:3a:5e:0b:bd:c4
+[    4.056748] rndis0: MAC 96:3a:5e:0b:bd:c5
+[    4.059678] usb0: HOST MAC 96:3a:5e:0b:bd:c6
+[    4.059723] usb0: MAC 96:3a:5e:0b:bd:c7
+[    4.059761] tegra-xudc-new 3550000.xudc: ep 0 (type: 0, dir: out) enabled
+[    4.073588] l4tbr0: port 1(rndis0) entered blocking state
+[    4.073594] l4tbr0: port 1(rndis0) entered disabled state
+[    4.073788] device rndis0 entered promiscuous mode
+[    4.108242] IPv6: ADDRCONF(NETDEV_UP): rndis0: link is not ready
+[    4.115496] l4tbr0: port 2(usb0) entered blocking state
+[    4.115500] l4tbr0: port 2(usb0) entered disabled state
+[    4.115645] device usb0 entered promiscuous mode
+[    4.126029] IPv6: ADDRCONF(NETDEV_UP): usb0: link is not ready
+[    4.258905] android_work: did not send uevent (0 0           (null))
+[    4.326295] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+[    4.351929] android_work: sent uevent USB_STATE=CONNECTED
+[    4.360464] configfs-gadget gadget: high-speed config #1: c
+[    4.360497] tegra-xudc-new 3550000.xudc: ep 5 (type: 3, dir: in) enabled
+[    4.360513] tegra-xudc-new 3550000.xudc: ep 3 (type: 2, dir: in) enabled
+[    4.360528] tegra-xudc-new 3550000.xudc: ep 2 (type: 2, dir: out) enabled
+[    4.360607] tegra-xudc-new 3550000.xudc: ep 9 (type: 3, dir: in) enabled
+[    4.360623] tegra-xudc-new 3550000.xudc: ep 7 (type: 2, dir: in) enabled
+[    4.360637] tegra-xudc-new 3550000.xudc: ep 4 (type: 2, dir: out) enabled
+[    4.360667] tegra-xudc-new 3550000.xudc: ep 15 (type: 3, dir: in) enabled
+[    4.360714] tegra-xudc-new 3550000.xudc: ep 11 (type: 2, dir: in) enabled
+[    4.360730] tegra-xudc-new 3550000.xudc: ep 6 (type: 2, dir: out) enabled
+[    4.360777] android_work: sent uevent USB_STATE=CONFIGURED
+[    4.364812] tegra-xudc-new 3550000.xudc: ep 13 (type: 2, dir: in) enabled
+[    4.364830] tegra-xudc-new 3550000.xudc: ep 8 (type: 2, dir: out) enabled
+[    4.365839] tegra-xudc-new 3550000.xudc: ep 13 disabled
+[    4.365919] tegra-xudc-new 3550000.xudc: ep 8 disabled
+[    4.384789] tegra-xudc-new 3550000.xudc: ep 13 (type: 2, dir: in) enabled
+[    4.384806] tegra-xudc-new 3550000.xudc: ep 8 (type: 2, dir: out) enabled
+[    4.409887] gpio tegra-gpio wake18 for gpio=101(M:5)
+[    4.414030] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+[    4.414160] IPv6: ADDRCONF(NETDEV_CHANGE): usb0: link becomes ready
+[    4.414252] IPv6: ADDRCONF(NETDEV_CHANGE): rndis0: link becomes ready
+[    4.429728] Wake76 for irq=199
+[    4.429734] Wake77 for irq=199
+[    4.429736] Wake78 for irq=199
+[    4.429738] Wake79 for irq=199
+[    4.429740] Wake80 for irq=199
+[    4.429743] Wake81 for irq=199
+[    4.429745] Wake82 for irq=199
+[    4.429791] tegra-xusb 3530000.xhci: Upgrade port 0 to USB3.0
+[    4.429797] tegra-xusb 3530000.xhci: Upgrade port 1 to USB3.0
+[    4.477651] CPU1: shutdown
+[    4.480393] psci: CPU1 killed.
+[    4.529252] usb usb2: usb_suspend_both: status 0
+[    4.557831] CPU2: shutdown
+[    4.560721] psci: CPU2 killed.
+[    5.551041] tegradc 15210000.nvdisplay: blank - powerdown
+[    5.939249] eqos 2490000.ether_qos eth0: Link is Up - 100Mbps/Full - flow control rx/tx
+[    5.939822] IPv6: ADDRCONF(NETDEV_CHANGE): eth0: link becomes ready
+[    6.981028] tegra-xusb 3530000.xhci: entering ELPG
+[    6.983778] tegra-xusb 3530000.xhci: entering ELPG done
+[    7.816598] tegradc 15210000.nvdisplay: blank - powerdown
+[    8.161592] tegradc 15210000.nvdisplay: blank - powerdown
+[    8.198695] l4tbr0: port 2(usb0) entered blocking state
+[    8.198700] l4tbr0: port 2(usb0) entered forwarding state
+[    8.198756] l4tbr0: port 1(rndis0) entered blocking state
+[    8.198759] l4tbr0: port 1(rndis0) entered forwarding state
+[    8.198878] IPv6: ADDRCONF(NETDEV_UP): l4tbr0: link is not ready
+[    8.198892] IPv6: ADDRCONF(NETDEV_CHANGE): l4tbr0: link becomes ready
+[   10.196883] tegradc 15210000.nvdisplay: blank - powerdown
+[   10.505010] tegradc 15210000.nvdisplay: blank - powerdown
+[   10.786716] tegradc 15210000.nvdisplay: blank - powerdown
+[   11.070720] tegradc 15210000.nvdisplay: blank - powerdown
+[   11.354529] tegradc 15210000.nvdisplay: blank - powerdown
+[   11.641709] tegradc 15210000.nvdisplay: blank - powerdown
+[   11.929855] tegradc 15210000.nvdisplay: blank - powerdown
+[   12.218772] tegradc 15210000.nvdisplay: blank - powerdown
+[   12.500627] tegradc 15210000.nvdisplay: blank - powerdown
+[   12.812870] tegradc 15210000.nvdisplay: blank - powerdown
+[   13.102931] tegradc 15210000.nvdisplay: blank - powerdown
+[   13.412783] tegradc 15210000.nvdisplay: blank - powerdown
+[   13.711591] tegradc 15210000.nvdisplay: blank - powerdown
+[   13.992795] tegradc 15210000.nvdisplay: blank - powerdown
+[   14.310024] tegradc 15210000.nvdisplay: blank - powerdown
+[   14.602916] tegradc 15210000.nvdisplay: blank - powerdown
+[   14.889361] tegradc 15210000.nvdisplay: blank - powerdown
+[   15.177071] tegradc 15210000.nvdisplay: blank - powerdown
+[   15.458064] tegradc 15210000.nvdisplay: blank - powerdown
+[   15.748424] tegradc 15210000.nvdisplay: blank - powerdown
+[   16.042470] tegradc 15210000.nvdisplay: blank - powerdown
+[   16.330558] tegradc 15210000.nvdisplay: blank - powerdown
+[   16.614639] tegradc 15210000.nvdisplay: blank - powerdown
+[   16.899103] tegradc 15210000.nvdisplay: blank - powerdown
+[   17.191228] tegradc 15210000.nvdisplay: blank - powerdown
+[   17.488312] tegradc 15210000.nvdisplay: blank - powerdown
+[   17.771302] tegradc 15210000.nvdisplay: blank - powerdown
+[   18.056195] tegradc 15210000.nvdisplay: blank - powerdown
+[   18.360563] tegradc 15210000.nvdisplay: blank - powerdown
+[   18.642528] tegradc 15210000.nvdisplay: blank - powerdown
+[   18.933849] tegradc 15210000.nvdisplay: blank - powerdown
+[   19.242787] tegradc 15210000.nvdisplay: blank - powerdown
+[   19.537962] tegradc 15210000.nvdisplay: blank - powerdown
+[   19.819165] tegradc 15210000.nvdisplay: blank - powerdown
+[   20.108371] tegradc 15210000.nvdisplay: blank - powerdown
+[   20.394259] tegradc 15210000.nvdisplay: blank - powerdown
+[   20.695402] tegradc 15210000.nvdisplay: blank - powerdown
+[   20.985102] tegradc 15210000.nvdisplay: blank - powerdown
+[   21.300570] tegradc 15210000.nvdisplay: blank - powerdown
+[   21.587068] tegradc 15210000.nvdisplay: blank - powerdown
+[   21.877768] tegradc 15210000.nvdisplay: blank - powerdown
+[   22.164550] tegradc 15210000.nvdisplay: blank - powerdown
+[   22.457155] tegradc 15210000.nvdisplay: blank - powerdown
+[   22.749889] tegradc 15210000.nvdisplay: blank - powerdown
+[   23.043878] tegradc 15210000.nvdisplay: blank - powerdown
+[   23.335701] tegradc 15210000.nvdisplay: blank - powerdown
+[   23.625147] tegradc 15210000.nvdisplay: blank - powerdown
+[   23.905943] tegradc 15210000.nvdisplay: blank - powerdown
+[   24.197106] tegradc 15210000.nvdisplay: blank - powerdown
+[   24.508429] tegradc 15210000.nvdisplay: blank - powerdown
+[   24.790195] tegradc 15210000.nvdisplay: blank - powerdown
+[   25.104537] tegradc 15210000.nvdisplay: blank - powerdown
+[   25.398535] tegradc 15210000.nvdisplay: blank - powerdown
+[   25.695659] tegradc 15210000.nvdisplay: blank - powerdown
+[   25.996647] tegradc 15210000.nvdisplay: blank - powerdown
+[   26.312363] tegradc 15210000.nvdisplay: blank - powerdown
+[   26.601529] tegradc 15210000.nvdisplay: blank - powerdown
+[   26.907377] tegradc 15210000.nvdisplay: blank - powerdown
+[   27.190411] tegradc 15210000.nvdisplay: blank - powerdown
+[   27.491992] tegradc 15210000.nvdisplay: blank - powerdown
+[   27.771806] tegradc 15210000.nvdisplay: blank - powerdown
+[   28.045857] tegradc 15210000.nvdisplay: blank - powerdown
+[   28.332068] tegradc 15210000.nvdisplay: blank - powerdown
+[   28.617037] tegradc 15210000.nvdisplay: blank - powerdown
+[   28.906935] tegradc 15210000.nvdisplay: blank - powerdown
+[   29.200468] tegradc 15210000.nvdisplay: blank - powerdown
+[   29.493330] tegradc 15210000.nvdisplay: blank - powerdown
+[   29.781462] tegradc 15210000.nvdisplay: blank - powerdown
+[   30.081209] tegradc 15210000.nvdisplay: blank - powerdown
+[   30.366176] tegradc 15210000.nvdisplay: blank - powerdown
+[   30.648491] tegradc 15210000.nvdisplay: blank - powerdown
+[   30.968820] tegradc 15210000.nvdisplay: blank - powerdown
+[   31.263002] tegradc 15210000.nvdisplay: blank - powerdown
+[   31.561189] tegradc 15210000.nvdisplay: blank - powerdown
+[   31.879344] tegradc 15210000.nvdisplay: blank - powerdown
+[   32.167363] tegradc 15210000.nvdisplay: blank - powerdown
+[   32.450636] tegradc 15210000.nvdisplay: blank - powerdown
+[   32.740003] tegradc 15210000.nvdisplay: blank - powerdown
+[   33.040916] tegradc 15210000.nvdisplay: blank - powerdown
+[   33.379025] tegradc 15210000.nvdisplay: blank - powerdown
+[   33.673955] tegradc 15210000.nvdisplay: blank - powerdown
+[   33.961859] tegradc 15210000.nvdisplay: blank - powerdown
+[   34.298094] tegradc 15210000.nvdisplay: blank - powerdown
+[   34.593192] tegradc 15210000.nvdisplay: blank - powerdown
+[   34.891631] tegradc 15210000.nvdisplay: blank - powerdown
+[   35.185138] tegradc 15210000.nvdisplay: blank - powerdown
+[   35.479003] tegradc 15210000.nvdisplay: blank - powerdown
+[   35.803965] tegradc 15210000.nvdisplay: blank - powerdown
+[   36.099661] tegradc 15210000.nvdisplay: blank - powerdown
+[   36.396069] tegradc 15210000.nvdisplay: blank - powerdown
+[   36.690156] tegradc 15210000.nvdisplay: blank - powerdown
+[   36.976224] tegradc 15210000.nvdisplay: blank - powerdown
+[   37.265222] tegradc 15210000.nvdisplay: blank - powerdown
+[   37.585342] tegradc 15210000.nvdisplay: blank - powerdown
+[   37.897332] tegradc 15210000.nvdisplay: blank - powerdown
+[   38.196000] tegradc 15210000.nvdisplay: blank - powerdown
+[   38.484960] tegradc 15210000.nvdisplay: blank - powerdown
+[   38.802632] tegradc 15210000.nvdisplay: blank - powerdown
+[   39.101062] tegradc 15210000.nvdisplay: blank - powerdown
+[   39.408202] tegradc 15210000.nvdisplay: blank - powerdown
+[   39.724883] tegradc 15210000.nvdisplay: blank - powerdown
+[   40.018501] tegradc 15210000.nvdisplay: blank - powerdown
+[   40.309162] tegradc 15210000.nvdisplay: blank - powerdown
+[   40.621128] tegradc 15210000.nvdisplay: blank - powerdown
+[   40.916166] tegradc 15210000.nvdisplay: blank - powerdown
+[   41.203976] tegradc 15210000.nvdisplay: blank - powerdown
+[   41.521576] tegradc 15210000.nvdisplay: blank - powerdown
+[   41.811250] tegradc 15210000.nvdisplay: blank - powerdown
+[   42.098247] tegradc 15210000.nvdisplay: blank - powerdown
+[   42.389326] tegradc 15210000.nvdisplay: blank - powerdown
+[   42.710374] tegradc 15210000.nvdisplay: blank - powerdown
+[   43.023775] tegradc 15210000.nvdisplay: blank - powerdown
+[   43.322516] tegradc 15210000.nvdisplay: blank - powerdown
+[   43.641081] tegradc 15210000.nvdisplay: blank - powerdown
+[   43.954239] tegradc 15210000.nvdisplay: blank - powerdown
+[   44.242761] tegradc 15210000.nvdisplay: blank - powerdown
+[   44.529258] tegradc 15210000.nvdisplay: blank - powerdown
+[   44.820514] tegradc 15210000.nvdisplay: blank - powerdown
+[   45.148846] tegradc 15210000.nvdisplay: blank - powerdown
+[   45.444196] tegradc 15210000.nvdisplay: blank - powerdown
+[   45.764314] tegradc 15210000.nvdisplay: blank - powerdown
+[   46.087757] tegradc 15210000.nvdisplay: blank - powerdown
+[   46.415775] tegradc 15210000.nvdisplay: blank - powerdown
+[   46.727623] tegradc 15210000.nvdisplay: blank - powerdown
+[   47.052182] tegradc 15210000.nvdisplay: blank - powerdown
+[   47.368182] tegradc 15210000.nvdisplay: blank - powerdown
+[   47.679113] tegradc 15210000.nvdisplay: blank - powerdown
+[   47.977397] tegradc 15210000.nvdisplay: blank - powerdown
+[   48.278147] tegradc 15210000.nvdisplay: blank - powerdown
+[   48.601058] tegradc 15210000.nvdisplay: blank - powerdown
+[   48.920021] tegradc 15210000.nvdisplay: blank - powerdown
+[   49.210780] tegradc 15210000.nvdisplay: blank - powerdown
+[   49.531278] tegradc 15210000.nvdisplay: blank - powerdown
+[   49.840944] tegradc 15210000.nvdisplay: blank - powerdown
+[   50.164309] tegradc 15210000.nvdisplay: blank - powerdown
+[   50.467691] tegradc 15210000.nvdisplay: blank - powerdown
+[   50.787834] tegradc 15210000.nvdisplay: blank - powerdown
+[   51.098879] tegradc 15210000.nvdisplay: blank - powerdown
+[   51.395005] tegradc 15210000.nvdisplay: blank - powerdown
+[   51.714669] tegradc 15210000.nvdisplay: blank - powerdown
+[   52.010820] tegradc 15210000.nvdisplay: blank - powerdown
+[   52.312902] tegradc 15210000.nvdisplay: blank - powerdown
+[   52.635161] tegradc 15210000.nvdisplay: blank - powerdown
+[   52.955069] tegradc 15210000.nvdisplay: blank - powerdown
+[   53.255439] tegradc 15210000.nvdisplay: blank - powerdown
+[   53.579847] tegradc 15210000.nvdisplay: blank - powerdown
+[   53.874736] tegradc 15210000.nvdisplay: blank - powerdown
+[   54.171773] tegradc 15210000.nvdisplay: blank - powerdown
+[   54.495273] tegradc 15210000.nvdisplay: blank - powerdown
+[   54.817808] tegradc 15210000.nvdisplay: blank - powerdown
+[   55.130014] tegradc 15210000.nvdisplay: blank - powerdown
+[   55.439746] tegradc 15210000.nvdisplay: blank - powerdown
+[   55.759550] tegradc 15210000.nvdisplay: blank - powerdown
+[   56.061778] tegradc 15210000.nvdisplay: blank - powerdown
+[   56.362144] tegradc 15210000.nvdisplay: blank - powerdown
+[   56.688228] tegradc 15210000.nvdisplay: blank - powerdown
+[   56.985471] tegradc 15210000.nvdisplay: blank - powerdown
+[   57.301363] tegradc 15210000.nvdisplay: blank - powerdown
+[   57.645473] tegradc 15210000.nvdisplay: blank - powerdown
+[   57.946832] tegradc 15210000.nvdisplay: blank - powerdown
+[   58.289444] tegradc 15210000.nvdisplay: blank - powerdown
+[   58.593796] tegradc 15210000.nvdisplay: blank - powerdown
+[   58.918051] tegradc 15210000.nvdisplay: blank - powerdown
+[   59.239184] tegradc 15210000.nvdisplay: blank - powerdown
+[   59.550370] tegradc 15210000.nvdisplay: blank - powerdown
+[   59.887554] tegradc 15210000.nvdisplay: blank - powerdown
+[   60.213940] tegradc 15210000.nvdisplay: blank - powerdown
+[   60.529361] tegradc 15210000.nvdisplay: blank - powerdown
+[   60.861743] tegradc 15210000.nvdisplay: blank - powerdown
+[   61.206066] tegradc 15210000.nvdisplay: blank - powerdown
+[   61.505854] tegradc 15210000.nvdisplay: blank - powerdown
+[   61.844637] tegradc 15210000.nvdisplay: blank - powerdown
+[   62.153903] tegradc 15210000.nvdisplay: blank - powerdown
+[   62.474732] tegradc 15210000.nvdisplay: blank - powerdown
+[   62.799494] tegradc 15210000.nvdisplay: blank - powerdown
+[   63.108113] tegradc 15210000.nvdisplay: blank - powerdown
+[   63.416155] tegradc 15210000.nvdisplay: blank - powerdown
+[   63.748116] tegradc 15210000.nvdisplay: blank - powerdown
+[   64.074327] tegradc 15210000.nvdisplay: blank - powerdown
+[   64.400746] tegradc 15210000.nvdisplay: blank - powerdown
+[   64.701743] tegradc 15210000.nvdisplay: blank - powerdown
+[   65.023401] tegradc 15210000.nvdisplay: blank - powerdown
+[   65.320014] tegradc 15210000.nvdisplay: blank - powerdown
+[   65.641414] tegradc 15210000.nvdisplay: blank - powerdown
+[   65.970603] tegradc 15210000.nvdisplay: blank - powerdown
+[   66.276948] tegradc 15210000.nvdisplay: blank - powerdown
+[   66.583340] tegradc 15210000.nvdisplay: blank - powerdown
+[   66.909593] tegradc 15210000.nvdisplay: blank - powerdown
+[   67.240970] tegradc 15210000.nvdisplay: blank - powerdown
+[   67.545057] tegradc 15210000.nvdisplay: blank - powerdown
+[   67.872047] tegradc 15210000.nvdisplay: blank - powerdown
+[   68.196972] tegradc 15210000.nvdisplay: blank - powerdown
+[   68.520363] tegradc 15210000.nvdisplay: blank - powerdown
+[   68.843538] tegradc 15210000.nvdisplay: blank - powerdown
+[   69.146439] tegradc 15210000.nvdisplay: blank - powerdown
+[   69.463567] tegradc 15210000.nvdisplay: blank - powerdown
+[   69.786159] tegradc 15210000.nvdisplay: blank - powerdown
+[   70.096883] tegradc 15210000.nvdisplay: blank - powerdown
+[   70.415387] tegradc 15210000.nvdisplay: blank - powerdown
+[   70.739247] tegradc 15210000.nvdisplay: blank - powerdown
+[   71.068044] tegradc 15210000.nvdisplay: blank - powerdown
+[   71.412050] tegradc 15210000.nvdisplay: blank - powerdown
+[   71.741547] tegradc 15210000.nvdisplay: blank - powerdown
+[   72.052140] tegradc 15210000.nvdisplay: blank - powerdown
+[   72.408009] tegradc 15210000.nvdisplay: blank - powerdown
+[   72.731800] tegradc 15210000.nvdisplay: blank - powerdown
+[   73.059464] tegradc 15210000.nvdisplay: blank - powerdown
+[   73.380934] tegradc 15210000.nvdisplay: blank - powerdown
+[   73.702625] tegradc 15210000.nvdisplay: blank - powerdown
+[   74.020927] tegradc 15210000.nvdisplay: blank - powerdown
+[   74.353609] tegradc 15210000.nvdisplay: blank - powerdown
+[   74.653292] tegradc 15210000.nvdisplay: blank - powerdown
+[   74.976795] tegradc 15210000.nvdisplay: blank - powerdown
+[   75.297273] tegradc 15210000.nvdisplay: blank - powerdown
+[   75.617475] tegradc 15210000.nvdisplay: blank - powerdown
+[   75.949937] tegradc 15210000.nvdisplay: blank - powerdown
+[   76.245697] tegradc 15210000.nvdisplay: blank - powerdown
+[   76.593147] tegradc 15210000.nvdisplay: blank - powerdown
+[   76.896110] tegradc 15210000.nvdisplay: blank - powerdown
+[   77.223225] tegradc 15210000.nvdisplay: blank - powerdown
+[   77.552611] tegradc 15210000.nvdisplay: blank - powerdown
+[   77.875125] tegradc 15210000.nvdisplay: blank - powerdown
+[   78.185918] tegradc 15210000.nvdisplay: blank - powerdown
+[   78.513584] tegradc 15210000.nvdisplay: blank - powerdown
+[   78.870419] tegradc 15210000.nvdisplay: blank - powerdown
+[   79.200262] tegradc 15210000.nvdisplay: blank - powerdown
+[   79.534381] tegradc 15210000.nvdisplay: blank - powerdown
+[   79.854138] tegradc 15210000.nvdisplay: blank - powerdown
+[   80.181647] tegradc 15210000.nvdisplay: blank - powerdown
+[   80.539653] tegradc 15210000.nvdisplay: blank - powerdown
+[   80.865321] tegradc 15210000.nvdisplay: blank - powerdown
+[   81.183530] tegradc 15210000.nvdisplay: blank - powerdown
+[   81.518450] tegradc 15210000.nvdisplay: blank - powerdown
+[   81.847068] tegradc 15210000.nvdisplay: blank - powerdown
+[   82.166740] tegradc 15210000.nvdisplay: blank - powerdown
+[   82.501187] tegradc 15210000.nvdisplay: blank - powerdown
+[   82.817377] tegradc 15210000.nvdisplay: blank - powerdown
+[   83.147010] tegradc 15210000.nvdisplay: blank - powerdown
+[   83.476821] tegradc 15210000.nvdisplay: blank - powerdown
+[   83.807986] tegradc 15210000.nvdisplay: blank - powerdown
+[   84.137717] tegradc 15210000.nvdisplay: blank - powerdown
+[   84.470826] tegradc 15210000.nvdisplay: blank - powerdown
+[   84.790075] tegradc 15210000.nvdisplay: blank - powerdown
+[   85.122065] tegradc 15210000.nvdisplay: blank - powerdown
+[   85.455323] tegradc 15210000.nvdisplay: blank - powerdown
+[   85.764215] tegradc 15210000.nvdisplay: blank - powerdown
+[   86.084352] tegradc 15210000.nvdisplay: blank - powerdown
+[   86.421573] tegradc 15210000.nvdisplay: blank - powerdown
+[   86.759630] tegradc 15210000.nvdisplay: blank - powerdown
+[   87.081729] tegradc 15210000.nvdisplay: blank - powerdown
+[   87.421489] tegradc 15210000.nvdisplay: blank - powerdown
+[   87.763229] tegradc 15210000.nvdisplay: blank - powerdown
+[   88.079593] tegradc 15210000.nvdisplay: blank - powerdown
+[   88.434498] tegradc 15210000.nvdisplay: blank - powerdown
+[   88.770803] tegradc 15210000.nvdisplay: blank - powerdown
+[   89.078745] tegradc 15210000.nvdisplay: blank - powerdown
+[   89.409092] tegradc 15210000.nvdisplay: blank - powerdown
+[   89.740211] tegradc 15210000.nvdisplay: blank - powerdown
+[   90.073889] tegradc 15210000.nvdisplay: blank - powerdown
+[   90.407840] tegradc 15210000.nvdisplay: blank - powerdown
+[   90.741237] tegradc 15210000.nvdisplay: blank - powerdown
+[   91.065360] tegradc 15210000.nvdisplay: blank - powerdown
+[   91.403905] tegradc 15210000.nvdisplay: blank - powerdown
+[   91.736440] tegradc 15210000.nvdisplay: blank - powerdown
+[   92.075019] tegradc 15210000.nvdisplay: blank - powerdown
+[   92.405527] tegradc 15210000.nvdisplay: blank - powerdown
+[   92.736276] tegradc 15210000.nvdisplay: blank - powerdown
+[   93.062527] tegradc 15210000.nvdisplay: blank - powerdown
+[   93.400295] tegradc 15210000.nvdisplay: blank - powerdown
+[   93.740910] tegradc 15210000.nvdisplay: blank - powerdown
+[   94.081067] tegradc 15210000.nvdisplay: blank - powerdown
+[   94.416883] tegradc 15210000.nvdisplay: blank - powerdown
+[   94.749686] tegradc 15210000.nvdisplay: blank - powerdown
+[   95.059182] tegradc 15210000.nvdisplay: blank - powerdown
+[   95.378377] tegradc 15210000.nvdisplay: blank - powerdown
+[   95.718565] tegradc 15210000.nvdisplay: blank - powerdown
+[   96.054757] tegradc 15210000.nvdisplay: blank - powerdown
+[   96.373552] tegradc 15210000.nvdisplay: blank - powerdown
+[   96.682173] tegradc 15210000.nvdisplay: blank - powerdown
+[   97.025180] tegradc 15210000.nvdisplay: blank - powerdown
+[   97.356650] tegradc 15210000.nvdisplay: blank - powerdown
+[   97.690022] tegradc 15210000.nvdisplay: blank - powerdown
+[   98.040603] tegradc 15210000.nvdisplay: blank - powerdown
+[   98.378323] tegradc 15210000.nvdisplay: blank - powerdown
+[   98.713958] tegradc 15210000.nvdisplay: blank - powerdown
+[   99.032419] tegradc 15210000.nvdisplay: blank - powerdown
+[   99.354727] tegradc 15210000.nvdisplay: blank - powerdown
+[   99.677210] tegradc 15210000.nvdisplay: blank - powerdown
+[   99.996014] tegradc 15210000.nvdisplay: blank - powerdown
+[  100.357276] tegradc 15210000.nvdisplay: blank - powerdown
+[  100.712413] tegradc 15210000.nvdisplay: blank - powerdown
+[  101.055087] tegradc 15210000.nvdisplay: blank - powerdown
+[  101.395791] tegradc 15210000.nvdisplay: blank - powerdown
+[  101.737239] tegradc 15210000.nvdisplay: blank - powerdown
+[  102.073748] tegradc 15210000.nvdisplay: blank - powerdown
+[  102.440713] tegradc 15210000.nvdisplay: blank - powerdown
+[  102.786478] tegradc 15210000.nvdisplay: blank - powerdown
+[  103.127641] tegradc 15210000.nvdisplay: blank - powerdown
+[  103.485406] tegradc 15210000.nvdisplay: blank - powerdown
+[  103.800062] tegradc 15210000.nvdisplay: blank - powerdown
+[  104.138598] tegradc 15210000.nvdisplay: blank - powerdown
+[  104.473173] tegradc 15210000.nvdisplay: blank - powerdown
+[  104.805075] tegradc 15210000.nvdisplay: blank - powerdown
+[  105.146607] tegradc 15210000.nvdisplay: blank - powerdown
+[  105.482906] tegradc 15210000.nvdisplay: blank - powerdown
+[  105.821219] tegradc 15210000.nvdisplay: blank - powerdown
+[  106.154373] tegradc 15210000.nvdisplay: blank - powerdown
+[  106.482674] tegradc 15210000.nvdisplay: blank - powerdown
+[  106.818686] tegradc 15210000.nvdisplay: blank - powerdown
+[  107.156762] tegradc 15210000.nvdisplay: blank - powerdown
+[  107.520363] tegradc 15210000.nvdisplay: blank - powerdown
+[  107.878676] tegradc 15210000.nvdisplay: blank - powerdown
+[  108.203318] tegradc 15210000.nvdisplay: blank - powerdown
+[  108.530883] tegradc 15210000.nvdisplay: blank - powerdown
+[  108.856609] tegradc 15210000.nvdisplay: blank - powerdown
+[  109.197175] tegradc 15210000.nvdisplay: blank - powerdown
+[  109.532884] tegradc 15210000.nvdisplay: blank - powerdown
+[  109.888388] tegradc 15210000.nvdisplay: blank - powerdown
+[  110.222865] tegradc 15210000.nvdisplay: blank - powerdown
+[  110.559460] tegradc 15210000.nvdisplay: blank - powerdown
+[  110.893808] tegradc 15210000.nvdisplay: blank - powerdown
+[  111.236145] tegradc 15210000.nvdisplay: blank - powerdown
+[  111.574413] tegradc 15210000.nvdisplay: blank - powerdown
+[  111.903702] tegradc 15210000.nvdisplay: blank - powerdown
+[  112.231189] tegradc 15210000.nvdisplay: blank - powerdown
+[  112.560548] tegradc 15210000.nvdisplay: blank - powerdown
+[  112.889890] tegradc 15210000.nvdisplay: blank - powerdown
+[  113.221096] tegradc 15210000.nvdisplay: blank - powerdown
+[  113.563720] tegradc 15210000.nvdisplay: blank - powerdown
+[  113.908299] tegradc 15210000.nvdisplay: blank - powerdown
+[  114.264570] tegradc 15210000.nvdisplay: blank - powerdown
+[  114.631330] tegradc 15210000.nvdisplay: blank - powerdown
+[  114.978901] tegradc 15210000.nvdisplay: blank - powerdown
+[  115.325570] tegradc 15210000.nvdisplay: blank - powerdown
+[  115.664938] tegradc 15210000.nvdisplay: blank - powerdown
+[  116.002153] tegradc 15210000.nvdisplay: blank - powerdown
+[  116.350974] tegradc 15210000.nvdisplay: blank - powerdown
+[  116.700441] tegradc 15210000.nvdisplay: blank - powerdown
+[  117.062778] tegradc 15210000.nvdisplay: blank - powerdown
+[  117.403487] tegradc 15210000.nvdisplay: blank - powerdown
+[  117.734822] tegradc 15210000.nvdisplay: blank - powerdown
+[  118.071566] tegradc 15210000.nvdisplay: blank - powerdown
+[  118.407833] tegradc 15210000.nvdisplay: blank - powerdown
+[  118.746429] tegradc 15210000.nvdisplay: blank - powerdown
+[  119.095775] tegradc 15210000.nvdisplay: blank - powerdown
+[  119.428981] tegradc 15210000.nvdisplay: blank - powerdown
+[  119.787896] tegradc 15210000.nvdisplay: blank - powerdown
+[  120.123752] tegradc 15210000.nvdisplay: blank - powerdown
+[  120.481139] tegradc 15210000.nvdisplay: blank - powerdown
+[  120.829763] tegradc 15210000.nvdisplay: blank - powerdown
+[  121.170429] tegradc 15210000.nvdisplay: blank - powerdown
+[  121.535663] tegradc 15210000.nvdisplay: blank - powerdown
+[  121.890613] tegradc 15210000.nvdisplay: blank - powerdown
+[  122.234177] tegradc 15210000.nvdisplay: blank - powerdown
+[  122.575197] tegradc 15210000.nvdisplay: blank - powerdown
+[  122.920364] tegradc 15210000.nvdisplay: blank - powerdown
+[  123.264447] tegradc 15210000.nvdisplay: blank - powerdown
+[  123.602124] tegradc 15210000.nvdisplay: blank - powerdown
+[  123.944239] tegradc 15210000.nvdisplay: blank - powerdown
+[  124.274949] tegradc 15210000.nvdisplay: blank - powerdown
+[  124.616644] tegradc 15210000.nvdisplay: blank - powerdown
+[  124.946607] tegradc 15210000.nvdisplay: blank - powerdown
+[  125.288207] tegradc 15210000.nvdisplay: blank - powerdown
+[  125.641424] tegradc 15210000.nvdisplay: blank - powerdown
+[  125.972769] tegradc 15210000.nvdisplay: blank - powerdown
+[  126.309849] tegradc 15210000.nvdisplay: blank - powerdown
+[  126.678027] tegradc 15210000.nvdisplay: blank - powerdown
+[  127.029888] tegradc 15210000.nvdisplay: blank - powerdown
+[  127.376522] tegradc 15210000.nvdisplay: blank - powerdown
+[  127.721094] tegradc 15210000.nvdisplay: blank - powerdown
+[  128.066593] tegradc 15210000.nvdisplay: blank - powerdown
+[  128.410384] tegradc 15210000.nvdisplay: blank - powerdown
+[  128.745185] tegradc 15210000.nvdisplay: blank - powerdown
+[  129.096954] tegradc 15210000.nvdisplay: blank - powerdown
+[  129.435427] tegradc 15210000.nvdisplay: blank - powerdown
+[  129.801140] tegradc 15210000.nvdisplay: blank - powerdown
+[  130.131684] tegradc 15210000.nvdisplay: blank - powerdown
+[  130.505480] tegradc 15210000.nvdisplay: blank - powerdown
+[  130.852871] tegradc 15210000.nvdisplay: blank - powerdown
+[  131.196579] tegradc 15210000.nvdisplay: blank - powerdown
+[  131.537923] tegradc 15210000.nvdisplay: blank - powerdown
+[  131.878462] tegradc 15210000.nvdisplay: blank - powerdown
+[  132.231740] tegradc 15210000.nvdisplay: blank - powerdown
+[  132.577269] tegradc 15210000.nvdisplay: blank - powerdown
+[  132.923462] tegradc 15210000.nvdisplay: blank - powerdown
+[  133.270373] tegradc 15210000.nvdisplay: blank - powerdown
+[  133.620493] tegradc 15210000.nvdisplay: blank - powerdown
+[  133.960266] tegradc 15210000.nvdisplay: blank - powerdown
+[  134.310450] tegradc 15210000.nvdisplay: blank - powerdown
+[  134.655655] tegradc 15210000.nvdisplay: blank - powerdown
+[  135.002714] tegradc 15210000.nvdisplay: blank - powerdown
+[  135.347292] tegradc 15210000.nvdisplay: blank - powerdown
+[  135.693296] tegradc 15210000.nvdisplay: blank - powerdown
+[  136.038432] tegradc 15210000.nvdisplay: blank - powerdown
+[  136.380460] tegradc 15210000.nvdisplay: blank - powerdown
+[  136.734228] tegradc 15210000.nvdisplay: blank - powerdown
+[  137.077053] tegradc 15210000.nvdisplay: blank - powerdown
+[  137.425459] tegradc 15210000.nvdisplay: blank - powerdown
+[  137.780076] tegradc 15210000.nvdisplay: blank - powerdown
+[  138.108379] tegradc 15210000.nvdisplay: blank - powerdown
+[  138.458225] tegradc 15210000.nvdisplay: blank - powerdown
+[  138.809014] tegradc 15210000.nvdisplay: blank - powerdown
+[  139.158509] tegradc 15210000.nvdisplay: blank - powerdown
+[  139.500639] tegradc 15210000.nvdisplay: blank - powerdown
+[  139.854500] tegradc 15210000.nvdisplay: blank - powerdown
+[  140.227299] tegradc 15210000.nvdisplay: blank - powerdown
+[  140.557872] tegradc 15210000.nvdisplay: blank - powerdown
+[  140.899658] tegradc 15210000.nvdisplay: blank - powerdown
+[  141.248480] tegradc 15210000.nvdisplay: blank - powerdown
+[  141.594431] tegradc 15210000.nvdisplay: blank - powerdown
+[  141.937761] tegradc 15210000.nvdisplay: blank - powerdown
+[  142.281812] tegradc 15210000.nvdisplay: blank - powerdown
+[  142.634272] tegradc 15210000.nvdisplay: blank - powerdown
+[  143.011199] tegradc 15210000.nvdisplay: blank - powerdown
+[  143.380985] tegradc 15210000.nvdisplay: blank - powerdown
+[  143.727438] tegradc 15210000.nvdisplay: blank - powerdown
+[  144.071479] tegradc 15210000.nvdisplay: blank - powerdown
+[  144.443135] tegradc 15210000.nvdisplay: blank - powerdown
+[  144.816401] tegradc 15210000.nvdisplay: blank - powerdown
+[  145.172390] tegradc 15210000.nvdisplay: blank - powerdown
+[  145.540169] tegradc 15210000.nvdisplay: blank - powerdown
+[  145.917234] tegradc 15210000.nvdisplay: blank - powerdown
+[  146.277142] tegradc 15210000.nvdisplay: blank - powerdown
+[  146.633294] tegradc 15210000.nvdisplay: blank - powerdown
+[  146.981930] tegradc 15210000.nvdisplay: blank - powerdown
+[  147.328909] tegradc 15210000.nvdisplay: blank - powerdown
+[  147.674341] tegradc 15210000.nvdisplay: blank - powerdown
+[  148.018648] tegradc 15210000.nvdisplay: blank - powerdown
+[  148.373929] tegradc 15210000.nvdisplay: blank - powerdown
+[  148.730893] tegradc 15210000.nvdisplay: blank - powerdown
+[  149.089200] tegradc 15210000.nvdisplay: blank - powerdown
+[  149.439245] tegradc 15210000.nvdisplay: blank - powerdown
+[  149.794771] tegradc 15210000.nvdisplay: blank - powerdown
+[  150.140212] tegradc 15210000.nvdisplay: blank - powerdown
+[  150.495358] tegradc 15210000.nvdisplay: blank - powerdown
+[  150.849424] tegradc 15210000.nvdisplay: blank - powerdown
+[  151.213322] tegradc 15210000.nvdisplay: blank - powerdown
+[  151.566809] tegradc 15210000.nvdisplay: blank - powerdown
+[  151.918141] tegradc 15210000.nvdisplay: blank - powerdown
+[  152.268946] tegradc 15210000.nvdisplay: blank - powerdown
+[  152.610015] tegradc 15210000.nvdisplay: blank - powerdown
+[  152.950700] tegradc 15210000.nvdisplay: blank - powerdown
+[  153.303908] tegradc 15210000.nvdisplay: blank - powerdown
+[  153.653937] tegradc 15210000.nvdisplay: blank - powerdown
+[  154.003967] tegradc 15210000.nvdisplay: blank - powerdown
+[  154.349238] tegradc 15210000.nvdisplay: blank - powerdown
+[  154.705162] tegradc 15210000.nvdisplay: blank - powerdown
+[  155.046246] tegradc 15210000.nvdisplay: blank - powerdown
+[  155.401027] tegradc 15210000.nvdisplay: blank - powerdown
+[  155.778958] tegradc 15210000.nvdisplay: blank - powerdown
+[  156.122266] tegradc 15210000.nvdisplay: blank - powerdown
+[  156.473343] tegradc 15210000.nvdisplay: blank - powerdown
+[  156.810412] tegradc 15210000.nvdisplay: blank - powerdown
+[  157.154081] tegradc 15210000.nvdisplay: blank - powerdown
+[  157.512131] tegradc 15210000.nvdisplay: blank - powerdown
+[  157.855959] tegradc 15210000.nvdisplay: blank - powerdown
+[  158.210458] tegradc 15210000.nvdisplay: blank - powerdown
+[  158.604575] tegradc 15210000.nvdisplay: blank - powerdown
+[  158.962900] tegradc 15210000.nvdisplay: blank - powerdown
+[  159.318383] tegradc 15210000.nvdisplay: blank - powerdown
+[  159.717144] tegradc 15210000.nvdisplay: blank - powerdown
+[  160.071445] tegradc 15210000.nvdisplay: blank - powerdown
+[  160.418292] tegradc 15210000.nvdisplay: blank - powerdown
+[  160.769324] tegradc 15210000.nvdisplay: blank - powerdown
+[  161.153786] tegradc 15210000.nvdisplay: blank - powerdown
+[  161.533201] tegradc 15210000.nvdisplay: blank - powerdown
+[  161.895830] tegradc 15210000.nvdisplay: blank - powerdown
+[  162.275312] tegradc 15210000.nvdisplay: blank - powerdown
+[  162.665326] tegradc 15210000.nvdisplay: blank - powerdown
+[  163.020977] tegradc 15210000.nvdisplay: blank - powerdown
+[  163.368159] tegradc 15210000.nvdisplay: blank - powerdown
+[  163.718825] tegradc 15210000.nvdisplay: blank - powerdown
+[  164.106631] tegradc 15210000.nvdisplay: blank - powerdown
+[  164.477529] tegradc 15210000.nvdisplay: blank - powerdown
+[  164.831571] tegradc 15210000.nvdisplay: blank - powerdown
+[  165.175074] tegradc 15210000.nvdisplay: blank - powerdown
+[  165.527199] tegradc 15210000.nvdisplay: blank - powerdown
+[  165.888688] tegradc 15210000.nvdisplay: blank - powerdown
+[  166.237166] tegradc 15210000.nvdisplay: blank - powerdown
+[  166.594214] tegradc 15210000.nvdisplay: blank - powerdown
+[  166.947243] tegradc 15210000.nvdisplay: blank - powerdown
+[  167.304473] tegradc 15210000.nvdisplay: blank - powerdown
+[  167.660665] tegradc 15210000.nvdisplay: blank - powerdown
+[  168.027133] tegradc 15210000.nvdisplay: blank - powerdown
+[  168.428453] tegradc 15210000.nvdisplay: blank - powerdown
+[  168.785447] tegradc 15210000.nvdisplay: blank - powerdown
+[  169.181752] tegradc 15210000.nvdisplay: blank - powerdown
+[  169.586988] tegradc 15210000.nvdisplay: blank - powerdown
+[  169.929251] tegradc 15210000.nvdisplay: blank - powerdown
+[  170.276827] tegradc 15210000.nvdisplay: blank - powerdown
+[  170.635770] tegradc 15210000.nvdisplay: blank - powerdown
+[  170.982633] tegradc 15210000.nvdisplay: blank - powerdown
+[  171.362768] tegradc 15210000.nvdisplay: blank - powerdown
+[  171.719496] tegradc 15210000.nvdisplay: blank - powerdown
+[  172.079793] tegradc 15210000.nvdisplay: blank - powerdown
+[  172.500586] tegradc 15210000.nvdisplay: blank - powerdown
+[  172.862382] tegradc 15210000.nvdisplay: blank - powerdown
+[  173.220669] tegradc 15210000.nvdisplay: blank - powerdown
+[  173.568949] tegradc 15210000.nvdisplay: blank - powerdown
+[  173.919705] tegradc 15210000.nvdisplay: blank - powerdown
+[  174.272930] tegradc 15210000.nvdisplay: blank - powerdown
+[  174.626688] tegradc 15210000.nvdisplay: blank - powerdown
